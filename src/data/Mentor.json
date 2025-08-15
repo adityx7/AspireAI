@@ -1,0 +1,51 @@
+[
+    {
+      "id": 1,
+      "name": "John Doe",
+      "photo": "https://via.placeholder.com/150",
+      "specialization": "Software Engineering",
+      "bio": "A passionate software engineer with 10+ years of experience in developing scalable web applications.",
+      "helpWith": "Web development, Software architecture, Technical interviews"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "photo": "https://via.placeholder.com/150",
+      "specialization": "Data Science",
+      "bio": "Data scientist with a love for machine learning and artificial intelligence.",
+      "helpWith": "Machine learning, AI, Data visualization"
+    },
+    {
+      "id": 3,
+      "name": "Alice Johnson",
+      "photo": "https://via.placeholder.com/150",
+      "specialization": "Product Management",
+      "bio": "Experienced product manager with a focus on user-centered design and agile methodologies.",
+      "helpWith": "Product design, Roadmap creation, Market research"
+    },
+    {
+      "id": 4,
+      "name": "David Lee",
+      "photo": "https://via.placeholder.com/150",
+      "specialization": "Cloud Computing",
+      "bio": "Cloud architect with expertise in AWS and Azure. Passionate about scaling applications in the cloud.",
+      "helpWith": "Cloud architecture, DevOps, Automation"
+    },
+    {
+      "id": 5,
+      "name": "Sophia Williams",
+      "photo": "https://via.placeholder.com/150",
+      "specialization": "UX/UI Design",
+      "bio": "UX/UI designer with a passion for creating intuitive and visually appealing user experiences.",
+      "helpWith": "UI design, Prototyping, User testing"
+    },
+    {
+      "id": 6,
+      "name": "Michael Brown",
+      "photo": "https://via.placeholder.com/150",
+      "specialization": "Marketing",
+      "bio": "Experienced marketing strategist with a focus on digital campaigns and brand building.",
+      "helpWith": "SEO, Content marketing, Brand strategy"
+    }
+  ]
+  

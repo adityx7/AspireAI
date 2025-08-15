@@ -1,0 +1,37 @@
+[
+  {
+    "fullName": "Sathvik N Shendige",
+    "usn": "1BG21CS076",
+    "email": "21cse096@bnmit.in",
+    "password": "$2b$10$GumIZ8xirtAmaFLbOIkBGuNc.DkFOAv8DrCDT690snkZhC8rfesWK",
+    "decryptedPassword": "ThisisMyPassword12*"
+  },
+  {
+    "fullName": "Nischal U",
+    "usn": "1BG21CS052",
+    "email": "21cse001@bnmit.in",
+    "password": "$2b$10$N6TUPpNG.g9c1lOsp/53FegTKHtJJzeO99iLVCzGjsmzg2y4AzmfS",
+    "decryptedPassword": "Mickey123!"
+  },
+  {
+    "fullName": "Sujay G Kaushik",
+    "usn": "1BG21CS095",
+    "email": "21cse002@bnmit.in",
+    "password": "$2b$10$NR1kS/.h9ngn7fE4Yim68./oGR/6vMny76nH0MYrpLKbW11CPrsci",
+    "decryptedPassword": "SpongeBob@2025"
+  },
+  {
+    "fullName": "Sumukha S Kashyap",
+    "usn": "1BG21CS096",
+    "email": "21cse003@bnmit.in",
+    "password": "$2b$10$/hZ0wS81e1caVWokRes1guSrjOB2NVw6vJikP5IbFb/klYDY/OEwa",
+    "decryptedPassword": "Tommy@123"
+  },
+  {
+    "fullName": "Rohith B",
+    "usn": "1BG21CS060",
+    "email": "21cse004@bnmit.in",
+    "password": "$2b$10$qNEemSqTM8zWbihN8hlPAeExlt8iRFk5SQb./m21HD384mKQDhoMC",
+    "decryptedPassword": "Shaggy@2Scooby"
+  }
+]

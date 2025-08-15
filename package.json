@@ -1,0 +1,75 @@
+{
+  "name": "finalproject",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@google/generative-ai": "^0.21.0",
+    "@mui/icons-material": "^6.3.0",
+    "@mui/material": "^6.3.0",
+    "@react-oauth/google": "^0.12.1",
+    "axios": "^1.8.1",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "cra-template": "1.2.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
+    "material-react-toastify": "^10.0.5",
+    "mongoose": "^8.10.0",
+    "pdfkit": "^0.16.0",
+    "punycode": "^2.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.3.0",
+    "react-scripts": "^5.0.1",
+    "react-slick": "^0.30.3",
+    "react-swipeable-views": "^0.14.0",
+    "react-swipeable-views-core": "^0.14.0",
+    "react-toastify": "^11.0.5",
+    "recharts": "^2.15.1",
+    "slick-carousel": "^1.8.1",
+    "socket.io-client": "^4.8.1",
+    "uuid": "^11.0.5",
+    "web-vitals": "^4.2.4"
+  },
+  "scripts": {
+  "start": "concurrently \"react-scripts start\" \"node src/components/pages/student/Server.js\" \"python src/AiAssistant.py\" \"node src/Analysis.js\"",
+  "build": "react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+},
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "babel-loader": "^9.2.1",
+    "concurrently": "^9.1.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  }
+}
