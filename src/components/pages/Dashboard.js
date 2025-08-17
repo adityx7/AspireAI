@@ -7,6 +7,15 @@ import NavDash from "../organisms/NavDash";
 import DashboardContent from "../organisms/DashContent";
 import FloatingChat from "../organisms/FloatingChat";
 
+// Glassmorphism background style
+const shimmerBackground = {
+    minHeight: "100vh",
+    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+    background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)",
+    position: "relative",
+    overflow: "hidden",
+};
+
 const Dashboard = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [title, setTitle] = useState("Dashboard"); // Default title
@@ -33,44 +42,48 @@ const Dashboard = () => {
     };
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-            {/* Navbar */}
-            <NavDash onDrawerToggle={handleDrawerToggle} title={title} />
+        <Box sx={shimmerBackground}>
+            <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+                {/* Navbar */}
+                <NavDash onDrawerToggle={handleDrawerToggle} title={title} />
 
-            <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                {/* Sidebar */}
-                <Box
-                    sx={{
-                        width: 250,
-                        backgroundColor: "#FBFBFB",
-                        boxShadow: "2px 0px 5px rgba(0, 0, 0, 0.1)",
-                        display: { xs: "none", sm: "block" },
-                    }}
+                <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+                    {/* Sidebar */}
+                    <Box
+                        sx={{
+                            width: 250,
+                            backgroundColor: "rgba(255,255,255,0.15)",
+                            backdropFilter: "blur(10px)",
+                            boxShadow: "2px 0px 15px rgba(0, 0, 0, 0.2)",
+                            display: { xs: "none", sm: "block" },
+                            border: "1px solid rgba(255,255,255,0.1)"
+                        }}
+                    >
+                        <SideBar onMenuClick={handleMenuClick} />
+                    </Box>
+
+                    {/* Main Content */}
+                    <Box sx={{ flexGrow: 1, overflowY: "auto", p: 2 }}>
+                        <Container maxWidth="lg" sx={{ py: 0, px: 2, width: "100%" }}>
+                            <DashboardContent />
+                        </Container>
+                    </Box>
+                </Box>
+
+                {/* Floating Chat Feature */}
+                <FloatingChat />
+
+                {/* Mobile Sidebar Drawer */}
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{ display: { xs: "block", sm: "none" }, color: "black" }}
                 >
                     <SideBar onMenuClick={handleMenuClick} />
-                </Box>
-
-                {/* Main Content */}
-                <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
-                    <Container sx={{ mt: 2 }}>
-                        <DashboardContent />
-                    </Container>
-                </Box>
+                </Drawer>
             </Box>
-
-            {/* Floating Chat Feature */}
-            <FloatingChat />
-
-            {/* Mobile Sidebar Drawer */}
-            <Drawer
-                variant="temporary"
-                open={mobileOpen}
-                onClose={handleDrawerToggle}
-                ModalProps={{ keepMounted: true }}
-                sx={{ display: { xs: "block", sm: "none" }, color: "black" }}
-            >
-                <SideBar onMenuClick={handleMenuClick} />
-            </Drawer>
         </Box>
     );
 };

@@ -146,299 +146,170 @@ export default function StudentRegister() {
         }
     };
 
-    const carouselSettings = {
-        dots: true,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 1,
-        slidesToScroll: 1,
-        arrows: false,
-        autoplay: true,
-        autoplaySpeed: 3000,
-    };
-
     return (
-        <Box sx={shimmerBackground}>
-            <Box sx={{ ...shimmerOverlay }} />
-            <Grid container sx={{ minHeight: "100vh", position: "relative", zIndex: 1 }}>
-            {/* Left Side (White Background) */}
-            <Grid
-                item
-                xs={12}
-                md={6}
+        <Box sx={{ minHeight: "100vh", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)", position: "relative", overflow: "hidden" }}>
+            <Box
+                component="div"
                 sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    padding: 4,
-                }}
-            >
-                <Box sx={{
-                    maxWidth: 420,
                     width: "100%",
-                    textAlign: "center",
-                    background: "rgba(255,255,255,0.18)",
-                    borderRadius: 6,
-                    boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 0 24px 4px #ff8c0088",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid rgba(255,255,255,0.18)",
-                    color: "#222",
-                    position: "relative",
-                    overflow: "hidden",
-                    p: { xs: 3, md: 5 },
-                }}>
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        mb={2}
-                        sx={{ fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#fff", textShadow: "0 2px 8px rgba(26,35,126,0.2)" }}
-                    >
-                        Get started today, it's 100% free.
-                    </Typography>
-                    <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        mb={4}
-                        sx={{ fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#fff", opacity: 0.85 }}
-                    >
-                        Create an account and connect with a mentor within minutes!
-                    </Typography>
-
-                    {!showForm && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => setShowForm(true)}
-                            fullWidth
-                            sx={{
-                                mb: 2,
-                                background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                color: "#fff",
-                                fontWeight: 700,
-                                fontSize: "1.1rem",
-                                px: 4,
-                                py: 1.5,
-                                borderRadius: 3,
-                                boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #ff8c0088",
-                                textTransform: "none",
-                                "&:hover": {
-                                    background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
-                                    boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #ff8c00bb",
-                                },
-                            }}
-                        >
-                            Sign in with Email
-                        </Button>
-                    )}
-
-                    {showForm && (
-                        <Box component="form" onSubmit={handleSubmit}>
-                            <Grid container spacing={2} sx={{ mb: 2 }}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Full Name"
-                                        name="fullName"
-                                        value={formData.fullName}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.fullName)}
-                                        helperText={errors.fullName}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="USN"
-                                        name="usn"
-                                        value={formData.usn}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.usn)}
-                                        helperText={errors.usn}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={2} sx={{ mb: 2 }}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.email)}
-                                        helperText={errors.email}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Password"
-                                        name="password"
-                                        type={showPassword ? "text" : "password"}  // Toggle between text/password
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.password)}
-                                        helperText={errors.password}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            ),
-                                        }}
-                                    />
-
-                                </Grid>
-                            </Grid>
+                    height: "100%",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                    background: "linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    animation: "shimmer 2.5s infinite linear",
+                }}
+            />
+            <Grid container sx={{ minHeight: "100vh", position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Grid item xs={12} md={7} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Box sx={{ width: "100%", maxWidth: 500, background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)", borderRadius: 8, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)", p: { xs: 3, md: 5 }, textAlign: "center" }}>
+                        <Typography variant="h3" sx={{ fontWeight: 800, color: "#1a237e", mb: 2, fontFamily: "inherit", textShadow: "0 2px 8px rgba(26,35,126,0.2)" }}>
+                            Find a Mentor
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontSize: { xs: "1.1rem", md: "1.3rem" }, color: "#1a237e", opacity: 0.95, mb: 3, fontFamily: "inherit" }}>
+                            Create your account and connect with the perfect mentor for your journey!
+                        </Typography>
+                        {!showForm && (
                             <Button
-                                fullWidth
                                 variant="contained"
-                                color="primary"
-                                type="submit"
-                                sx={{
-                                    background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                    color: "#fff",
-                                    fontWeight: 700,
-                                    fontSize: "1.1rem",
-                                    px: 4,
-                                    py: 1.5,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #ff8c0088",
-                                    textTransform: "none",
-                                    mb: 2,
-                                    "&:hover": {
-                                        background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
-                                        boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #ff8c00bb",
-                                    },
-                                }}
-                            >
-                                Register
-                            </Button>
+                                    sx={{
+                                        background: "linear-gradient(90deg, #6a85b6 60%, #fbd288 100%)",
+                                        color: "#1a237e",
+                                        fontWeight: 700,
+                                        fontSize: "1.1rem",
+                                        px: 4,
+                                        py: 1.5,
+                                        borderRadius: 8,
+                                        boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #fbd28888",
+                                        textTransform: "none",
+                                        mb: 2,
+                                        "&:hover": {
+                                            background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)",
+                                            boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #6a85b6bb",
+                                        },
+                                    }}
+                                    onClick={() => setShowForm(true)}
+                                    fullWidth
+                                >
+                                    Sign in with Email
+                                </Button>
+                            )}
+                            {showForm && (
+                                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+                                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="outlined"
+                                                label="Full Name"
+                                                name="fullName"
+                                                value={formData.fullName}
+                                                onChange={handleInputChange}
+                                                error={Boolean(errors.fullName)}
+                                                helperText={errors.fullName}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="outlined"
+                                                label="USN"
+                                                name="usn"
+                                                value={formData.usn}
+                                                onChange={handleInputChange}
+                                                error={Boolean(errors.usn)}
+                                                helperText={errors.usn}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container spacing={2} sx={{ mb: 2 }}>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="outlined"
+                                                label="Email"
+                                                name="email"
+                                                value={formData.email}
+                                                onChange={handleInputChange}
+                                                error={Boolean(errors.email)}
+                                                helperText={errors.email}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                variant="outlined"
+                                                label="Password"
+                                                name="password"
+                                                type={showPassword ? "text" : "password"}
+                                                value={formData.password}
+                                                onChange={handleInputChange}
+                                                error={Boolean(errors.password)}
+                                                helperText={errors.password}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                        </IconButton>
+                                                    ),
+                                                }}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        sx={{
+                                            background: "linear-gradient(90deg, #6a85b6 60%, #fbd288 100%)",
+                                            color: "#1a237e",
+                                            fontWeight: 700,
+                                            fontSize: "1.1rem",
+                                            px: 4,
+                                            py: 1.5,
+                                            borderRadius: 8,
+                                            boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #fbd28888",
+                                            textTransform: "none",
+                                            mb: 2,
+                                            "&:hover": {
+                                                background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)",
+                                                boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #6a85b6bb",
+                                            },
+                                        }}
+                                        type="submit"
+                                    >
+                                        Register
+                                    </Button>
+                                </Box>
+                            )}
+                            <Typography variant="body2" sx={{ mt: 3, color: "#1a237e", fontFamily: "inherit" }}>
+                                Already have an account?{" "}
+                                <Link href="/login" sx={{ color: "#ff8c00", textDecoration: "underline", fontWeight: 600, "&:hover": { color: "#fff176" } }}>
+                                    Login here
+                                </Link>
+                            </Typography>
                         </Box>
+                    </Grid>
+                    {/* Right Section: Info Box */}
+                    {!isMobile && (
+                        <Grid item xs={12} md={5} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Box sx={{ width: "100%", maxWidth: 400, background: "#fff", borderRadius: 8, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)", p: { xs: 3, md: 5 }, ml: { md: 4 }, textAlign: "center" }}>
+                                <Typography variant="h5" fontWeight="bold" mb={2} color="#1a237e" fontSize={'2rem'} sx={{ fontFamily: "inherit" }}>
+                                    How it works
+                                </Typography>
+                                <Typography variant="body1" color="#1a237e" mb={2} sx={{ fontFamily: "inherit" }}>
+                                    1. Sign up and complete your profile.<br />
+                                    2. Browse mentors and choose one.<br />
+                                    3. Collaborate with your mentor using our platform's tools.<br />
+                                    <br />
+                                    Get started and unlock your potential today!
+                                </Typography>
+                            </Box>
+                        </Grid>
                     )}
-
-                    <Typography variant="body2" sx={{ mt: 3, color: "#fff", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
-                        Already have an account? <Link href="/login" sx={{ color: "#ffd600", textDecoration: "underline", fontWeight: 600 }}>
-                            Login here
-                        </Link>
-                    </Typography>
-                </Box>
-            </Grid>
-
-            {/* Right Side (Carousel on Black Background) */}
-            {!isMobile &&
-                <Grid
-                    item
-                    xs={12}
-                    md={6}
-                    sx={{
-                        backgroundColor: "#000",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        color: "#fff",
-                    }}
-                >
-                    <Box sx={{ maxWidth: 550, width: { md: "80%", lg: "200%" } }}>
-
-                        <Slider {...carouselSettings}>
-                            <Box>
-                                <Box
-                                    sx={{
-                                        height: 70,
-                                        width: 70,
-                                        backgroundColor: "#fff",
-                                        borderRadius: "50%",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        margin: "0 auto 20px auto",
-                                    }}
-                                >
-                                    <GroupIcon sx={{ color: "#000", fontSize: 50 }} />
-                                </Box>
-                                <Typography
-                                    variant="h5"
-                                    fontWeight="bold"
-                                    mb={1}
-                                    sx={{ fontFamily: "courier" }}
-                                >
-                                    Sign up and Complete your profile
-                                </Typography>
-                                <Typography sx={{ fontFamily: "courier" }}>
-                                    Once you've created an account, you can provide a little extra
-                                    information about yourself. We'll use this information to
-                                    recommend mentors to you.
-                                </Typography>
-                            </Box>
-                            <Box>
-                                <Box
-                                    sx={{
-                                        height: 70,
-                                        width: 70,
-                                        backgroundColor: "#fff",
-                                        borderRadius: "50%",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        margin: "0 auto 20px auto",
-                                    }}
-                                >
-                                    <AdsClickIcon sx={{ color: "#000", fontSize: 50 }} />
-                                </Box>
-                                <Typography
-                                    variant="h5"
-                                    fontWeight="bold"
-                                    mb={1}
-                                    sx={{ fontFamily: "courier" }}
-                                >
-                                    Browse mentors and choose one
-                                </Typography>
-                                <Typography sx={{ fontFamily: "courier" }}>
-                                    Once you've browsed mentors & found someone that you'd like to
-                                    work with, you can send them an introduction to get started.
-                                </Typography>
-                            </Box>
-                            <Box>
-                                <Box
-                                    sx={{
-                                        height: 70,
-                                        width: 70,
-                                        backgroundColor: "#fff",
-                                        borderRadius: "50%",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        margin: "0 auto 20px auto",
-                                    }}
-                                >
-                                    <Diversity1Icon sx={{ color: "#000", fontSize: 50 }} />
-                                </Box>
-                                <Typography
-                                    variant="h5"
-                                    fontWeight="bold"
-                                    mb={1}
-                                    sx={{ fontFamily: "courier" }}
-                                >
-                                    Collaborate with your mentor
-                                </Typography>
-                                <Typography sx={{ fontFamily: "courier" }}>
-                                    Use our tools like real-time messaging, phone calls & video chat
-                                    to tackle any challenges that you're currently facing.
-                                </Typography>
-                            </Box>
-                        </Slider>
-                    </Box>
                 </Grid>
-            }
-            <ToastContainer />
-        </Grid>
-        </Box>
+                <ToastContainer />
+            </Box>
     );
 }

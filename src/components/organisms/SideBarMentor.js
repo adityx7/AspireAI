@@ -46,7 +46,7 @@ const SidebarMentor = () => {
                     variant="h6"
                     sx={{ fontWeight: "bold", fontFamily: "courier", color: "#0288d1" }}
                 >
-                    Career Compass
+                    AspireAI
                 </Typography>
             </Box>
 

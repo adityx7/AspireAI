@@ -87,7 +87,7 @@ const MentorContactPage = () => {
                 fontSize: isMobile ? "0.9rem" : "1rem",
               }}
             >
-              Use the form below to contact the Career Compass team with any
+              Use the form below to contact the AspireAI team with any
               questions, comments, or concerns.
             </Typography>
           </Box>

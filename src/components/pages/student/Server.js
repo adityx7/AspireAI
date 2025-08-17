@@ -267,6 +267,35 @@ app.get("/api/students/:usn", async (req, res) => {
     }
 });
 
+// ✅ Update Student Profile API
+app.put("/api/students/:usn", async (req, res) => {
+    try {
+        const { usn } = req.params;
+        const updateData = req.body;
+
+        console.log("Updating student with USN:", usn);
+        console.log("Update data:", updateData);
+
+        const updatedStudent = await Student.findOneAndUpdate(
+            { usn },
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        res.json({ 
+            message: "Student profile updated successfully", 
+            student: updatedStudent 
+        });
+    } catch (error) {
+        console.error("Error updating student data:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+});
+
 // ✅ Start Server on PORT 5002
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

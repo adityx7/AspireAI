@@ -103,168 +103,158 @@ export default function MentorRegister() {
     };
 
     return (
-        <Grid container sx={{ height: "100vh" }}>
-            {/* Left Side (White Background) */}
-            <Grid
-                item
-                xs={12}
-                md={6}
+        <Box sx={{ minHeight: "100vh", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)", position: "relative", overflow: "hidden" }}>
+            <Box
+                component="div"
                 sx={{
-                    backgroundColor: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexDirection: "column",
-                    padding: 4,
+                    width: "100%",
+                    height: "100%",
+                    zIndex: 0,
+                    pointerEvents: "none",
+                    background: "linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    animation: "shimmer 2.5s infinite linear",
                 }}
-            >
-                <Box sx={{ maxWidth: 400, width: "100%", textAlign: "center" }}>
-                    <Typography
-                        variant="h4"
-                        fontWeight="bold"
-                        mb={2}
-                        sx={{ fontFamily: "courier" }}
-                    >
-                        Get started today, it's 100% free.
-                    </Typography>
-                    <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        mb={4}
-                        sx={{ fontFamily: "courier" }}
-                    >
-                        Create an account and connect with a mentor within minutes!
-                    </Typography>
-
-                    {!showForm && (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => setShowForm(true)}
-                            fullWidth
-                            sx={{ mb: 2 }}
-                        >
-                            Sign in with Email
-                        </Button>
-                    )}
-
-                    {showForm && (
-                        <Box component="form" onSubmit={handleSubmit}>
-                            <Grid container spacing={2} sx={{ mb: 2 }}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Full Name"
-                                        name="fullName"
-                                        value={formData.fullName}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.fullName)}
-                                        helperText={errors.fullName}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Mentor ID"
-                                        name="mentorID"
-                                        placeholder="BNM0001"
-                                        value={formData.mentorID}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.mentorID)}
-                                        helperText={errors.mentorID}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <Grid container spacing={2} sx={{ mb: 2 }}>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.email)}
-                                        helperText={errors.email}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        label="Password"
-                                        name="password"
-                                        type="password"
-                                        value={formData.password}
-                                        onChange={handleInputChange}
-                                        error={Boolean(errors.password)}
-                                        helperText={errors.password}
-                                    />
-                                </Grid>
-                            </Grid>
+            />
+            <Grid container sx={{ minHeight: "100vh", position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Grid item xs={12} md={7} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Box sx={{ width: "100%", maxWidth: 500, background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)", borderRadius: 8, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)", p: { xs: 3, md: 5 }, textAlign: "center" }}>
+                        <Typography variant="h3" sx={{ fontWeight: 800, color: "#1a237e", mb: 2, fontFamily: "inherit", textShadow: "0 2px 8px rgba(26,35,126,0.2)" }}>
+                            Mentor Registration
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontSize: { xs: "1.1rem", md: "1.3rem" }, color: "#1a237e", opacity: 0.95, mb: 3, fontFamily: "inherit" }}>
+                            Join AspireAI as a mentor and empower students to achieve their dreams!
+                        </Typography>
+                        {!showForm && (
                             <Button
-                                fullWidth
                                 variant="contained"
-                                color="primary"
-                                type="submit"
+                                sx={{
+                                    background: "linear-gradient(90deg, #6a85b6 60%, #fbd288 100%)",
+                                    color: "#1a237e",
+                                    fontWeight: 700,
+                                    fontSize: "1.1rem",
+                                    px: 4,
+                                    py: 1.5,
+                                    borderRadius: 8,
+                                    boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #fbd28888",
+                                    textTransform: "none",
+                                    mb: 2,
+                                    "&:hover": {
+                                        background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)",
+                                        boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #6a85b6bb",
+                                    },
+                                }}
+                                onClick={() => setShowForm(true)}
+                                fullWidth
                             >
-                                Register
+                                Sign in with Email
                             </Button>
-                        </Box>
-                    )}
-
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 3 }}>
-                        Already have an account?{" "}
-                        <Link href="/login" underline="hover">
-                            Login here
-                        </Link>
-                    </Typography>
-                </Box>
-            </Grid>
-
-            {/* Right Section */}
-            {!isMobile &&
-                <Grid
-                    item
-                    xs={12}
-                    md={6}
-                    sx={{
-                        backgroundColor: "#000",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "column",
-                        color: "#fff",
-                    }}
-                >
-                    <Box sx={{ maxWidth: 550, width: "100%" }}>
-                        <Grid
-                            item
-                            xs={12}
-                            md={6}
-                            sx={{
-                                backgroundColor: "#000",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexDirection: "column",
-                                color: "#fff",
-                            }}
-                        >
-                            <Box sx={{ width: { md: "140%", lg: "200%" }, backgroundColor: "#fff", padding: 4, borderRadius: 6, ml: '292px' }}>
-                                <Typography variant="h5" fontWeight="bold" mb={2} color="black" fontSize={'40px'} sx={{ fontFamily: "courier" }}>
-                                    Welcome to Career Compass!
-                                </Typography>
-                                <Typography variant="body1" color="text.primary" mb={2} sx={{ fontFamily: "courier" }}>
-                                    Thank you for your interest in volunteering as a Compass mentor to help students who are in need to achieve their college and career dreams. The Compass mentoring model is completely virtual: you will conduct all communication through our online platform, without ever having to share your personal contact info with your mentee. The platform also contains all the tools and resources you will need to be successful as a mentor, including mentor training that takes about 30 minutes to complete and can be found in the "help" tab upon registering.
-                                </Typography>
+                        )}
+                        {showForm && (
+                            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+                                <Grid container spacing={2} sx={{ mb: 2 }}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            label="Full Name"
+                                            name="fullName"
+                                            value={formData.fullName}
+                                            onChange={handleInputChange}
+                                            error={Boolean(errors.fullName)}
+                                            helperText={errors.fullName}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            label="Mentor ID"
+                                            name="mentorID"
+                                            placeholder="BNM0001"
+                                            value={formData.mentorID}
+                                            onChange={handleInputChange}
+                                            error={Boolean(errors.mentorID)}
+                                            helperText={errors.mentorID}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Grid container spacing={2} sx={{ mb: 2 }}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            label="Email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                            error={Boolean(errors.email)}
+                                            helperText={errors.email}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            variant="outlined"
+                                            label="Password"
+                                            name="password"
+                                            type="password"
+                                            value={formData.password}
+                                            onChange={handleInputChange}
+                                            error={Boolean(errors.password)}
+                                            helperText={errors.password}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{
+                                        background: "linear-gradient(90deg, #6a85b6 60%, #fbd288 100%)",
+                                        color: "#1a237e",
+                                        fontWeight: 700,
+                                        fontSize: "1.1rem",
+                                        px: 4,
+                                        py: 1.5,
+                                        borderRadius: 8,
+                                        boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #fbd28888",
+                                        textTransform: "none",
+                                        mb: 2,
+                                        "&:hover": {
+                                            background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)",
+                                            boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #6a85b6bb",
+                                        },
+                                    }}
+                                    type="submit"
+                                >
+                                    Register
+                                </Button>
                             </Box>
-                        </Grid>
+                        )}
+                        <Typography variant="body2" sx={{ mt: 3, color: "#1a237e", fontFamily: "inherit" }}>
+                            Already have an account?{" "}
+                            <Link href="/mentor-login" sx={{ color: "#ff8c00", textDecoration: "underline", fontWeight: 600, "&:hover": { color: "#fff176" } }}>
+                                Login here
+                            </Link>
+                        </Typography>
                     </Box>
                 </Grid>
-            }
-        </Grid>
+                {/* Right Section: Info Box */}
+                {!isMobile && (
+                    <Grid item xs={12} md={5} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Box sx={{ width: "100%", maxWidth: 400, background: "#fff", borderRadius: 8, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)", p: { xs: 3, md: 5 }, ml: { md: 4 }, textAlign: "center" }}>
+                            <Typography variant="h5" fontWeight="bold" mb={2} color="#1a237e" fontSize={'2rem'} sx={{ fontFamily: "inherit" }}>
+                                Welcome to AspireAI!
+                            </Typography>
+                            <Typography variant="body1" color="#1a237e" mb={2} sx={{ fontFamily: "inherit" }}>
+                                Thank you for your interest in volunteering as an AspireAI mentor to help students achieve their college and career dreams. The AspireAI mentoring model is completely virtual: you will conduct all communication through our online platform, without ever having to share your personal contact info with your mentee. The platform also contains all the tools and resources you need to be successful as a mentor, including mentor training found in the "help" tab upon registering.
+                            </Typography>
+                        </Box>
+                    </Grid>
+                )}
+            </Grid>
+        </Box>
     );
 }

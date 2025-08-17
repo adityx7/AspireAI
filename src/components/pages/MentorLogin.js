@@ -5,12 +5,34 @@ import {
     TextField,
     Typography,
     Link,
+    Alert,
+    CircularProgress,
 } from "@mui/material";
-import AcUnitIcon from "@mui/icons-material/AcUnit"; // Snowflake icon
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const mentorIDRegex = /^BNM\d{4}$/;
+
+const shimmerBackground = {
+    minHeight: "100vh",
+    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+    background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)",
+    position: "relative",
+    overflow: "hidden",
+};
+
+const shimmerOverlay = {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+    animation: "shimmer 2.5s infinite linear",
+    zIndex: 0,
+    pointerEvents: "none",
+};
 
 export default function MentorSignInPage() {
     const navigate = useNavigate();
@@ -19,6 +41,7 @@ export default function MentorSignInPage() {
     const [password, setPassword] = useState("");
     const [mentorIDError, setMentorIDError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // Refs for focusing on the fields
     const mentorIDRef = useRef(null);
@@ -62,6 +85,7 @@ export default function MentorSignInPage() {
             return;
         }
 
+        setLoading(true);
         try {
             console.log("Sending request with:", { mentorID, password });
         
@@ -84,177 +108,100 @@ export default function MentorSignInPage() {
         } catch (error) {
             console.error("Login error:", error.response ? error.response.data : error);
             setErrorMessage("Login failed. Check your credentials.");
+        } finally {
+            setLoading(false);
         }        
     };
 
     return (
-        <Box
-            sx={{
-                minHeight: "100vh",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                background: "linear-gradient(to bottom, #f5f5f5 50%, #000 50%)",
-                px: 2, // Padding for smaller screens
-            }}
-        >
-            {/* Main Container */}
+        <Box sx={shimmerBackground}>
+            <Box sx={{ ...shimmerOverlay }} />
             <Box
                 sx={{
-                    width: { xs: "100%", sm: "80%", md: "50%", lg: "40%" },
-                    maxWidth: 450,
-                    backgroundColor: "#F8FAFC", // Light gray
-                    borderRadius: 3,
-                    boxShadow: 3,
-                    padding: { xs: 3, sm: 4, md: 5 },
+                    minHeight: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                 }}
             >
-                {errorMessage && (
-                    <Typography color="error" sx={{ textAlign: "center", mb: 2 }}>
-                        {errorMessage}
-                    </Typography>
-                )}
-
-                {/* Top Section */}
                 <Box
                     sx={{
+                        background: "rgba(255,255,255,0.18)",
+                        borderRadius: 6,
+                        p: { xs: 4, md: 8 },
                         textAlign: "center",
-                        mb: 4,
+                        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 0 24px 4px #ff8c0088",
+                        backdropFilter: "blur(8px)",
+                        border: "1px solid rgba(255,255,255,0.18)",
+                        color: "#222",
+                        width: { xs: "90%", sm: "500px" },
+                        position: "relative",
+                        overflow: "hidden",
                     }}
                 >
-                    <Box
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: 1,
-                            mb: 2,
-                        }}
-                    >
-                        <AcUnitIcon sx={{ fontSize: 40, color: "black.main" }} />
-                        <Typography
-                            variant="h5"
-                            fontWeight="bold"
-                            sx={{
-                                fontSize: { xs: "1.5rem", sm: "1.8rem" },
-                                fontFamily: "Courier",
-                            }}
-                        >
-                            Career Compass
-                        </Typography>
-                    </Box>
-                    <Typography
-                        variant="h6"
-                        fontWeight="bold"
-                        sx={{ mb: 1, fontSize: { xs: "1rem", sm: "1.2rem" } }}
-                    >
-                        Account Login
+                    <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: "#fff", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", textShadow: "0 2px 8px rgba(26,35,126,0.2)" }}>
+                        Mentor Login
                     </Typography>
-                    <Typography variant="body3" color="text.secondary">
-                        Enter your account info below:
-                    </Typography>
-                </Box>
-
-                {/* Sign-In Form Section */}
-                <Box
-                    sx={{
-                        backgroundColor: "#fff",
-                        borderRadius: 2,
-                        boxShadow: 1,
-                        padding: { xs: 2, sm: 4 },
-                        mb: 3,
-                    }}
-                >
-                    {/* mentorID and Password Section */}
-                    <Box sx={{ mb: 3 }}>
+                    <form onSubmit={handleSubmit}>
                         <TextField
                             fullWidth
-                            variant="outlined"
-                            size="small"
                             label="Mentor ID"
+                            name="mentorID"
                             placeholder="BNM0001"
                             value={mentorID}
                             onChange={(e) => setmentorID(e.target.value)}
-                            error={Boolean(mentorIDError)}
+                            error={!!mentorIDError}
                             helperText={mentorIDError}
-                            sx={{
-                                mb: 4,
-                                mt: 3,
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: "12px",
-                                    backgroundColor: "#fff",
-                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#FFA928",
-                                    },
-                                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#0073B1",
-                                    },
-                                },
-                                "& .MuiFormHelperText-root": {
-                                    fontSize: "0.85rem",
-                                },
-                            }}
                             inputRef={mentorIDRef}
+                            variant="outlined"
+                            sx={{ mb: 2, background: "rgba(255,255,255,0.7)", borderRadius: 2 }}
                         />
                         <TextField
                             fullWidth
-                            variant="outlined"
-                            size="small"
                             label="Password"
+                            name="password"
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            error={Boolean(passwordError)}
+                            error={!!passwordError}
                             helperText={passwordError}
+                            inputRef={passwordRef}
+                            variant="outlined"
+                            sx={{ mb: 2, background: "rgba(255,255,255,0.7)", borderRadius: 2 }}
+                        />
+                        {errorMessage && (
+                            <Alert severity="error" sx={{ mb: 2 }}>
+                                {errorMessage}
+                            </Alert>
+                        )}
+                        <Button
+                            type="submit"
+                            variant="contained"
                             sx={{
-                                mt: 1,
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: "12px",
-                                    backgroundColor: "#fff",
-                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#FFA928",
-                                    },
-                                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#0073B1",
-                                    },
-                                },
-                                "& .MuiFormHelperText-root": {
-                                    fontSize: "0.85rem",
+                                background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
+                                color: "#fff",
+                                fontWeight: 700,
+                                fontSize: "1.1rem",
+                                px: 4,
+                                py: 1.5,
+                                borderRadius: 3,
+                                boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #ff8c0088",
+                                textTransform: "none",
+                                mb: 2,
+                                "&:hover": {
+                                    background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
+                                    boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #ff8c00bb",
                                 },
                             }}
-                            inputRef={passwordRef}
-                        />
-                    </Box>
-
-                    {/* Sign In Button */}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{
-                            textTransform: "capitalize",
-                            mb: 2,
-                            py: { xs: 1, sm: 1.5 },
-                            background: "#FFA928",
-                        }}
-                        onClick={handleSubmit}
-                    >
-                        Sign In
-                    </Button>
-
-                    {/* Links Section */}
-                    <Box sx={{ textAlign: "center" }}>
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 1, fontSize: { xs: "0.85rem", sm: "0.95rem" } }}
                         >
-                            <Link href="/mentor/register" underline="hover" color="primary">
-                                Create Mentor Account<br></br>
-                            </Link>
-                        </Typography>
-                    </Box>
+                            {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Login"}
+                        </Button>
+                    </form>
+                    <Typography variant="body2" sx={{ mt: 2, color: "#fff", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
+                        Don't have an account? <Link href="/mentor/register" sx={{ color: "#ffd600", textDecoration: "underline", fontWeight: 600 }}>
+                            Create Mentor Account
+                        </Link>
+                    </Typography>
                 </Box>
             </Box>
         </Box>

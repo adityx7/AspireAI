@@ -17,7 +17,8 @@ import MentorContact from './components/pages/MentorContact';
 import SettingsMentor from './components/pages/SettingsMentor';
 import ProfilePage from './components/pages/Profile';
 import { AuthProvider } from './components/pages/AuthContext';
-import MentorProfile from './components/pages/ProfileMentor';
+import MentorProfile from './components/pages/mentor/MentorProfile';
+import StudentProfile from './components/pages/student/StudentProfile';
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/settings-mentor" element={<SettingsMentor />} />
           <Route path="/contact-mentor" element={< MentorContact title = {"Contact us"} />} />
           <Route path="/profile-mentor" element={<MentorProfile />} />
+    <Route path="/student-profile" element={<StudentProfile />} />
         </Routes>
       </Router>
     </AuthProvider>

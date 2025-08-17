@@ -26,7 +26,15 @@ const Settings = () => {
     };
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        <Box 
+            sx={{ 
+                minHeight: "100vh",
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)",
+                position: "relative",
+                overflow: "hidden",
+            }}
+        >
             {/* Navbar */}
             <NavDash
                 onDrawerToggle={handleDrawerToggle}
@@ -39,8 +47,10 @@ const Settings = () => {
                 <Box
                     sx={{
                         width: 250,
-                        backgroundColor: "#FBFBFB",
-                        boxShadow: "2px 0px 5px rgba(0, 0, 0, 0.1)",
+                        background: "rgba(255, 255, 255, 0.15)",
+                        backdropFilter: "blur(8px)",
+                        WebkitBackdropFilter: "blur(8px)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
                         display: { xs: "none", sm: "block" },
                     }}
                 >
@@ -49,7 +59,7 @@ const Settings = () => {
 
                 {/* Main Content */}
                 <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
-                    <Container sx={{ mt: 2 }}>
+                    <Container maxWidth="lg" sx={{ mt: 2, px: { xs: 2, sm: 3 } }}>
                         <SettingsPage/>
                     </Container>
                 </Box>

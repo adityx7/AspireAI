@@ -12,6 +12,7 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    Paper,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -129,7 +130,32 @@ const SettingsPage = () => {
         >
             <ToastContainer position="top-right" autoClose={3000} />
             {/* Stepper */}
-            <Stepper activeStep={activeStep} sx={{ width: "60%", mb: 4 }}>
+            <Stepper activeStep={activeStep} sx={{ 
+                width: "100%", 
+                maxWidth: "800px",
+                mb: 4,
+                '& .MuiStepLabel-label': {
+                    color: 'rgba(255,255,255,0.8) !important',
+                    fontWeight: 600,
+                    textShadow: "0 1px 4px rgba(26,35,126,0.3)",
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
+                },
+                '& .MuiStepLabel-label.Mui-active': {
+                    color: '#ff8c00 !important'
+                },
+                '& .MuiStepLabel-label.Mui-completed': {
+                    color: '#4caf50 !important'
+                },
+                '& .MuiStepIcon-root': {
+                    color: 'rgba(255,255,255,0.3)'
+                },
+                '& .MuiStepIcon-root.Mui-active': {
+                    color: '#ff8c00'
+                },
+                '& .MuiStepIcon-root.Mui-completed': {
+                    color: '#4caf50'
+                }
+            }}>
                 {steps.map((label) => (
                     <Step key={label}>
                         <StepLabel>{label}</StepLabel>
@@ -138,13 +164,84 @@ const SettingsPage = () => {
             </Stepper>
 
             {/* Step Content */}
-            <Box
+            <Paper
+                elevation={8}
                 sx={{
-                    backgroundColor: "#fff",
-                    width: "60%",
-                    borderRadius: "8px",
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                    padding: "24px",
+                    width: "100%",
+                    maxWidth: "800px",
+                    borderRadius: "24px",
+                    overflow: "hidden",
+                    background: "rgba(255, 255, 255, 0.18)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    padding: "32px",
+                    color: "white",
+                    "& .MuiTextField-root": {
+                        "& .MuiOutlinedInput-root": {
+                            background: "rgba(255, 255, 255, 0.15)",
+                            borderRadius: "12px",
+                            "& fieldset": {
+                                borderColor: "rgba(255, 255, 255, 0.3)",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "rgba(255, 255, 255, 0.5)",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#ff8c00",
+                            },
+                            "& input": {
+                                color: "white",
+                            },
+                        },
+                        "& .MuiInputLabel-root": {
+                            color: "rgba(255, 255, 255, 0.8)",
+                            "&.Mui-focused": {
+                                color: "#ff8c00",
+                            },
+                        },
+                        "& .MuiFormHelperText-root": {
+                            color: "rgba(255, 255, 255, 0.7)",
+                            "&.Mui-error": {
+                                color: "#ff6b6b",
+                            },
+                        },
+                    },
+                    "& .MuiFormControl-root": {
+                        "& .MuiOutlinedInput-root": {
+                            background: "rgba(255, 255, 255, 0.15)",
+                            borderRadius: "12px",
+                            "& fieldset": {
+                                borderColor: "rgba(255, 255, 255, 0.3)",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "rgba(255, 255, 255, 0.5)",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#ff8c00",
+                            },
+                            color: "white",
+                        },
+                        "& .MuiInputLabel-root": {
+                            color: "rgba(255, 255, 255, 0.8)",
+                            "&.Mui-focused": {
+                                color: "#ff8c00",
+                            },
+                        },
+                        "& .MuiSelect-select": {
+                            color: "white",
+                        },
+                        "& .MuiSvgIcon-root": {
+                            color: "rgba(255, 255, 255, 0.8)",
+                        },
+                    },
+                    "& .MuiTypography-root": {
+                        color: "white",
+                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                    },
+                    "& .MuiDivider-root": {
+                        backgroundColor: "rgba(255, 255, 255, 0.3)",
+                    },
                 }}
             >
                 {activeStep === 0 && (
@@ -337,27 +434,42 @@ const SettingsPage = () => {
                         />
                     </>
                 )}
-            </Box>
 
-            <Box>
                 {/* Navigation Buttons */}
                 <Box sx={{ display: "flex", flexDirection: "row", pt: 2, mt: 3 }}>
                     <Button
                         color="inherit"
                         disabled={activeStep === 0}
                         onClick={() => setActiveStep((prev) => prev - 1)}
-                        sx={{ mr: 1 }}
+                        sx={{ 
+                            mr: 1,
+                            color: "rgba(255, 255, 255, 0.8)",
+                            "&:hover": {
+                                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                            },
+                        }}
                     >
                         Back
                     </Button>
                     <Box sx={{ flex: "1 1 auto" }} />
                     {activeStep < steps.length - 1 ? (
-                        <Button onClick={handleNext} variant="contained">
+                        <Button onClick={handleNext} variant="contained" sx={{
+                            backgroundColor: "#ff8c00",
+                            "&:hover": {
+                                backgroundColor: "#e67c00",
+                            },
+                        }}>
                             Next
                         </Button>
                     ) : (
                         <>
-                            <Button onClick={handleReset} variant="contained" color="secondary" startIcon={<RestartAltIcon />} sx={{ mr: 2 }}>
+                            <Button onClick={handleReset} variant="contained" color="secondary" startIcon={<RestartAltIcon />} sx={{ 
+                                mr: 2,
+                                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                "&:hover": {
+                                    backgroundColor: "rgba(255, 255, 255, 0.3)",
+                                },
+                            }}>
                                 Reset
                             </Button>
                             <Button
@@ -365,13 +477,19 @@ const SettingsPage = () => {
                                 variant="contained"
                                 color="primary"
                                 endIcon={<CheckCircleIcon />}
+                                sx={{
+                                    backgroundColor: "#4caf50",
+                                    "&:hover": {
+                                        backgroundColor: "#45a049",
+                                    },
+                                }}
                             >
                                 Submit
                             </Button>
                         </>
                     )}
                 </Box>
-            </Box>
+            </Paper>
         </Box>
     );
 };

@@ -5,8 +5,9 @@ import {
   TextField,
   Button,
   Divider,
+  Paper,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
 
@@ -29,16 +30,60 @@ const ContactPage = () => {
         overflowX: "hidden", // Prevent horizontal scrolling
       }}
     >
-      <Box
+      <Paper
+        elevation={8}
         sx={{
           width: "100%",
-          maxWidth: "600px",
-          padding: "20px",
-        //   border: isMobile ? "none" : "1px solid #ccc",
-          borderRadius: isMobile ? "0" : "8px",
-          backgroundColor: "#fff",
-          boxShadow: isMobile ? "none" : "0px 6px 12px rgba(0, 0, 0, 0.2)",
-          overflow: "hidden", // Prevent content from overflowing
+          maxWidth: "700px",
+          padding: isMobile ? "24px" : "32px",
+          borderRadius: "24px",
+          overflow: "hidden",
+          background: "rgba(255, 255, 255, 0.18)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          color: "white",
+          "& .MuiTextField-root": {
+            "& .MuiOutlinedInput-root": {
+              background: "rgba(255, 255, 255, 0.15)",
+              borderRadius: "12px",
+              "& fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.3)",
+              },
+              "&:hover fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.5)",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#ff8c00",
+              },
+              "& input": {
+                color: "white",
+              },
+              "& textarea": {
+                color: "white",
+              },
+            },
+            "& .MuiInputLabel-root": {
+              color: "rgba(255, 255, 255, 0.8)",
+              "&.Mui-focused": {
+                color: "#ff8c00",
+              },
+            },
+          },
+          "& .MuiTypography-root": {
+            color: "white",
+            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+          },
+          "& .MuiDivider-root": {
+            backgroundColor: "rgba(255, 255, 255, 0.3)",
+          },
+          "& .MuiButton-root": {
+            backgroundColor: "#ff8c00",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "#e67c00",
+            },
+          },
         }}
       >
         {/* Header Section */}
@@ -54,13 +99,14 @@ const ContactPage = () => {
           <Box
             sx={{
               width: "80px",
-              height: "50px",
+              height: "80px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "#1976d2",
+              background: "linear-gradient(135deg, #ff8c00, #1976d2)",
               borderRadius: "50%",
-              mr: '20px'
+              mr: '20px',
+              boxShadow: "0 4px 16px rgba(255, 140, 0, 0.3)",
             }}
           >
             <EmailIcon sx={{ color: "#fff", fontSize: "30px" }} />
@@ -87,7 +133,7 @@ const ContactPage = () => {
                 fontSize: isMobile ? "0.9rem" : "1rem",
               }}
             >
-              Use the form below to contact the Career Compass team with any
+              Use the form below to contact the AspireAI team with any
               questions, comments, or concerns.
             </Typography>
           </Box>
@@ -126,7 +172,7 @@ const ContactPage = () => {
         >
           Send Query
         </Button>
-      </Box>
+      </Paper>
     </Box>
   );
 };

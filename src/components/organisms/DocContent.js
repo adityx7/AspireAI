@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, Divider, Button, TextField } from "@mui/material";
+import { Box, Typography, Divider, Button, TextField, Paper } from "@mui/material";
 import FolderIcon from "@mui/icons-material/FolderCopyOutlined";
 import DynamicFormIcon from "@mui/icons-material/DynamicForm";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
@@ -55,19 +55,85 @@ const DocumentsPage = () => {
     return (
         <Box sx={{ mt: { xs: "40px", md: "180px" }, display: "flex", flexDirection: "column", alignItems: "center" }}>
             {/* Top Section */}
-            <Box sx={{ textAlign: "center", padding: "24px", boxShadow: "0 5px 12px rgba(0, 0, 0, 0.4)", borderRadius: "8px", maxWidth: "500px", width: "100%" }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", width: "80px", height: "80px", backgroundColor: "#D4EBF8", borderRadius: "50%", margin: "0 auto" }}>
-                    <FolderIcon sx={{ fontSize: 40, color: "#0288d1" }} />
+            <Paper 
+                elevation={8}
+                sx={{ 
+                    textAlign: "center", 
+                    padding: "32px", 
+                    borderRadius: "24px", 
+                    maxWidth: "600px", 
+                    width: "100%",
+                    background: "rgba(255, 255, 255, 0.18)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    color: "white",
+                    "& .MuiTextField-root": {
+                        "& .MuiOutlinedInput-root": {
+                            background: "rgba(255, 255, 255, 0.15)",
+                            borderRadius: "12px",
+                            "& fieldset": {
+                                borderColor: "rgba(255, 255, 255, 0.3)",
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "rgba(255, 255, 255, 0.5)",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#ff8c00",
+                            },
+                            "& input": {
+                                color: "white",
+                            },
+                        },
+                        "& .MuiInputLabel-root": {
+                            color: "rgba(255, 255, 255, 0.8)",
+                            "&.Mui-focused": {
+                                color: "#ff8c00",
+                            },
+                        },
+                    },
+                    "& .MuiButton-root": {
+                        backgroundColor: "#ff8c00",
+                        color: "white",
+                        "&:hover": {
+                            backgroundColor: "#e67c00",
+                        },
+                        "&:disabled": {
+                            backgroundColor: "rgba(255, 255, 255, 0.2)",
+                            color: "rgba(255, 255, 255, 0.5)",
+                        },
+                    },
+                    "& .MuiTypography-root": {
+                        color: "white",
+                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                    },
+                    "& .MuiDivider-root": {
+                        backgroundColor: "rgba(255, 255, 255, 0.3)",
+                    },
+                }}
+            >
+                <Box sx={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center", 
+                    width: "80px", 
+                    height: "80px", 
+                    background: "linear-gradient(135deg, #ff8c00, #0288d1)", 
+                    borderRadius: "50%", 
+                    margin: "0 auto",
+                    boxShadow: "0 4px 16px rgba(255, 140, 0, 0.3)",
+                }}>
+                    <FolderIcon sx={{ fontSize: 40, color: "white" }} />
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: "bold", marginTop: "16px", color: "#333", fontFamily: "Courier" }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold", marginTop: "16px" }}>
                     Skill Analysis Questionnaire
                 </Typography>
-                <Typography variant="body2" sx={{ marginTop: "8px", color: "#666", fontFamily: "Courier" }}>
+                <Typography variant="body2" sx={{ marginTop: "8px" }}>
                     Start to assess yourself by knowing yourself better with the questionnaire.
                 </Typography>
 
                 {/* Divider */}
-                <Divider sx={{ width: "100%", maxWidth: "500px", marginTop: "24px", borderColor: "#ddd" }} />
+                <Divider sx={{ width: "100%", maxWidth: "500px", marginTop: "24px" }} />
 
                 {/* Email Input */}
                 <TextField
@@ -90,9 +156,9 @@ const DocumentsPage = () => {
                 </Box>
 
                 {/* Loading and Error Handling */}
-                {loading && <Typography sx={{ mt: 2, color: "blue" }}>Fetching your data...</Typography>}
-                {error && <Typography sx={{ mt: 2, color: "red" }}>{error}</Typography>}
-            </Box>
+                {loading && <Typography sx={{ mt: 2, color: "#4fc3f7" }}>Fetching your data...</Typography>}
+                {error && <Typography sx={{ mt: 2, color: "#ff6b6b" }}>{error}</Typography>}
+            </Paper>
 
             {/* Analysis Modal with Download Report Button */}
             {/* Analysis Modal with Download Report Button */}
