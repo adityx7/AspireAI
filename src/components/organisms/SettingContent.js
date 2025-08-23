@@ -17,7 +17,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import { toast, ToastContainer } from "react-toastify";
-// import axios from "axios";
+
 const steps = ["User Details", "Academics", "Profile Details"];
 
 const SettingsPage = () => {
@@ -40,8 +40,9 @@ const SettingsPage = () => {
 
     const handleInputChange = (field, value) => {
         setFormData({ ...formData, [field]: value });
-        setFormErrors({ ...formErrors, [field]: "" }); // Clear errors as user types
+        setFormErrors({ ...formErrors, [field]: "" });
     };
+
     const majorsOptions = [
         { value: "Computer Science & Engineering", label: "Computer Science & Engineering" },
         { value: "Information Science", label: "Information Science" },
@@ -99,6 +100,7 @@ const SettingsPage = () => {
         });
         setFormErrors({});
     };
+
     const handleSubmit = async () => {
         try {
             const response = await fetch("http://localhost:5002/api/students", {
@@ -119,6 +121,7 @@ const SettingsPage = () => {
             toast.error("Error submitting form.");
         }
     };
+
     return (
         <Box
             sx={{
@@ -128,20 +131,36 @@ const SettingsPage = () => {
                 padding: "24px",
             }}
         >
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer 
+                position="top-right" 
+                autoClose={3000}
+                theme="dark"
+                toastStyle={{
+                    background: "linear-gradient(120deg, rgba(30,58,138,0.95) 0%, rgba(15,23,42,0.98) 100%)",
+                    border: "1px solid rgba(255,215,0,0.3)",
+                    color: "#e2e8f0",
+                    backdropFilter: "blur(10px)",
+                    borderRadius: "12px",
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                }}
+                progressStyle={{
+                    background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)"
+                }}
+            />
+
             {/* Stepper */}
             <Stepper activeStep={activeStep} sx={{ 
                 width: "100%", 
                 maxWidth: "800px",
                 mb: 4,
                 '& .MuiStepLabel-label': {
-                    color: 'rgba(255,255,255,0.8) !important',
+                    color: '#e2e8f0 !important',
                     fontWeight: 600,
-                    textShadow: "0 1px 4px rgba(26,35,126,0.3)",
+                    textShadow: "0 1px 4px rgba(0,0,0,0.3)",
                     fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
                 },
                 '& .MuiStepLabel-label.Mui-active': {
-                    color: '#ff8c00 !important'
+                    color: '#ffd700 !important'
                 },
                 '& .MuiStepLabel-label.Mui-completed': {
                     color: '#4caf50 !important'
@@ -150,7 +169,7 @@ const SettingsPage = () => {
                     color: 'rgba(255,255,255,0.3)'
                 },
                 '& .MuiStepIcon-root.Mui-active': {
-                    color: '#ff8c00'
+                    color: '#ffd700'
                 },
                 '& .MuiStepIcon-root.Mui-completed': {
                     color: '#4caf50'
@@ -171,37 +190,42 @@ const SettingsPage = () => {
                     maxWidth: "800px",
                     borderRadius: "24px",
                     overflow: "hidden",
-                    background: "rgba(255, 255, 255, 0.18)",
-                    backdropFilter: "blur(8px)",
-                    WebkitBackdropFilter: "blur(8px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    background: "linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255,215,0,0.3)",
+                    boxShadow: "0 8px 32px rgba(255,215,0,0.2)",
                     padding: "32px",
-                    color: "white",
+                    color: "#e2e8f0",
                     "& .MuiTextField-root": {
                         "& .MuiOutlinedInput-root": {
-                            background: "rgba(255, 255, 255, 0.15)",
+                            background: "rgba(15,23,42,0.5)",
                             borderRadius: "12px",
                             "& fieldset": {
-                                borderColor: "rgba(255, 255, 255, 0.3)",
+                                borderColor: "rgba(255,215,0,0.3)",
                             },
                             "&:hover fieldset": {
-                                borderColor: "rgba(255, 255, 255, 0.5)",
+                                borderColor: "rgba(255,215,0,0.5)",
                             },
                             "&.Mui-focused fieldset": {
-                                borderColor: "#ff8c00",
+                                borderColor: "#ffd700",
+                                borderWidth: "2px",
                             },
                             "& input": {
-                                color: "white",
+                                color: "#e2e8f0",
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                             },
                         },
                         "& .MuiInputLabel-root": {
-                            color: "rgba(255, 255, 255, 0.8)",
+                            color: "rgba(255,215,0,0.8)",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                             "&.Mui-focused": {
-                                color: "#ff8c00",
+                                color: "#ffd700",
                             },
                         },
                         "& .MuiFormHelperText-root": {
-                            color: "rgba(255, 255, 255, 0.7)",
+                            color: "#cbd5e1",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                             "&.Mui-error": {
                                 color: "#ff6b6b",
                             },
@@ -209,44 +233,53 @@ const SettingsPage = () => {
                     },
                     "& .MuiFormControl-root": {
                         "& .MuiOutlinedInput-root": {
-                            background: "rgba(255, 255, 255, 0.15)",
+                            background: "rgba(15,23,42,0.5)",
                             borderRadius: "12px",
                             "& fieldset": {
-                                borderColor: "rgba(255, 255, 255, 0.3)",
+                                borderColor: "rgba(255,215,0,0.3)",
                             },
                             "&:hover fieldset": {
-                                borderColor: "rgba(255, 255, 255, 0.5)",
+                                borderColor: "rgba(255,215,0,0.5)",
                             },
                             "&.Mui-focused fieldset": {
-                                borderColor: "#ff8c00",
+                                borderColor: "#ffd700",
+                                borderWidth: "2px",
                             },
-                            color: "white",
+                            color: "#e2e8f0",
                         },
                         "& .MuiInputLabel-root": {
-                            color: "rgba(255, 255, 255, 0.8)",
+                            color: "rgba(255,215,0,0.8)",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                             "&.Mui-focused": {
-                                color: "#ff8c00",
+                                color: "#ffd700",
                             },
                         },
                         "& .MuiSelect-select": {
-                            color: "white",
+                            color: "#e2e8f0",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                         },
                         "& .MuiSvgIcon-root": {
-                            color: "rgba(255, 255, 255, 0.8)",
+                            color: "rgba(255,215,0,0.8)",
                         },
                     },
                     "& .MuiTypography-root": {
-                        color: "white",
+                        color: "#e2e8f0",
                         fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                     },
                     "& .MuiDivider-root": {
-                        backgroundColor: "rgba(255, 255, 255, 0.3)",
+                        backgroundColor: "rgba(255,215,0,0.3)",
                     },
                 }}
             >
                 {activeStep === 0 && (
                     <>
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: "courier" }}>
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: 700, 
+                            mb: 2, 
+                            color: "#ffd700",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                            textShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                        }}>
                             User Details
                         </Typography>
                         <Divider sx={{ mb: 3 }} />
@@ -265,7 +298,7 @@ const SettingsPage = () => {
                                     label="USN"
                                     variant="outlined"
                                     fullWidth
-                                    value={formData.usn.toUpperCase()} // Ensure input is displayed in uppercase
+                                    value={formData.usn.toUpperCase()}
                                     onChange={(e) => {
                                         const uppercasedValue = e.target.value.toUpperCase();
                                         handleInputChange("usn", uppercasedValue);
@@ -321,15 +354,31 @@ const SettingsPage = () => {
                                         value={formData.gender}
                                         onChange={(e) => handleInputChange("gender", e.target.value)}
                                         error={!!formErrors.gender}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    background: "linear-gradient(120deg, rgba(30,58,138,0.95) 0%, rgba(15,23,42,0.98) 100%)",
+                                                    backdropFilter: "blur(10px)",
+                                                    border: "1px solid rgba(255,215,0,0.3)",
+                                                    "& .MuiMenuItem-root": {
+                                                        color: "#e2e8f0",
+                                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                                        "&:hover": {
+                                                            background: "rgba(255,215,0,0.2)",
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        }}
                                     >
-                                        <MenuItem value="">Select Gender</MenuItem> {/* Default empty option */}
+                                        <MenuItem value="">Select Gender</MenuItem>
                                         <MenuItem value="Male">Male</MenuItem>
                                         <MenuItem value="Female">Female</MenuItem>
                                         <MenuItem value="Others">Others</MenuItem>
                                         <MenuItem value="Prefer not to say">Prefer not to say</MenuItem>
                                     </Select>
                                     {formErrors.gender && (
-                                        <Typography color="error" variant="caption">
+                                        <Typography color="error" variant="caption" sx={{ fontFamily: "inherit" }}>
                                             {formErrors.gender}
                                         </Typography>
                                     )}
@@ -345,10 +394,9 @@ const SettingsPage = () => {
                                     error={!!formErrors.dob}
                                     helperText={formErrors.dob}
                                     inputProps={{
-                                        max: new Date().toISOString().split("T")[0] // Set the max date to today's date
+                                        max: new Date().toISOString().split("T")[0]
                                     }}
                                 />
-
                             </Box>
                         </Box>
                     </>
@@ -356,14 +404,21 @@ const SettingsPage = () => {
 
                 {activeStep === 1 && (
                     <>
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: "Courier" }}>
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: 700, 
+                            mb: 2, 
+                            color: "#ffd700",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                            textShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                        }}>
                             Academics
                         </Typography>
                         <Divider sx={{ mb: 3 }} />
 
-                        {/* Graduation Year */}
                         <FormControl fullWidth sx={{ mb: 2 }}>
-                            <Typography fontFamily="Courier">What is your graduation year?</Typography>
+                            <Typography sx={{ color: "#e2e8f0", fontFamily: "inherit", mb: 1 }}>
+                                What is your graduation year?
+                            </Typography>
                             <TextField
                                 id="year"
                                 select
@@ -371,7 +426,7 @@ const SettingsPage = () => {
                                 SelectProps={{
                                     native: true,
                                 }}
-                                variant="standard"
+                                variant="outlined"
                             >
                                 {[2023, 2024, 2025, 2026].map((year) => (
                                     <option key={year} value={year}>
@@ -381,9 +436,10 @@ const SettingsPage = () => {
                             </TextField>
                         </FormControl>
 
-                        {/* College */}
                         <FormControl fullWidth sx={{ mb: 2 }}>
-                            <Typography fontFamily="Courier">Choose the college you're attending or attended</Typography>
+                            <Typography sx={{ color: "#e2e8f0", fontFamily: "inherit", mb: 1 }}>
+                                Choose the college you're attending or attended
+                            </Typography>
                             <TextField
                                 placeholder="Enter your college name"
                                 value={formData.collegeName}
@@ -391,9 +447,8 @@ const SettingsPage = () => {
                             />
                         </FormControl>
 
-                        {/* Majors */}
                         <FormControl fullWidth>
-                            <Typography id="majors-label" fontFamily="Courier">
+                            <Typography sx={{ color: "#e2e8f0", fontFamily: "inherit", mb: 1 }}>
                                 Choose your major
                             </Typography>
                             <Select
@@ -404,6 +459,25 @@ const SettingsPage = () => {
                                 onChange={(e) =>
                                     setFormData({ ...formData, selectedMajors: e.target.value })
                                 }
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            background: "linear-gradient(120deg, rgba(30,58,138,0.95) 0%, rgba(15,23,42,0.98) 100%)",
+                                            backdropFilter: "blur(10px)",
+                                            border: "1px solid rgba(255,215,0,0.3)",
+                                            "& .MuiMenuItem-root": {
+                                                color: "#e2e8f0",
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                                "&:hover": {
+                                                    background: "rgba(255,215,0,0.2)",
+                                                },
+                                                "&.Mui-selected": {
+                                                    background: "rgba(255,215,0,0.3)",
+                                                },
+                                            },
+                                        },
+                                    },
+                                }}
                             >
                                 {majorsOptions.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -414,19 +488,27 @@ const SettingsPage = () => {
                         </FormControl>
                     </>
                 )}
+
                 {activeStep === 2 && (
                     <>
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, fontFamily: "Courier" }}>
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: 700, 
+                            mb: 1, 
+                            color: "#ffd700",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                            textShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                        }}>
                             Profile Details
                         </Typography>
                         <Divider sx={{ mb: 3 }} />
-                        <Typography variant="body1" sx={{ mb: 1, fontFamily: "Courier" }}>
+                        <Typography variant="body1" sx={{ mb: 1, color: "#e2e8f0", fontFamily: "inherit" }}>
                             Short Bio
                         </Typography>
                         <TextField
                             fullWidth
                             placeholder="State purpose..."
                             multiline
+                            rows={4}
                             variant="outlined"
                             sx={{ mb: 3 }}
                             value={formData.shortBio}
@@ -443,9 +525,10 @@ const SettingsPage = () => {
                         onClick={() => setActiveStep((prev) => prev - 1)}
                         sx={{ 
                             mr: 1,
-                            color: "rgba(255, 255, 255, 0.8)",
+                            color: "#e2e8f0",
+                            fontFamily: "inherit",
                             "&:hover": {
-                                backgroundColor: "rgba(255, 255, 255, 0.1)",
+                                backgroundColor: "rgba(255,215,0,0.1)",
                             },
                         }}
                     >
@@ -454,20 +537,26 @@ const SettingsPage = () => {
                     <Box sx={{ flex: "1 1 auto" }} />
                     {activeStep < steps.length - 1 ? (
                         <Button onClick={handleNext} variant="contained" sx={{
-                            backgroundColor: "#ff8c00",
+                            background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                            color: "#1e3a8a",
+                            fontFamily: "inherit",
+                            fontWeight: 700,
                             "&:hover": {
-                                backgroundColor: "#e67c00",
+                                background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                transform: "translateY(-2px)",
                             },
                         }}>
                             Next
                         </Button>
                     ) : (
                         <>
-                            <Button onClick={handleReset} variant="contained" color="secondary" startIcon={<RestartAltIcon />} sx={{ 
+                            <Button onClick={handleReset} variant="contained" startIcon={<RestartAltIcon />} sx={{ 
                                 mr: 2,
-                                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                background: "rgba(255,215,0,0.2)",
+                                color: "#e2e8f0",
+                                fontFamily: "inherit",
                                 "&:hover": {
-                                    backgroundColor: "rgba(255, 255, 255, 0.3)",
+                                    background: "rgba(255,215,0,0.3)",
                                 },
                             }}>
                                 Reset
@@ -478,9 +567,13 @@ const SettingsPage = () => {
                                 color="primary"
                                 endIcon={<CheckCircleIcon />}
                                 sx={{
-                                    backgroundColor: "#4caf50",
+                                    background: "linear-gradient(90deg, #4caf50 0%, #45a049 100%)",
+                                    color: "#fff",
+                                    fontFamily: "inherit",
+                                    fontWeight: 700,
                                     "&:hover": {
-                                        backgroundColor: "#45a049",
+                                        background: "linear-gradient(90deg, #45a049 0%, #4caf50 100%)",
+                                        transform: "translateY(-2px)",
                                     },
                                 }}
                             >

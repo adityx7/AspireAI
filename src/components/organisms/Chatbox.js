@@ -95,30 +95,60 @@ const Chatbox = ({ open, onClose }) => {
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: { xs: "90%", sm: 800 },
-                    bgcolor: "#E9E6DE",
-                    boxShadow: 24,
+                    background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
+                    boxShadow: "0 8px 32px 0 rgba(255,215,0,0.2)",
+                    border: "1px solid rgba(255,215,0,0.3)",
                     p: 2,
-                    borderRadius: 2,
+                    borderRadius: 4,
                     maxHeight: '90vh',
                     display: "flex",
                     flexDirection: "column",
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                 }}
             >
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: "'Russo One', sans-serif", textAlign: "center" }}>
-                    Vishwakarm.ai
+                {/* Header */}
+                <Typography 
+                    variant="h6" 
+                    sx={{ 
+                        mb: 2, 
+                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", 
+                        textAlign: "center",
+                        color: "#ffd700",
+                        fontWeight: 700,
+                        fontSize: "1.5rem",
+                        textShadow: "0 2px 8px rgba(0,0,0,0.3)"
+                    }}
+                >
+                    AspireAI Assistant
                 </Typography>
 
+                {/* Chat Messages Area */}
                 <Paper
                     sx={{
                         flexGrow: 1,
                         overflowY: "auto",
                         padding: "12px",
                         mb: "70px",
-                        borderRadius: 2,
-                        backgroundColor: "#F7F6F2",
-                        boxShadow: "inset 0px 2px 8px rgba(0, 0, 0, 0.1)",
-                        scrollbarWidth: "none",
-                        "&::-webkit-scrollbar": { display: "none" },
+                        borderRadius: 3,
+                        background: "linear-gradient(120deg, rgba(15,23,42,0.5) 0%, rgba(30,58,138,0.3) 100%)",
+                        border: "1px solid rgba(255,215,0,0.2)",
+                        boxShadow: "inset 0px 2px 8px rgba(0, 0, 0, 0.3)",
+                        scrollbarWidth: "thin",
+                        scrollbarColor: "#ffd700 rgba(255,215,0,0.1)",
+                        "&::-webkit-scrollbar": { 
+                            width: "6px"
+                        },
+                        "&::-webkit-scrollbar-track": {
+                            background: "rgba(255,215,0,0.1)",
+                            borderRadius: "3px"
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                            background: "rgba(255,215,0,0.5)",
+                            borderRadius: "3px",
+                            "&:hover": {
+                                background: "#ffd700"
+                            }
+                        }
                     }}
                 >
                     <List>
@@ -129,28 +159,44 @@ const Chatbox = ({ open, onClose }) => {
                                     justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
                                     display: "flex",
                                     alignItems: "flex-start",
+                                    mb: 1,
                                 }}
                             >
                                 {msg.role === "assistant" && (
                                     <Avatar
                                         src={Bot}
-                                        sx={{ marginRight: '8px', width: 40, height: 40 }}
+                                        sx={{ 
+                                            marginRight: '12px', 
+                                            width: 40, 
+                                            height: 40,
+                                            border: "2px solid #ffd700",
+                                            boxShadow: "0 2px 8px rgba(255,215,0,0.3)"
+                                        }}
                                     />
                                 )}
                                 <Box
                                     sx={{
-                                        bgcolor: msg.role === "user" ? '#85A947' : '#E4F1AC',
-                                        color: msg.role === "user" ? 'white' : 'black',
+                                        bgcolor: msg.role === "user" 
+                                            ? 'linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)' 
+                                            : 'linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)',
+                                        color: msg.role === "user" ? '#1e3a8a' : '#e2e8f0',
                                         borderRadius: msg.role === "user"
                                             ? "18px 18px 0px 18px"
                                             : "0px 18px 18px 18px",
-                                        padding: "10px 16px",
-                                        maxWidth: '60%',
+                                        padding: "12px 16px",
+                                        maxWidth: '70%',
                                         minWidth: "auto",
                                         fontSize: "14px",
-                                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                        boxShadow: msg.role === "user" 
+                                            ? "0px 4px 12px rgba(255,215,0,0.3)" 
+                                            : "0px 4px 12px rgba(0,0,0,0.3)",
+                                        border: msg.role === "user" 
+                                            ? "none" 
+                                            : "1px solid rgba(255,215,0,0.2)",
                                         wordWrap: "break-word",
                                         display: "inline-block",
+                                        fontWeight: msg.role === "user" ? 600 : 400,
                                     }}
                                     dangerouslySetInnerHTML={{
                                         __html: msg.role === "assistant"
@@ -161,7 +207,13 @@ const Chatbox = ({ open, onClose }) => {
                                 {msg.role === "user" && (
                                     <Avatar
                                         src={user}
-                                        sx={{ marginLeft: '8px', width: 40, height: 40 }}
+                                        sx={{ 
+                                            marginLeft: '12px', 
+                                            width: 40, 
+                                            height: 40,
+                                            border: "2px solid #ffd700",
+                                            boxShadow: "0 2px 8px rgba(255,215,0,0.3)"
+                                        }}
                                     />
                                 )}
                             </ListItem>
@@ -169,19 +221,21 @@ const Chatbox = ({ open, onClose }) => {
                     </List>
                 </Paper>
 
+                {/* Input Area */}
                 <Box
                     sx={{
                         position: "absolute",
                         bottom: 8,
                         left: 8,
                         right: 8,
-                        backgroundColor: "#EFF3EA",
+                        background: "linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
-                        padding: "8px",
-                        borderRadius: 2,
-                        boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
+                        padding: "12px",
+                        borderRadius: 3,
+                        boxShadow: "0px 4px 16px rgba(255,215,0,0.2)",
+                        border: "1px solid rgba(255,215,0,0.3)",
                     }}
                 >
                     <TextField
@@ -198,15 +252,68 @@ const Chatbox = ({ open, onClose }) => {
                         inputRef={inputRef} // Set the ref to the TextField
                         sx={{
                             '& .MuiOutlinedInput-root': {
-                                borderRadius: 2,
-                                bgcolor: "white"
+                                borderRadius: 3,
+                                backgroundColor: "rgba(15,23,42,0.5)",
+                                color: "#e2e8f0",
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                "& fieldset": {
+                                    borderColor: "rgba(255,215,0,0.3)",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "rgba(255,215,0,0.5)",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#ffd700",
+                                },
+                            },
+                            '& .MuiOutlinedInput-input': {
+                                padding: "12px 16px",
+                                "&::placeholder": {
+                                    color: "#cbd5e1",
+                                    opacity: 0.7,
+                                }
                             }
                         }}
                     />
-                    <IconButton onClick={handleSend} disabled={isLoading} color="primary">
+                    <IconButton 
+                        onClick={handleSend} 
+                        disabled={isLoading}
+                        sx={{
+                            background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                            color: "#1e3a8a",
+                            "&:hover": {
+                                background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                transform: "scale(1.05)",
+                            },
+                            "&:disabled": {
+                                background: "rgba(255,215,0,0.3)",
+                                color: "#1e3a8a",
+                            },
+                            boxShadow: "0 2px 8px rgba(255,215,0,0.3)",
+                            transition: "all 0.3s ease",
+                        }}
+                    >
                         <SendIcon />
                     </IconButton>
-                    <IconButton onClick={handleRefresh} disabled={isLoading} color="secondary">
+                    <IconButton 
+                        onClick={handleRefresh} 
+                        disabled={isLoading}
+                        sx={{
+                            background: "linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)",
+                            color: "#ffd700",
+                            border: "1px solid rgba(255,215,0,0.3)",
+                            "&:hover": {
+                                background: "linear-gradient(120deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.2) 100%)",
+                                transform: "scale(1.05)",
+                            },
+                            "&:disabled": {
+                                background: "rgba(30,58,138,0.3)",
+                                color: "rgba(255,215,0,0.5)",
+                            },
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                            transition: "all 0.3s ease",
+                        }}
+                    >
                         <RefreshIcon />
                     </IconButton>
                 </Box>

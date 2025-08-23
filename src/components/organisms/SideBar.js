@@ -16,6 +16,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ContactMailIcon from "@mui/icons-material/DraftsOutlined";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import AccountCircleIcon from "@mui/icons-material/AccountCircleOutlined"; // ✅ Import Profile Icon
+import HomeIcon from "@mui/icons-material/Home";
 
 const Sidebar = ({ onMenuClick }) => {
     const location = useLocation(); // Get the current route path
@@ -24,6 +25,7 @@ const Sidebar = ({ onMenuClick }) => {
     const currentPath = location.pathname.split("/")[1]; // Extract the first part of the path
 
     const menuItems = [
+        { text: "Home", path: "", icon: <HomeIcon /> },
         { text: "Dashboard", path: "dashboard", icon: <DashboardIcon /> },
         { text: "Mentors", path: "mentors", icon: <PersonIcon /> },
         { text: "Skill Analysis", path: "documents", icon: <AutoGraphOutlinedIcon /> },

@@ -52,7 +52,19 @@ export default function Navbar() {
     !isDashbaord && !isMentormain && !isMentors && !isDocuments &&
     !isContactUs && !isSettings && !isMentorLoginPage && !isMentorContact && 
     !isMentorSettings && !isProfile && !isProfileMentor &&
-    <AppBar position="sticky" sx={{ backgroundColor: '#fff', color: 'text.primary', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)', borderBottom: '1px solid #e0e0e0' }} >
+    <AppBar 
+      position="sticky" 
+      sx={{ 
+        background: "linear-gradient(120deg, rgba(30,58,138,0.95) 0%, rgba(15,23,42,0.98) 100%)",
+        backdropFilter: "blur(10px)",
+        WebkitBackdropFilter: "blur(10px)",
+        color: "#e2e8f0", 
+        boxShadow: "0px 4px 16px rgba(255,215,0,0.2)", 
+        border: "1px solid rgba(255,215,0,0.3)",
+        borderTop: "none",
+        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
+      }} 
+    >
       <Toolbar sx={{ mt: "20px" }}>
         {/* Menu Icon - Visible only on smaller screens */}
         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
@@ -63,6 +75,14 @@ export default function Navbar() {
             aria-controls={anchorEl ? 'mobile-menu' : undefined}
             aria-haspopup="true"
             onClick={handleMenuClick}
+            sx={{
+              color: "#ffd700",
+              '&:hover': {
+                backgroundColor: "rgba(255,215,0,0.1)",
+                transform: "scale(1.05)",
+              },
+              transition: "all 0.3s ease"
+            }}
           >
             <MenuIcon />
           </IconButton>
@@ -77,9 +97,35 @@ export default function Navbar() {
 
         {/* Icon and Logo/Text */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {/* Added HomeIcon here */}
-          <AcUnitIcon sx={{ fontSize: 30, mr: 1 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1, display: "flex" }}>
+          {/* Updated icon with gold color */}
+          <AcUnitIcon sx={{ 
+            fontSize: 30, 
+            mr: 1, 
+            color: "#ffd700",
+            filter: "drop-shadow(0 2px 8px rgba(255,215,0,0.3))",
+            transition: "all 0.3s ease",
+            '&:hover': {
+              transform: "rotate(15deg) scale(1.1)",
+              filter: "drop-shadow(0 4px 12px rgba(255,215,0,0.5))",
+            }
+          }} />
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              flexGrow: 1, 
+              display: "flex",
+              color: "#ffd700",
+              fontWeight: 700,
+              fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+              textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+              letterSpacing: "0.5px",
+              transition: "all 0.3s ease",
+              '&:hover': {
+                textShadow: "0 0 12px rgba(255,215,0,0.6)",
+                transform: "scale(1.02)",
+              }
+            }}
+          >
             AspireAI
           </Typography>
         </Box>

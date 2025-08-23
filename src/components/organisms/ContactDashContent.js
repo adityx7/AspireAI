@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -10,13 +10,29 @@ import {
   useTheme
 } from "@mui/material";
 import EmailIcon from "@mui/icons-material/Email";
+import { toast, ToastContainer } from "react-toastify";
 
 const ContactPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [formData, setFormData] = useState({
+    subject: "",
+    message: ""
+  });
+
+  const handleInputChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+  };
 
   const handleSendQuery = () => {
-    console.log("Query Sent");
+    if (!formData.subject || !formData.message) {
+      toast.warning("Please fill in all fields.");
+      return;
+    }
+    
+    console.log("Query Sent", formData);
+    toast.success("Query sent successfully!");
+    setFormData({ subject: "", message: "" });
   };
 
   return (
@@ -27,7 +43,8 @@ const ContactPage = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        overflowX: "hidden", // Prevent horizontal scrolling
+        overflowX: "hidden",
+        p: 2,
       }}
     >
       <Paper
@@ -38,51 +55,57 @@ const ContactPage = () => {
           padding: isMobile ? "24px" : "32px",
           borderRadius: "24px",
           overflow: "hidden",
-          background: "rgba(255, 255, 255, 0.18)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-          color: "white",
+          background: "linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          border: "1px solid rgba(255,215,0,0.3)",
+          boxShadow: "0 8px 32px rgba(255,215,0,0.2)",
+          color: "#e2e8f0",
           "& .MuiTextField-root": {
             "& .MuiOutlinedInput-root": {
-              background: "rgba(255, 255, 255, 0.15)",
+              background: "rgba(15,23,42,0.5)",
               borderRadius: "12px",
               "& fieldset": {
-                borderColor: "rgba(255, 255, 255, 0.3)",
+                borderColor: "rgba(255,215,0,0.3)",
               },
               "&:hover fieldset": {
-                borderColor: "rgba(255, 255, 255, 0.5)",
+                borderColor: "rgba(255,215,0,0.5)",
               },
               "&.Mui-focused fieldset": {
-                borderColor: "#ff8c00",
+                borderColor: "#ffd700",
+                borderWidth: "2px",
               },
               "& input": {
-                color: "white",
+                color: "#e2e8f0",
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
               },
               "& textarea": {
-                color: "white",
+                color: "#e2e8f0",
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+              },
+              "& input::placeholder": {
+                color: "#cbd5e1",
+                opacity: 0.7,
+              },
+              "& textarea::placeholder": {
+                color: "#cbd5e1",
+                opacity: 0.7,
               },
             },
             "& .MuiInputLabel-root": {
-              color: "rgba(255, 255, 255, 0.8)",
+              color: "rgba(255,215,0,0.8)",
+              fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
               "&.Mui-focused": {
-                color: "#ff8c00",
+                color: "#ffd700",
               },
             },
           },
           "& .MuiTypography-root": {
-            color: "white",
+            color: "#e2e8f0",
             fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
           },
           "& .MuiDivider-root": {
-            backgroundColor: "rgba(255, 255, 255, 0.3)",
-          },
-          "& .MuiButton-root": {
-            backgroundColor: "#ff8c00",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "#e67c00",
-            },
+            backgroundColor: "rgba(255,215,0,0.3)",
           },
         }}
       >
@@ -90,9 +113,9 @@ const ContactPage = () => {
         <Box
           sx={{
             display: "flex",
-            flexDirection: isMobile ? "column" : "row", // Stack icon and text vertically on small screens
+            flexDirection: isMobile ? "column" : "row",
             alignItems: isMobile ? "flex-start" : "center",
-            marginBottom: "20px",
+            marginBottom: "24px",
           }}
         >
           {/* Icon inside circular box */}
@@ -103,34 +126,41 @@ const ContactPage = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(135deg, #ff8c00, #1976d2)",
+              background: "linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)",
               borderRadius: "50%",
-              mr: '20px',
-              boxShadow: "0 4px 16px rgba(255, 140, 0, 0.3)",
+              mr: isMobile ? 0 : '20px',
+              mb: isMobile ? '16px' : 0,
+              boxShadow: "0 4px 16px rgba(255,215,0,0.4)",
+              border: "2px solid rgba(255,215,0,0.6)",
             }}
           >
-            <EmailIcon sx={{ color: "#fff", fontSize: "30px" }} />
+            <EmailIcon sx={{ color: "#1e3a8a", fontSize: "32px" }} />
           </Box>
 
           {/* Text Section */}
           <Box>
             <Typography
-              variant="h6"
+              variant="h4"
               component="h1"
-              fontFamily={"Courier"}
               sx={{
-                fontSize: isMobile ? "1.5rem" : "2rem",
+                fontSize: isMobile ? "1.8rem" : "2.2rem",
+                fontWeight: 700,
+                color: "#ffd700",
+                textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                letterSpacing: "0.5px",
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
               }}
             >
               Contact Support
             </Typography>
             <Typography
-              variant="body2"
-              color="textSecondary"
-              fontFamily={"Bookman Old Style"}
+              variant="body1"
               sx={{
-                marginTop: "5px",
-                fontSize: isMobile ? "0.9rem" : "1rem",
+                marginTop: "8px",
+                fontSize: isMobile ? "1rem" : "1.1rem",
+                color: "#cbd5e1",
+                lineHeight: 1.6,
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
               }}
             >
               Use the form below to contact the AspireAI team with any
@@ -140,22 +170,28 @@ const ContactPage = () => {
         </Box>
 
         {/* Divider */}
-        <Divider sx={{ margin: "20px 0" }} />
+        <Divider sx={{ margin: "24px 0" }} />
 
         {/* Form Fields */}
         <TextField
           label="Subject"
           variant="outlined"
           fullWidth
+          value={formData.subject}
+          onChange={(e) => handleInputChange("subject", e.target.value)}
+          placeholder="Enter your subject..."
           sx={{ marginBottom: "20px" }}
         />
         <TextField
-          label="Message..."
+          label="Message"
           variant="outlined"
           fullWidth
           multiline
-          rows={5}
-          sx={{ marginBottom: "20px" }}
+          rows={6}
+          value={formData.message}
+          onChange={(e) => handleInputChange("message", e.target.value)}
+          placeholder="Type your message here..."
+          sx={{ marginBottom: "24px" }}
         />
 
         {/* Divider */}
@@ -164,15 +200,48 @@ const ContactPage = () => {
         {/* Button */}
         <Button
           variant="contained"
-          color="primary"
           onClick={handleSendQuery}
           sx={{
-            width: isMobile ? "100%" : "auto", // Full-width button on small screens
+            background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+            color: "#1e3a8a",
+            fontWeight: 700,
+            fontSize: "1.1rem",
+            px: 4,
+            py: 1.5,
+            borderRadius: "12px",
+            boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
+            textTransform: "none",
+            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+            width: isMobile ? "100%" : "auto",
+            "&:hover": {
+              background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+              boxShadow: "0 6px 24px rgba(255,215,0,0.4)",
+              transform: "translateY(-2px)",
+            },
+            transition: "all 0.3s ease",
           }}
         >
           Send Query
         </Button>
       </Paper>
+
+      {/* Toast Container */}
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000}
+        theme="dark"
+        toastStyle={{
+          background: "linear-gradient(120deg, rgba(30,58,138,0.95) 0%, rgba(15,23,42,0.98) 100%)",
+          border: "1px solid rgba(255,215,0,0.3)",
+          color: "#e2e8f0",
+          backdropFilter: "blur(10px)",
+          borderRadius: "12px",
+          fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+        }}
+        progressStyle={{
+          background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)"
+        }}
+      />
     </Box>
   );
 };

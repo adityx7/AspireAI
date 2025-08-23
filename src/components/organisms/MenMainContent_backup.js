@@ -149,7 +149,6 @@ export default function MentorTrainingPage() {
                     ))}
                 </Grid>
             </Paper>
-                </Typography>
 
                 {/* Subheading */}
                 <Box sx={{ width: '100%' }}>
@@ -213,7 +212,6 @@ export default function MentorTrainingPage() {
                         </Grid>
                     ))}
                 </Grid>
-            </Box>
         </Box>
     );
 }

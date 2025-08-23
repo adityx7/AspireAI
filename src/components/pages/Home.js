@@ -13,13 +13,12 @@ import redBall from "../../assets/BallRed.png";
 import chatImage from "../../assets/Chat.png";
 import pplImage from "../../assets/pplImage.png";
 import { useNavigate } from "react-router-dom";
-// ...existing code...
 
 function Home() {
   const navigate = useNavigate();
 
   return (
-  <Box sx={{ minHeight: "100vh", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)", position: "relative", overflow: "hidden" }}>
+    <Box sx={{ minHeight: "100vh", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)", position: "relative", overflow: "hidden" }}>
       <Box
         component="div"
         sx={{
@@ -27,7 +26,7 @@ function Home() {
           height: "100%",
           zIndex: 0,
           pointerEvents: "none",
-          background: "linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+          background: "linear-gradient(120deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%)",
           position: "absolute",
           top: 0,
           left: 0,
@@ -45,9 +44,9 @@ function Home() {
           px: { xs: 2, md: 10 },
           pt: { xs: 8, md: 12 },
           pb: { xs: 6, md: 10 },
-          background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)",
+          background: "linear-gradient(90deg, #1e3a8a 0%, #0f172a 40%, #ffd700 100%)",
           borderRadius: 16,
-          boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)",
+          boxShadow: "0 8px 32px 0 rgba(255, 215, 0, 0.2)",
         }}
       >
         {/* Left */}
@@ -57,10 +56,10 @@ function Home() {
             sx={{
               fontWeight: 800,
               fontSize: { xs: "2.5rem", md: "3.5rem", lg: "4rem" },
-              color: "#1a237e",
+              color: "#ffd700",
               mb: 3,
               lineHeight: 1.1,
-              textShadow: "0 2px 8px rgba(26,35,126,0.2)",
+              textShadow: "0 2px 8px rgba(0,0,0,0.3)",
             }}
           >
             AspireAI Online Mentoring.
@@ -69,7 +68,7 @@ function Home() {
             variant="body1"
             sx={{
               fontSize: { xs: "1.1rem", md: "1.3rem" },
-              color: "#1a237e",
+              color: "#e2e8f0",
               opacity: 0.95,
               mb: 4,
               fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
@@ -80,19 +79,19 @@ function Home() {
           <Button
             variant="contained"
             sx={{
-              background: "linear-gradient(90deg, #6a85b6 60%, #fbd288 100%)",
-              color: "#1a237e",
+              background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+              color: "#1e3a8a",
               fontWeight: 700,
               fontSize: "1.1rem",
               px: 4,
               py: 1.5,
               borderRadius: 8,
-              boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #fbd28888",
+              boxShadow: "0 4px 16px rgba(255,215,0,0.3), 0 0 16px 2px rgba(255,215,0,0.2)",
               textTransform: "none",
               mb: 2,
               "&:hover": {
-                background: "linear-gradient(90deg, #fbd288 60%, #6a85b6 100%)",
-                boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #6a85b6bb",
+                background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                boxShadow: "0 4px 24px rgba(255,215,0,0.4), 0 0 32px 4px rgba(255,215,0,0.3)",
               },
             }}
             onClick={() => navigate("/student/register")}
@@ -104,7 +103,7 @@ function Home() {
             sx={{
               mt: 2,
               fontSize: "1rem",
-              color: "#1a237e",
+              color: "#e2e8f0",
               opacity: 0.9,
               fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
             }}
@@ -113,10 +112,10 @@ function Home() {
             <Link
               href="/mentor/register"
               sx={{
-                color: "#ff8c00",
+                color: "#ffd700",
                 textDecoration: "underline",
                 fontWeight: 600,
-                "&:hover": { color: "#fff176" },
+                "&:hover": { color: "#ffed4e" },
               }}
             >
               Click here
@@ -136,6 +135,7 @@ function Home() {
               left: "10%",
               zIndex: 1,
               opacity: 0.3,
+              filter: "sepia(100%) hue-rotate(45deg) saturate(2)",
             }}
           />
           <Box
@@ -162,7 +162,7 @@ function Home() {
               left: "40%",
               zIndex: 3,
               borderRadius: 3,
-              boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+              boxShadow: "0 4px 24px rgba(255,215,0,0.2)",
             }}
           />
           <Box
@@ -176,7 +176,7 @@ function Home() {
               left: "75%",
               zIndex: 3,
               borderRadius: 3,
-              boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+              boxShadow: "0 4px 24px rgba(255,215,0,0.2)",
             }}
           />
         </Box>
@@ -189,10 +189,10 @@ function Home() {
           sx={{
             fontWeight: 700,
             fontSize: { xs: "2rem", md: "2.5rem" },
-            color: "#fff",
+            color: "#ffd700",
             mb: 6,
             textAlign: "center",
-            textShadow: "0 2px 8px rgba(26,35,126,0.2)",
+            textShadow: "0 2px 8px rgba(0,0,0,0.3)",
             fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
           }}
         >
@@ -200,24 +200,24 @@ function Home() {
         </Typography>
         <Grid container spacing={4} justifyContent="center">
           <Grid item>
-            <Box sx={{ p: 3, minWidth: 220, textAlign: 'center', background: 'linear-gradient(120deg, #fffbe6 0%, #fbd288 100%)', borderRadius: 12, boxShadow: 3 }}>
-              <PhoneIphoneOutlinedIcon sx={{ fontSize: 40, color: '#6a85b6', mb: 1 }} />
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#1a237e' }}>Sign Up</Typography>
-              <Typography variant="body2" sx={{ color: '#1a237e' }}>Create your profile and begin your mentorship journey.</Typography>
+            <Box sx={{ p: 3, minWidth: 220, textAlign: 'center', background: 'linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)', borderRadius: 12, boxShadow: "0 4px 16px rgba(255,215,0,0.2)", border: "1px solid rgba(255,215,0,0.3)" }}>
+              <PhoneIphoneOutlinedIcon sx={{ fontSize: 40, color: '#ffd700', mb: 1 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#ffd700' }}>Sign Up</Typography>
+              <Typography variant="body2" sx={{ color: '#e2e8f0' }}>Create your profile and begin your mentorship journey.</Typography>
             </Box>
           </Grid>
           <Grid item>
-            <Box sx={{ p: 3, minWidth: 220, textAlign: 'center', background: 'linear-gradient(120deg, #fffbe6 0%, #fbd288 100%)', borderRadius: 12, boxShadow: 3 }}>
-              <SearchOutlinedIcon sx={{ fontSize: 40, color: '#6a85b6', mb: 1 }} />
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#1a237e' }}>Personalize Experience</Typography>
-              <Typography variant="body2" sx={{ color: '#1a237e' }}>Share your goals and interests to find the best mentor match.</Typography>
+            <Box sx={{ p: 3, minWidth: 220, textAlign: 'center', background: 'linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)', borderRadius: 12, boxShadow: "0 4px 16px rgba(255,215,0,0.2)", border: "1px solid rgba(255,215,0,0.3)" }}>
+              <SearchOutlinedIcon sx={{ fontSize: 40, color: '#ffd700', mb: 1 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#ffd700' }}>Personalize Experience</Typography>
+              <Typography variant="body2" sx={{ color: '#e2e8f0' }}>Share your goals and interests to find the best mentor match.</Typography>
             </Box>
           </Grid>
           <Grid item>
-            <Box sx={{ p: 3, minWidth: 220, textAlign: 'center', background: 'linear-gradient(120deg, #fffbe6 0%, #fbd288 100%)', borderRadius: 12, boxShadow: 3 }}>
-              <TextsmsRoundedIcon sx={{ fontSize: 40, color: '#6a85b6', mb: 1 }} />
-              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#1a237e' }}>Connect & Grow</Typography>
-              <Typography variant="body2" sx={{ color: '#1a237e' }}>Engage with your mentor through secure chat and calls—grow together!</Typography>
+            <Box sx={{ p: 3, minWidth: 220, textAlign: 'center', background: 'linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)', borderRadius: 12, boxShadow: "0 4px 16px rgba(255,215,0,0.2)", border: "1px solid rgba(255,215,0,0.3)" }}>
+              <TextsmsRoundedIcon sx={{ fontSize: 40, color: '#ffd700', mb: 1 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: '#ffd700' }}>Connect & Grow</Typography>
+              <Typography variant="body2" sx={{ color: '#e2e8f0' }}>Engage with your mentor through secure chat and calls—grow together!</Typography>
             </Box>
           </Grid>
         </Grid>
@@ -232,9 +232,10 @@ function Home() {
           justifyContent: "space-between",
           px: { xs: 2, md: 10 },
           py: 8,
-          background: "rgba(255,255,255,0.07)",
+          background: "rgba(30,58,138,0.3)",
           borderRadius: 6,
-          boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.17)",
+          boxShadow: "0 8px 32px 0 rgba(255,215,0,0.1)",
+          border: "1px solid rgba(255,215,0,0.2)",
           my: 8,
         }}
       >
@@ -246,7 +247,7 @@ function Home() {
               mb: 2,
               fontSize: { xs: "1.6rem", md: "2rem" },
               fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
-              color: "#1a237e",
+              color: "#ffd700",
             }}
           >
             Connect and Collaborate Effortlessly.
@@ -256,8 +257,8 @@ function Home() {
             sx={{
               mb: 3,
               fontSize: { xs: "1rem", md: "1.2rem" },
-              color: "#222",
-              opacity: 0.8,
+              color: "#e2e8f0",
+              opacity: 0.9,
               fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
             }}
           >
@@ -272,7 +273,7 @@ function Home() {
             sx={{
               width: { xs: "220px", md: "320px", lg: "400px" },
               borderRadius: 4,
-              boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+              boxShadow: "0 4px 24px rgba(255,215,0,0.2)",
               mt: { xs: 4, md: 0 },
             }}
           />
@@ -295,12 +296,13 @@ function Home() {
       >
         <Box
           sx={{
-            background: "rgba(26,35,126,0.85)",
+            background: "rgba(15,23,42,0.9)",
             borderRadius: 6,
             p: { xs: 4, md: 8 },
             textAlign: "center",
-            color: "#fff",
-            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.27)",
+            color: "#ffd700",
+            boxShadow: "0 8px 32px 0 rgba(255,215,0,0.2)",
+            border: "1px solid rgba(255,215,0,0.3)",
           }}
         >
           <Typography sx={{ fontSize: { md: "2.5rem", xs: "1.8rem" }, fontWeight: 700, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", mb: 3 }}>
@@ -314,11 +316,13 @@ function Home() {
               textTransform: "capitalize",
               fontWeight: 700,
               fontSize: "1.2rem",
-              background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
+              background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+              color: "#1e3a8a",
               borderRadius: 3,
-              boxShadow: "0 4px 16px rgba(26,35,126,0.15)",
+              boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
               "&:hover": {
-                background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
+                background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                boxShadow: "0 4px 24px rgba(255,215,0,0.4)",
               },
               mt: 2,
             }}
@@ -332,14 +336,15 @@ function Home() {
       <Box
         sx={{
           width: "100%",
-          backgroundColor: "#1D293F",
-          color: "#FFFFFF",
+          backgroundColor: "#0f172a",
+          color: "#e2e8f0",
           pt: 6,
           pb: 6,
           px: { xs: 0, sm: 0, lg: 0 },
           borderTopLeftRadius: 32,
           borderTopRightRadius: 32,
           mt: 8,
+          borderTop: "2px solid #ffd700",
         }}
       >
         <Grid
@@ -358,7 +363,7 @@ function Home() {
           <Grid item xs={12} sm={6} md={3} lg={3} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
             <Typography
               variant="h4"
-              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#F6C794" }}
+              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#ffd700" }}
             >
               AspireAI
             </Typography>
@@ -368,7 +373,7 @@ function Home() {
                 lineHeight: 1.8,
                 fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                 fontSize: "16px",
-                color: "#CBDCEB",
+                color: "#cbd5e1",
               }}
             >
               Empowering students and professionals to reach their goals through personalized mentorship and support.
@@ -379,7 +384,7 @@ function Home() {
             orientation="vertical"
             flexItem
             sx={{
-              backgroundColor: "#CBDCEB",
+              backgroundColor: "#ffd700",
               mx: 2,
               height: '100px',
               alignSelf: "center"
@@ -390,17 +395,17 @@ function Home() {
           <Grid item xs={6} sm={4} md={2} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
             <Typography
               variant="h4"
-              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#FFF6B3" }}
+              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#ffd700" }}
             >
               Main Menu
             </Typography>
             <Typography variant="body1" sx={{ mb: 2, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
-              <Link href="/" sx={{ textDecoration: "none", color: "#CBDCEB" }}>
+              <Link href="/" sx={{ textDecoration: "none", color: "#cbd5e1", "&:hover": { color: "#ffd700" } }}>
                 Home
               </Link>
             </Typography>
             <Typography variant="body1" sx={{ mb: 2, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
-              <Link href="/contact" sx={{ textDecoration: "none", color: "#CBDCEB" }}>
+              <Link href="/contact" sx={{ textDecoration: "none", color: "#cbd5e1", "&:hover": { color: "#ffd700" } }}>
                 Contact
               </Link>
             </Typography>
@@ -410,7 +415,7 @@ function Home() {
             orientation="vertical"
             flexItem
             sx={{
-              backgroundColor: "#CBDCEB",
+              backgroundColor: "#ffd700",
               mx: 2,
               height: '100px',
               alignSelf: "center"
@@ -421,17 +426,17 @@ function Home() {
           <Grid item xs={6} sm={4} md={2} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
             <Typography
               variant="h4"
-              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#FFF6B3" }}
+              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#ffd700" }}
             >
               For Users
             </Typography>
             <Typography variant="body1" sx={{ mb: 2, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
-              <Link href="student/register" sx={{ textDecoration: "none", color: "#CBDCEB" }}>
+              <Link href="student/register" sx={{ textDecoration: "none", color: "#cbd5e1", "&:hover": { color: "#ffd700" } }}>
                 Register
               </Link>
             </Typography>
             <Typography variant="body1" sx={{ mb: 2, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
-              <Link href="/login" sx={{ textDecoration: "none", color: "#CBDCEB" }}>
+              <Link href="/login" sx={{ textDecoration: "none", color: "#cbd5e1", "&:hover": { color: "#ffd700" } }}>
                 Login
               </Link>
             </Typography>
@@ -441,7 +446,7 @@ function Home() {
             orientation="vertical"
             flexItem
             sx={{
-              backgroundColor: "#CBDCEB",
+              backgroundColor: "#ffd700",
               mx: 2,
               height: '100px',
               alignSelf: "center"
@@ -452,7 +457,7 @@ function Home() {
           <Grid item xs={12} sm={6} md={3} lg={3} sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
             <Typography
               variant="h4"
-              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#FFF6B3" }}
+              sx={{ mb: 3, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", color: "#ffd700" }}
             >
               Contact Us
             </Typography>
@@ -461,7 +466,7 @@ function Home() {
               sx={{
                 lineHeight: 1.8,
                 fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
-                color: "#CBDCEB",
+                color: "#cbd5e1",
                 mb: { xs: 2, sm: 3 },
               }}
             >
@@ -469,19 +474,20 @@ function Home() {
             </Typography>
             <Button
               variant="contained"
-              color="primary"
               onClick={() => navigate("/contact")}
               sx={{
                 mt: { xs: 2, sm: 3 },
-                backgroundColor: "#0066FF",
-                "&:hover": { backgroundColor: "#0051cc" },
+                background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                color: "#1e3a8a",
+                "&:hover": { 
+                  background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                },
                 fontSize: { xs: "14px", sm: "16px" },
                 padding: { xs: "6px 12px", sm: "8px 16px" },
                 borderRadius: 3,
                 fontWeight: 700,
                 textAlign: "center",
                 py: 4,
-                color: "#CBDCEB",
                 fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
               }}
             >
@@ -491,6 +497,7 @@ function Home() {
         </Grid>
       </Box>
     </Box>
-    );
-  }
+  );
+}
+
 export default Home;

@@ -8,9 +8,22 @@ import NavDash from "../organisms/NavDash";
 const shimmerBackground = {
     minHeight: "100vh",
     fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
-    background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)",
+    background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
     position: "relative",
     overflow: "hidden",
+};
+
+const shimmerOverlay = {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "linear-gradient(120deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%)",
+    animation: "shimmer 2.5s infinite linear",
+    zIndex: 0,
+    pointerEvents: "none",
 };
 
 const ProfilePage = () => {
@@ -91,16 +104,18 @@ const ProfilePage = () => {
 
     if (loading) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <CircularProgress />
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" sx={shimmerBackground}>
+                <CircularProgress sx={{ color: "#ffd700" }} />
             </Box>
         );
     }
     if (error || !userData) {
         console.log("Error or no userData:", error, userData);
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <Typography variant="h6" color="error">{error || "User profile not found!"}</Typography>
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" sx={shimmerBackground}>
+                <Typography variant="h6" sx={{ color: "#ef4444", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
+                    {error || "User profile not found!"}
+                </Typography>
             </Box>
         );
     }
@@ -109,16 +124,18 @@ const ProfilePage = () => {
 
     return (
         <Box sx={shimmerBackground}>
-            <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+            <Box sx={shimmerOverlay} />
+            <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", position: "relative", zIndex: 1 }}>
                 <NavDash onDrawerToggle={handleDrawerToggle} title={title} />
                 <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
                     <Box sx={{ 
                         width: 250, 
-                        backgroundColor: "rgba(251,251,251,0.15)", 
+                        background: "linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)",
                         backdropFilter: "blur(10px)", 
-                        boxShadow: "2px 0px 15px rgba(0, 0, 0, 0.2)", 
+                        boxShadow: "2px 0px 15px rgba(255,215,0,0.2)", 
                         display: { xs: "none", sm: "block" }, 
-                        border: "1px solid rgba(255,255,255,0.1)" 
+                        border: "1px solid rgba(255,215,0,0.3)",
+                        borderRadius: "0 8px 8px 0"
                     }}>
                         <SideBar onMenuClick={handleMenuClick} />
                     </Box>
@@ -127,31 +144,43 @@ const ProfilePage = () => {
                             <Paper 
                                 elevation={0} 
                                 sx={{ 
-                                    background: "rgba(255,255,255,0.18)",
+                                    background: "linear-gradient(120deg, rgba(30,58,138,0.8) 0%, rgba(15,23,42,0.9) 100%)",
                                     borderRadius: 6,
                                     p: 4, 
-                                    boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 0 24px 4px #ff8c0088",
+                                    boxShadow: "0 8px 32px 0 rgba(255,215,0,0.2)",
                                     backdropFilter: "blur(8px)",
-                                    border: "1px solid rgba(255,255,255,0.18)",
-                                    color: "#fff"
+                                    border: "1px solid rgba(255,215,0,0.3)",
+                                    color: "#e2e8f0"
                                 }}
                             >
                                 <Box display="flex" flexDirection="column" alignItems="center">
-                                    <Avatar sx={{ width: 100, height: 100, mb: 2 }}>
+                                    <Avatar sx={{ 
+                                        width: 100, 
+                                        height: 100, 
+                                        mb: 2,
+                                        background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                                        color: "#1e3a8a",
+                                        fontSize: "2.5rem",
+                                        fontWeight: 700,
+                                        border: "3px solid rgba(255,215,0,0.5)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.3)"
+                                    }}>
                                         {userData.name ? userData.name.charAt(0).toUpperCase() : "?"}
                                     </Avatar>
                                     <Typography variant="h5" fontWeight="bold" sx={{ 
-                                        color: "#fff", 
-                                        textShadow: "0 2px 8px rgba(26,35,126,0.2)",
-                                        fontFamily: "'Poppins', 'Inter', 'Segoe UI', 'Roboto', sans-serif",
-                                        letterSpacing: "0.5px"
+                                        color: "#ffd700", 
+                                        textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                        letterSpacing: "0.5px",
+                                        mb: 1
                                     }}>
                                         {userData.name || "N/A"}
                                     </Typography>
                                     <Typography variant="subtitle1" sx={{ 
-                                        color: "rgba(255,255,255,0.9)",
-                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
-                                        fontWeight: 500
+                                        color: "#e2e8f0",
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                        fontWeight: 500,
+                                        textAlign: "center"
                                     }}>
                                         {userData.collegeName || "N/A"} - {userData.selectedMajors?.join(", ") || "N/A"}
                                     </Typography>
@@ -162,36 +191,36 @@ const ProfilePage = () => {
                                     {/* Personal Information Card */}
                                     <Grid item xs={12} md={6}>
                                         <Paper sx={{ 
-                                            background: "rgba(255,255,255,0.12)",
+                                            background: "linear-gradient(120deg, rgba(15,23,42,0.8) 0%, rgba(30,58,138,0.6) 100%)",
                                             borderRadius: 4,
                                             p: 3, 
                                             backdropFilter: "blur(6px)",
-                                            border: "1px solid rgba(255,255,255,0.15)",
-                                            boxShadow: "0 4px 16px rgba(31, 38, 135, 0.25)"
+                                            border: "1px solid rgba(255,215,0,0.3)",
+                                            boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                         }}>
                                             <Typography variant="h6" sx={{ 
-                                                color: "#fff", 
+                                                color: "#ffd700", 
                                                 fontWeight: 600, 
                                                 mb: 2, 
-                                                borderBottom: "2px solid rgba(255,140,0,0.6)", 
+                                                borderBottom: "2px solid rgba(255,215,0,0.6)", 
                                                 pb: 1,
-                                                fontFamily: "'Poppins', 'Inter', 'Segoe UI', sans-serif",
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                                                 letterSpacing: "0.3px"
                                             }}>
                                                 Personal Information
                                             </Typography>
                                             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>USN:</Typography>
-                                                    <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>{userData.usn || "N/A"}</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>USN:</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600 }}>{userData.usn || "N/A"}</Typography>
                                                 </Box>
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Gender:</Typography>
-                                                    <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>{userData.gender || "N/A"}</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>Gender:</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600 }}>{userData.gender || "N/A"}</Typography>
                                                 </Box>
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Date of Birth:</Typography>
-                                                    <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>{userData.dob || "N/A"}</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>Date of Birth:</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600 }}>{userData.dob || "N/A"}</Typography>
                                                 </Box>
                                             </Box>
                                         </Paper>
@@ -200,32 +229,32 @@ const ProfilePage = () => {
                                     {/* Contact Information Card */}
                                     <Grid item xs={12} md={6}>
                                         <Paper sx={{ 
-                                            background: "rgba(255,255,255,0.12)",
+                                            background: "linear-gradient(120deg, rgba(15,23,42,0.8) 0%, rgba(30,58,138,0.6) 100%)",
                                             borderRadius: 4,
                                             p: 3, 
                                             backdropFilter: "blur(6px)",
-                                            border: "1px solid rgba(255,255,255,0.15)",
-                                            boxShadow: "0 4px 16px rgba(31, 38, 135, 0.25)"
+                                            border: "1px solid rgba(255,215,0,0.3)",
+                                            boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                         }}>
                                             <Typography variant="h6" sx={{ 
-                                                color: "#fff", 
+                                                color: "#ffd700", 
                                                 fontWeight: 600, 
                                                 mb: 2, 
-                                                borderBottom: "2px solid rgba(26,35,126,0.8)", 
+                                                borderBottom: "2px solid rgba(255,215,0,0.6)", 
                                                 pb: 1,
-                                                fontFamily: "'Poppins', 'Inter', 'Segoe UI', sans-serif",
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                                                 letterSpacing: "0.3px"
                                             }}>
                                                 Contact Information
                                             </Typography>
                                             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Mobile:</Typography>
-                                                    <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>{userData.mobileNumber || "N/A"}</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>Mobile:</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600 }}>{userData.mobileNumber || "N/A"}</Typography>
                                                 </Box>
                                                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Alt Mobile:</Typography>
-                                                    <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600 }}>{userData.alternateMobileNumber || "N/A"}</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>Alt Mobile:</Typography>
+                                                    <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600 }}>{userData.alternateMobileNumber || "N/A"}</Typography>
                                                 </Box>
                                             </Box>
                                         </Paper>
@@ -234,20 +263,20 @@ const ProfilePage = () => {
                                     {/* Email Information Card */}
                                     <Grid item xs={12}>
                                         <Paper sx={{ 
-                                            background: "rgba(255,255,255,0.12)",
+                                            background: "linear-gradient(120deg, rgba(15,23,42,0.8) 0%, rgba(30,58,138,0.6) 100%)",
                                             borderRadius: 4,
                                             p: 3, 
                                             backdropFilter: "blur(6px)",
-                                            border: "1px solid rgba(255,255,255,0.15)",
-                                            boxShadow: "0 4px 16px rgba(31, 38, 135, 0.25)"
+                                            border: "1px solid rgba(255,215,0,0.3)",
+                                            boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                         }}>
                                             <Typography variant="h6" sx={{ 
-                                                color: "#fff", 
+                                                color: "#ffd700", 
                                                 fontWeight: 600, 
                                                 mb: 2, 
-                                                borderBottom: "2px solid rgba(255,140,0,0.6)", 
+                                                borderBottom: "2px solid rgba(255,215,0,0.6)", 
                                                 pb: 1,
-                                                fontFamily: "'Poppins', 'Inter', 'Segoe UI', sans-serif",
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                                                 letterSpacing: "0.3px"
                                             }}>
                                                 Email Information
@@ -255,14 +284,14 @@ const ProfilePage = () => {
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12} md={6}>
                                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>Personal Email:</Typography>
-                                                        <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600, wordBreak: "break-all" }}>{userData.email || "N/A"}</Typography>
+                                                        <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>Personal Email:</Typography>
+                                                        <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600, wordBreak: "break-all" }}>{userData.email || "N/A"}</Typography>
                                                     </Box>
                                                 </Grid>
                                                 <Grid item xs={12} md={6}>
                                                     <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>College Email:</Typography>
-                                                        <Typography variant="body2" sx={{ color: "#fff", fontWeight: 600, wordBreak: "break-all" }}>{userData.collegeEmail || "N/A"}</Typography>
+                                                        <Typography variant="body2" sx={{ color: "#cbd5e1", fontWeight: 500 }}>College Email:</Typography>
+                                                        <Typography variant="body2" sx={{ color: "#e2e8f0", fontWeight: 600, wordBreak: "break-all" }}>{userData.collegeEmail || "N/A"}</Typography>
                                                     </Box>
                                                 </Grid>
                                             </Grid>
@@ -273,28 +302,28 @@ const ProfilePage = () => {
                                 {/* About Me Section */}
                                 <Box mt={4}>
                                     <Paper sx={{ 
-                                        background: "rgba(255,255,255,0.12)",
+                                        background: "linear-gradient(120deg, rgba(15,23,42,0.8) 0%, rgba(30,58,138,0.6) 100%)",
                                         borderRadius: 4,
                                         p: 3, 
                                         backdropFilter: "blur(6px)",
-                                        border: "1px solid rgba(255,255,255,0.15)",
-                                        boxShadow: "0 4px 16px rgba(31, 38, 135, 0.25)"
+                                        border: "1px solid rgba(255,215,0,0.3)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                     }}>
                                         <Typography variant="h6" sx={{ 
-                                            color: "#fff", 
+                                            color: "#ffd700", 
                                             fontWeight: 600, 
                                             mb: 2, 
-                                            borderBottom: "2px solid rgba(26,35,126,0.8)", 
+                                            borderBottom: "2px solid rgba(255,215,0,0.6)", 
                                             pb: 1,
-                                            fontFamily: "'Poppins', 'Inter', 'Segoe UI', sans-serif",
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                                             letterSpacing: "0.3px"
                                         }}>
                                             About Me
                                         </Typography>
                                         <Typography variant="body1" sx={{ 
-                                            color: "rgba(255,255,255,0.9)", 
+                                            color: "#e2e8f0", 
                                             lineHeight: 1.6,
-                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
                                         }}>
                                             {userData.shortBio || "No bio available"}
                                         </Typography>
@@ -304,15 +333,15 @@ const ProfilePage = () => {
                                 {/* New Profile Features */}
                                 <Box mt={4}>
                                     <Paper sx={{ 
-                                        background: "rgba(255,255,255,0.1)",
+                                        background: "linear-gradient(120deg, rgba(15,23,42,0.7) 0%, rgba(30,58,138,0.5) 100%)",
                                         borderRadius: 4,
                                         p: 3, 
                                         mb: 3,
                                         backdropFilter: "blur(4px)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        boxShadow: "0 4px 16px rgba(31, 38, 135, 0.2)"
+                                        border: "1px solid rgba(255,215,0,0.3)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                     }}>
-                                        <Typography variant="h6" mb={1} sx={{ color: "#fff", fontWeight: 600 }}>Bio</Typography>
+                                        <Typography variant="h6" mb={2} sx={{ color: "#ffd700", fontWeight: 600, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>Bio</Typography>
                                         <TextField 
                                             fullWidth 
                                             multiline 
@@ -321,11 +350,23 @@ const ProfilePage = () => {
                                             onChange={e => setBio(e.target.value)} 
                                             placeholder="Tell us about yourself..." 
                                             sx={{ 
-                                                background: "rgba(255,255,255,0.7)", 
-                                                borderRadius: 2,
                                                 mb: 2,
                                                 '& .MuiOutlinedInput-root': {
-                                                    '& fieldset': { border: 'none' }
+                                                    backgroundColor: "rgba(15,23,42,0.5)",
+                                                    color: "#e2e8f0",
+                                                    '& fieldset': { 
+                                                        borderColor: "rgba(255,215,0,0.3)",
+                                                    },
+                                                    '&:hover fieldset': {
+                                                        borderColor: "rgba(255,215,0,0.5)",
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: "#ffd700",
+                                                    },
+                                                },
+                                                '& .MuiOutlinedInput-input::placeholder': {
+                                                    color: "#cbd5e1",
+                                                    opacity: 0.7,
                                                 }
                                             }}
                                         />
@@ -334,18 +375,21 @@ const ProfilePage = () => {
                                             variant="contained"
                                             disabled={!bio.trim()}
                                             sx={{
-                                                background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                                color: "#fff",
+                                                background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                                                color: "#1e3a8a",
                                                 fontWeight: 600,
-                                                borderRadius: 2,
+                                                borderRadius: 3,
                                                 textTransform: "none",
+                                                boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
                                                 "&:hover": {
-                                                    background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
+                                                    background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                                    boxShadow: "0 4px 24px rgba(255,215,0,0.4)",
                                                 },
                                                 "&:disabled": {
-                                                    background: "rgba(255,255,255,0.3)",
-                                                    color: "rgba(255,255,255,0.5)",
+                                                    background: "rgba(255,215,0,0.3)",
+                                                    color: "#1e3a8a",
                                                 },
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
                                             }}
                                         >
                                             Update Bio
@@ -353,17 +397,28 @@ const ProfilePage = () => {
                                     </Paper>
                                     
                                     <Paper sx={{ 
-                                        background: "rgba(255,255,255,0.1)",
+                                        background: "linear-gradient(120deg, rgba(15,23,42,0.7) 0%, rgba(30,58,138,0.5) 100%)",
                                         borderRadius: 4,
                                         p: 3, 
                                         mb: 3,
                                         backdropFilter: "blur(4px)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        boxShadow: "0 4px 16px rgba(31, 38, 135, 0.2)"
+                                        border: "1px solid rgba(255,215,0,0.3)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                     }}>
-                                        <Typography variant="h6" mb={1} sx={{ color: "#fff", fontWeight: 600 }}>Skills</Typography>
-                                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
-                                            {skills.map((skill, idx) => <Chip key={idx} label={skill} sx={{ background: "rgba(255,140,0,0.8)", color: "#fff" }} />)}
+                                        <Typography variant="h6" mb={2} sx={{ color: "#ffd700", fontWeight: 600, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>Skills</Typography>
+                                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+                                            {skills.map((skill, idx) => (
+                                                <Chip 
+                                                    key={idx} 
+                                                    label={skill} 
+                                                    sx={{ 
+                                                        background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)", 
+                                                        color: "#1e3a8a",
+                                                        fontWeight: 600,
+                                                        boxShadow: "0 2px 8px rgba(255,215,0,0.3)"
+                                                    }} 
+                                                />
+                                            ))}
                                         </Box>
                                         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                                             <TextField 
@@ -373,10 +428,22 @@ const ProfilePage = () => {
                                                 size="small" 
                                                 sx={{ 
                                                     flex: 1,
-                                                    background: "rgba(255,255,255,0.7)", 
-                                                    borderRadius: 2,
                                                     '& .MuiOutlinedInput-root': {
-                                                        '& fieldset': { border: 'none' }
+                                                        backgroundColor: "rgba(15,23,42,0.5)",
+                                                        color: "#e2e8f0",
+                                                        '& fieldset': { 
+                                                            borderColor: "rgba(255,215,0,0.3)",
+                                                        },
+                                                        '&:hover fieldset': {
+                                                            borderColor: "rgba(255,215,0,0.5)",
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: "#ffd700",
+                                                        },
+                                                    },
+                                                    '& .MuiOutlinedInput-input::placeholder': {
+                                                        color: "#cbd5e1",
+                                                        opacity: 0.7,
                                                     }
                                                 }} 
                                             />
@@ -384,14 +451,17 @@ const ProfilePage = () => {
                                                 onClick={handleAddSkill} 
                                                 variant="contained"
                                                 sx={{
-                                                    background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                                    color: "#fff",
+                                                    background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                                                    color: "#1e3a8a",
                                                     fontWeight: 600,
-                                                    borderRadius: 2,
+                                                    borderRadius: 3,
                                                     textTransform: "none",
+                                                    boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
                                                     "&:hover": {
-                                                        background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
+                                                        background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                                        boxShadow: "0 4px 24px rgba(255,215,0,0.4)",
                                                     },
+                                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
                                                 }}
                                             >
                                                 Add
@@ -400,17 +470,29 @@ const ProfilePage = () => {
                                     </Paper>
                                     
                                     <Paper sx={{ 
-                                        background: "rgba(255,255,255,0.1)",
+                                        background: "linear-gradient(120deg, rgba(15,23,42,0.7) 0%, rgba(30,58,138,0.5) 100%)",
                                         borderRadius: 4,
                                         p: 3, 
                                         mb: 3,
                                         backdropFilter: "blur(4px)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        boxShadow: "0 4px 16px rgba(31, 38, 135, 0.2)"
+                                        border: "1px solid rgba(255,215,0,0.3)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                     }}>
-                                        <Typography variant="h6" mb={1} sx={{ color: "#fff", fontWeight: 600 }}>Interests</Typography>
-                                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
-                                            {interests.map((interest, idx) => <Chip key={idx} label={interest} sx={{ background: "rgba(26,35,126,0.8)", color: "#fff" }} />)}
+                                        <Typography variant="h6" mb={2} sx={{ color: "#ffd700", fontWeight: 600, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>Interests</Typography>
+                                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+                                            {interests.map((interest, idx) => (
+                                                <Chip 
+                                                    key={idx} 
+                                                    label={interest} 
+                                                    sx={{ 
+                                                        background: "linear-gradient(120deg, #1e3a8a 0%, #3b82f6 100%)", 
+                                                        color: "#e2e8f0",
+                                                        fontWeight: 600,
+                                                        border: "1px solid rgba(255,215,0,0.3)",
+                                                        boxShadow: "0 2px 8px rgba(30,58,138,0.3)"
+                                                    }} 
+                                                />
+                                            ))}
                                         </Box>
                                         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                                             <TextField 
@@ -420,10 +502,22 @@ const ProfilePage = () => {
                                                 size="small" 
                                                 sx={{ 
                                                     flex: 1,
-                                                    background: "rgba(255,255,255,0.7)", 
-                                                    borderRadius: 2,
                                                     '& .MuiOutlinedInput-root': {
-                                                        '& fieldset': { border: 'none' }
+                                                        backgroundColor: "rgba(15,23,42,0.5)",
+                                                        color: "#e2e8f0",
+                                                        '& fieldset': { 
+                                                            borderColor: "rgba(255,215,0,0.3)",
+                                                        },
+                                                        '&:hover fieldset': {
+                                                            borderColor: "rgba(255,215,0,0.5)",
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: "#ffd700",
+                                                        },
+                                                    },
+                                                    '& .MuiOutlinedInput-input::placeholder': {
+                                                        color: "#cbd5e1",
+                                                        opacity: 0.7,
                                                     }
                                                 }} 
                                             />
@@ -431,14 +525,17 @@ const ProfilePage = () => {
                                                 onClick={handleAddInterest} 
                                                 variant="contained"
                                                 sx={{
-                                                    background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                                    color: "#fff",
+                                                    background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                                                    color: "#1e3a8a",
                                                     fontWeight: 600,
-                                                    borderRadius: 2,
+                                                    borderRadius: 3,
                                                     textTransform: "none",
+                                                    boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
                                                     "&:hover": {
-                                                        background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
+                                                        background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                                        boxShadow: "0 4px 24px rgba(255,215,0,0.4)",
                                                     },
+                                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
                                                 }}
                                             >
                                                 Add
@@ -447,17 +544,29 @@ const ProfilePage = () => {
                                     </Paper>
                                     
                                     <Paper sx={{ 
-                                        background: "rgba(255,255,255,0.1)",
+                                        background: "linear-gradient(120deg, rgba(15,23,42,0.7) 0%, rgba(30,58,138,0.5) 100%)",
                                         borderRadius: 4,
                                         p: 3, 
                                         mb: 3,
                                         backdropFilter: "blur(4px)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        boxShadow: "0 4px 16px rgba(31, 38, 135, 0.2)"
+                                        border: "1px solid rgba(255,215,0,0.3)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                     }}>
-                                        <Typography variant="h6" mb={1} sx={{ color: "#fff", fontWeight: 600 }}>Achievements</Typography>
-                                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 1 }}>
-                                            {achievements.map((ach, idx) => <Chip key={idx} label={ach} sx={{ background: "rgba(255,214,0,0.8)", color: "#000" }} />)}
+                                        <Typography variant="h6" mb={2} sx={{ color: "#ffd700", fontWeight: 600, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>Achievements</Typography>
+                                        <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+                                            {achievements.map((ach, idx) => (
+                                                <Chip 
+                                                    key={idx} 
+                                                    label={ach} 
+                                                    sx={{ 
+                                                        background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)", 
+                                                        color: "#1e3a8a",
+                                                        fontWeight: 700,
+                                                        border: "2px solid rgba(255,215,0,0.5)",
+                                                        boxShadow: "0 2px 8px rgba(255,215,0,0.4)"
+                                                    }} 
+                                                />
+                                            ))}
                                         </Box>
                                         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                                             <TextField 
@@ -467,10 +576,22 @@ const ProfilePage = () => {
                                                 size="small" 
                                                 sx={{ 
                                                     flex: 1,
-                                                    background: "rgba(255,255,255,0.7)", 
-                                                    borderRadius: 2,
                                                     '& .MuiOutlinedInput-root': {
-                                                        '& fieldset': { border: 'none' }
+                                                        backgroundColor: "rgba(15,23,42,0.5)",
+                                                        color: "#e2e8f0",
+                                                        '& fieldset': { 
+                                                            borderColor: "rgba(255,215,0,0.3)",
+                                                        },
+                                                        '&:hover fieldset': {
+                                                            borderColor: "rgba(255,215,0,0.5)",
+                                                        },
+                                                        '&.Mui-focused fieldset': {
+                                                            borderColor: "#ffd700",
+                                                        },
+                                                    },
+                                                    '& .MuiOutlinedInput-input::placeholder': {
+                                                        color: "#cbd5e1",
+                                                        opacity: 0.7,
                                                     }
                                                 }} 
                                             />
@@ -478,14 +599,17 @@ const ProfilePage = () => {
                                                 onClick={handleAddAchievement} 
                                                 variant="contained"
                                                 sx={{
-                                                    background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                                    color: "#fff",
+                                                    background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                                                    color: "#1e3a8a",
                                                     fontWeight: 600,
-                                                    borderRadius: 2,
+                                                    borderRadius: 3,
                                                     textTransform: "none",
+                                                    boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
                                                     "&:hover": {
-                                                        background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
+                                                        background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                                        boxShadow: "0 4px 24px rgba(255,215,0,0.4)",
                                                     },
+                                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
                                                 }}
                                             >
                                                 Add
@@ -494,26 +618,42 @@ const ProfilePage = () => {
                                     </Paper>
                                     
                                     <Paper sx={{ 
-                                        background: "rgba(255,255,255,0.1)",
+                                        background: "linear-gradient(120deg, rgba(15,23,42,0.7) 0%, rgba(30,58,138,0.5) 100%)",
                                         borderRadius: 4,
                                         p: 3, 
                                         mb: 3,
                                         backdropFilter: "blur(4px)",
-                                        border: "1px solid rgba(255,255,255,0.1)",
-                                        boxShadow: "0 4px 16px rgba(31, 38, 135, 0.2)"
+                                        border: "1px solid rgba(255,215,0,0.3)",
+                                        boxShadow: "0 4px 16px rgba(255,215,0,0.2)"
                                     }}>
-                                        <Typography variant="h6" mb={1} sx={{ color: "#fff", fontWeight: 600 }}>Upload Resume / Portfolio</Typography>
+                                        <Typography variant="h6" mb={2} sx={{ color: "#ffd700", fontWeight: 600, fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>Upload Resume / Portfolio</Typography>
                                         <Input 
                                             type="file" 
                                             onChange={handleResumeUpload} 
                                             sx={{ 
-                                                background: "rgba(255,255,255,0.7)", 
+                                                backgroundColor: "rgba(15,23,42,0.5)",
                                                 borderRadius: 2,
                                                 p: 1,
-                                                width: "100%"
+                                                width: "100%",
+                                                color: "#e2e8f0",
+                                                border: "1px solid rgba(255,215,0,0.3)",
+                                                "&:hover": {
+                                                    borderColor: "rgba(255,215,0,0.5)",
+                                                },
+                                                "&:focus": {
+                                                    borderColor: "#ffd700",
+                                                }
                                             }}
                                         />
-                                        {resume && <Typography mt={1} sx={{ color: "#fff" }}>Uploaded: {resume.name}</Typography>}
+                                        {resume && (
+                                            <Typography mt={1} sx={{ 
+                                                color: "#ffd700", 
+                                                fontWeight: 600,
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif"
+                                            }}>
+                                                Uploaded: {resume.name}
+                                            </Typography>
+                                        )}
                                     </Paper>
                                 </Box>
                             </Paper>
@@ -524,12 +664,36 @@ const ProfilePage = () => {
                     variant="temporary"
                     open={mobileOpen}
                     onClose={handleDrawerToggle}
-                    ModalProps={{ keepMounted: true }}
-                    sx={{ display: { xs: "block", sm: "none" }, color: "black" }}
+                    ModalProps={{ 
+                        keepMounted: true,
+                        sx: {
+                            "& .MuiDrawer-paper": {
+                                background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
+                                border: "1px solid rgba(255,215,0,0.3)",
+                                boxShadow: "0 8px 32px rgba(255,215,0,0.2)",
+                            }
+                        }
+                    }}
+                    sx={{ 
+                        display: { xs: "block", sm: "none" },
+                        "& .MuiDrawer-paper": {
+                            background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
+                            border: "1px solid rgba(255,215,0,0.3)",
+                            boxShadow: "0 8px 32px rgba(255,215,0,0.2)",
+                        }
+                    }}
                 >
                     <SideBar onMenuClick={handleMenuClick} />
                 </Drawer>
             </Box>
+
+            {/* Add the shimmer animation */}
+            <style jsx>{`
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100vw); }
+                }
+            `}</style>
         </Box>
     );
 };

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Button, TextField, Typography, Link, Alert, CircularProgress } from "@mui/material";
-import AcUnitIcon from "@mui/icons-material/AcUnit"; 
+import PersonIcon from "@mui/icons-material/Person"; 
 import axios from "axios"; // Import axios for API calls
 import { useNavigate } from "react-router-dom"; // To navigate after login
 
 const shimmerBackground = {
     minHeight: "100vh",
     fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
-    background: "linear-gradient(120deg, #ff8c00 0%, #1a237e 100%)",
+    background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
     position: "relative",
     overflow: "hidden",
 };
@@ -19,7 +19,7 @@ const shimmerOverlay = {
     left: 0,
     width: "100%",
     height: "100%",
-    background: "linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)",
+    background: "linear-gradient(120deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0.05) 100%)",
     animation: "shimmer 2.5s infinite linear",
     zIndex: 0,
     pointerEvents: "none",
@@ -92,39 +92,88 @@ export default function SignInPage() {
         }
     };
 
-        return (
-            <Box sx={shimmerBackground}>
-                <Box sx={{ ...shimmerOverlay }} />
+    return (
+        <Box sx={shimmerBackground}>
+            <Box sx={{ ...shimmerOverlay }} />
+            <Box
+                sx={{
+                    minHeight: "100vh",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "relative",
+                    zIndex: 1,
+                }}
+            >
                 <Box
                     sx={{
-                        minHeight: "100vh",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
+                        borderRadius: 6,
+                        p: { xs: 4, md: 8 },
+                        textAlign: "center",
+                        boxShadow: "0 8px 32px 0 rgba(255,215,0,0.2)",
+                        backdropFilter: "blur(8px)",
+                        border: "1px solid rgba(255,215,0,0.3)",
+                        color: "#e2e8f0",
+                        width: { xs: "90%", sm: "500px" },
+                        position: "relative",
+                        overflow: "hidden",
                     }}
                 >
-                    <Box
-                        sx={{
-                            background: "rgba(255,255,255,0.18)",
-                            borderRadius: 6,
-                            p: { xs: 4, md: 8 },
-                            textAlign: "center",
-                            boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37), 0 0 24px 4px #ff8c0088",
-                            backdropFilter: "blur(8px)",
-                            border: "1px solid rgba(255,255,255,0.18)",
-                            color: "#222",
-                            width: { xs: "90%", sm: "500px" },
-                            position: "relative",
-                            overflow: "hidden",
-                        }}
-                    >
-                        <Typography variant="h4" sx={{ fontWeight: 700, mb: 3, color: "#fff", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", textShadow: "0 2px 8px rgba(26,35,126,0.2)" }}>
+                    {/* Header with Icon */}
+                    <Box sx={{ mb: 4 }}>
+                        <PersonIcon
+                            sx={{
+                                fontSize: 60,
+                                color: "#ffd700",
+                                mb: 2,
+                                p: 1.5,
+                                backgroundColor: "rgba(255,215,0,0.1)",
+                                borderRadius: "50%",
+                                border: "2px solid rgba(255,215,0,0.3)",
+                            }}
+                        />
+                        <Typography 
+                            variant="h4" 
+                            sx={{ 
+                                fontWeight: 700, 
+                                color: "#ffd700", 
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif", 
+                                textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+                                mb: 1
+                            }}
+                        >
                             Student Login
                         </Typography>
-                        <form onSubmit={handleSubmit}>
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                color: "#e2e8f0",
+                                opacity: 0.9,
+                                fontSize: "1.1rem",
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                            }}
+                        >
+                            Welcome back! Enter your credentials to continue.
+                        </Typography>
+                    </Box>
+
+                    <form onSubmit={handleSubmit}>
+                        <Box sx={{ mb: 3, textAlign: "left" }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "#ffd700",
+                                    mb: 1,
+                                    fontWeight: 600,
+                                    fontSize: "0.9rem",
+                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                }}
+                            >
+                                University Seat Number (USN)
+                            </Typography>
                             <TextField
                                 fullWidth
-                                label="USN"
                                 name="usn"
                                 value={usn}
                                 onChange={(e) => setUsn(e.target.value)}
@@ -132,11 +181,54 @@ export default function SignInPage() {
                                 helperText={usnError}
                                 inputRef={usnRef}
                                 variant="outlined"
-                                sx={{ mb: 2, background: "rgba(255,255,255,0.7)", borderRadius: 2 }}
+                                placeholder="Enter your USN (e.g., 1BG21CS001)"
+                                sx={{
+                                    "& .MuiOutlinedInput-root": {
+                                        color: "#e2e8f0",
+                                        backgroundColor: "rgba(15,23,42,0.5)",
+                                        borderRadius: 2,
+                                        "& fieldset": {
+                                            borderColor: "rgba(255,215,0,0.3)",
+                                            borderWidth: "2px",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "rgba(255,215,0,0.5)",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "#ffd700",
+                                            borderWidth: "2px",
+                                        },
+                                    },
+                                    "& .MuiOutlinedInput-input": {
+                                        padding: "14px 16px",
+                                    },
+                                    "& .MuiOutlinedInput-input::placeholder": {
+                                        color: "#cbd5e1",
+                                        opacity: 0.7,
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        color: "#ef4444",
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                    },
+                                }}
                             />
+                        </Box>
+
+                        <Box sx={{ mb: 3, textAlign: "left" }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "#ffd700",
+                                    mb: 1,
+                                    fontWeight: 600,
+                                    fontSize: "0.9rem",
+                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                }}
+                            >
+                                Password
+                            </Typography>
                             <TextField
                                 fullWidth
-                                label="Password"
                                 name="password"
                                 type="password"
                                 value={password}
@@ -145,43 +237,134 @@ export default function SignInPage() {
                                 helperText={passwordError}
                                 inputRef={passwordRef}
                                 variant="outlined"
-                                sx={{ mb: 2, background: "rgba(255,255,255,0.7)", borderRadius: 2 }}
-                            />
-                            {errorMessage && (
-                                <Alert severity="error" sx={{ mb: 2 }}>
-                                    {errorMessage}
-                                </Alert>
-                            )}
-                            <Button
-                                type="submit"
-                                variant="contained"
+                                placeholder="Enter your password"
                                 sx={{
-                                    background: "linear-gradient(90deg, #ff8c00 60%, #1a237e 100%)",
-                                    color: "#fff",
-                                    fontWeight: 700,
-                                    fontSize: "1.1rem",
-                                    px: 4,
-                                    py: 1.5,
-                                    borderRadius: 3,
-                                    boxShadow: "0 4px 16px rgba(26,35,126,0.15), 0 0 16px 2px #ff8c0088",
-                                    textTransform: "none",
-                                    mb: 2,
-                                    "&:hover": {
-                                        background: "linear-gradient(90deg, #1a237e 60%, #ff8c00 100%)",
-                                        boxShadow: "0 4px 24px rgba(26,35,126,0.25), 0 0 32px 4px #ff8c00bb",
+                                    "& .MuiOutlinedInput-root": {
+                                        color: "#e2e8f0",
+                                        backgroundColor: "rgba(15,23,42,0.5)",
+                                        borderRadius: 2,
+                                        "& fieldset": {
+                                            borderColor: "rgba(255,215,0,0.3)",
+                                            borderWidth: "2px",
+                                        },
+                                        "&:hover fieldset": {
+                                            borderColor: "rgba(255,215,0,0.5)",
+                                        },
+                                        "&.Mui-focused fieldset": {
+                                            borderColor: "#ffd700",
+                                            borderWidth: "2px",
+                                        },
+                                    },
+                                    "& .MuiOutlinedInput-input": {
+                                        padding: "14px 16px",
+                                    },
+                                    "& .MuiOutlinedInput-input::placeholder": {
+                                        color: "#cbd5e1",
+                                        opacity: 0.7,
+                                    },
+                                    "& .MuiFormHelperText-root": {
+                                        color: "#ef4444",
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
                                     },
                                 }}
+                            />
+                        </Box>
+
+                        {errorMessage && (
+                            <Alert 
+                                severity="error" 
+                                sx={{ 
+                                    mb: 3,
+                                    backgroundColor: "rgba(239,68,68,0.1)",
+                                    color: "#ef4444",
+                                    border: "1px solid rgba(239,68,68,0.3)",
+                                    borderRadius: 2,
+                                    "& .MuiAlert-icon": {
+                                        color: "#ef4444",
+                                    },
+                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                                }}
                             >
-                                {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Login"}
-                            </Button>
-                        </form>
-                        <Typography variant="body2" sx={{ mt: 2, color: "#fff", fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif" }}>
-                            Don't have an account? <Link href="/student/register" sx={{ color: "#ffd600", textDecoration: "underline", fontWeight: 600 }}>
-                                Sign up and Get Connected.
-                            </Link>
-                        </Typography>
-                    </Box>
+                                {errorMessage}
+                            </Alert>
+                        )}
+
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            fullWidth
+                            disabled={loading}
+                            sx={{
+                                background: "linear-gradient(90deg, #ffd700 0%, #ffed4e 100%)",
+                                color: "#1e3a8a",
+                                fontWeight: 700,
+                                fontSize: "1.1rem",
+                                py: 1.8,
+                                borderRadius: 3,
+                                boxShadow: "0 4px 16px rgba(255,215,0,0.3)",
+                                textTransform: "none",
+                                mb: 3,
+                                "&:hover": {
+                                    background: "linear-gradient(90deg, #ffed4e 0%, #ffd700 100%)",
+                                    boxShadow: "0 4px 24px rgba(255,215,0,0.4)",
+                                    transform: "translateY(-1px)",
+                                },
+                                "&:disabled": {
+                                    background: "rgba(255,215,0,0.3)",
+                                    color: "#1e3a8a",
+                                },
+                                transition: "all 0.3s ease",
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                            }}
+                        >
+                            {loading ? <CircularProgress size={24} sx={{ color: "#1e3a8a" }} /> : "Login"}
+                        </Button>
+                    </form>
+
+                    <Typography 
+                        variant="body2" 
+                        sx={{ 
+                            color: "#e2e8f0", 
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                            mb: 2
+                        }}
+                    >
+                        Don't have an account?{" "}
+                        <Link 
+                            href="/student/register" 
+                            sx={{ 
+                                color: "#ffd700", 
+                                textDecoration: "none", 
+                                fontWeight: 600,
+                                "&:hover": {
+                                    color: "#ffed4e",
+                                    textDecoration: "underline",
+                                }
+                            }}
+                        >
+                            Sign up and Get Connected.
+                        </Link>
+                    </Typography>
+
+                    {/* Back to Home Link */}
+                    <Link
+                        href="/"
+                        sx={{
+                            color: "#cbd5e1",
+                            textDecoration: "none",
+                            fontSize: "0.9rem",
+                            fontWeight: 500,
+                            "&:hover": {
+                                color: "#ffd700",
+                                textDecoration: "underline",
+                            },
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
+                        }}
+                    >
+                        ← Back to Home
+                    </Link>
                 </Box>
             </Box>
-        );
-    }
+        </Box>
+    );
+}

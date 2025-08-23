@@ -12,9 +12,8 @@ const SearchBar = () => {
         startAdornment: <SearchIcon sx={{ mr: 1 }} />,
       }}
       sx={{
-        backgroundColor: "#fff", // Background color of the search bar
+        background: "linear-gradient(120deg, #1e3a8a 0%, #0f172a 100%)",
         borderRadius: "8px", // Border radius to make corners rounded
-        
         width: "300px", // Set a specific width (optional)
       }}
     />

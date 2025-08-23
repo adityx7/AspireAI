@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Box, Typography, Button, Paper } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import HomeIcon from "@mui/icons-material/Home";
 import Dashboard from "../../assets/Dashboard.png";
 import HeadsetMicIcon from "@mui/icons-material/HeadsetMic";
 import { useNavigate } from "react-router-dom";
@@ -15,39 +14,8 @@ const DashboardContent = ({ selectedMenu }) => {
         navigate("/mentors");
     };
 
-    const handleGoHome = () => {
-        navigate("/");
-    };
-
     return (
         <Box sx={{ mt: { xs: "40px", md: "80px" }, display: "flex", flexDirection: "column", alignItems: "center" }}>
-            {/* Go to Home Button */}
-            <Box sx={{ mb: 3, width: { xs: "90%", sm: "80%", md: "70%" }, display: "flex", justifyContent: "flex-start" }}>
-                <Button
-                    variant="contained"
-                    startIcon={<HomeIcon />}
-                    onClick={handleGoHome}
-                    sx={{
-                        backgroundColor: "#1a237e",
-                        color: "white",
-                        borderRadius: "12px",
-                        padding: "10px 20px",
-                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif",
-                        fontWeight: 600,
-                        textTransform: "none",
-                        boxShadow: "0 4px 16px rgba(26, 35, 126, 0.3)",
-                        "&:hover": {
-                            backgroundColor: "#303f9f",
-                            boxShadow: "0 6px 20px rgba(26, 35, 126, 0.4)",
-                            transform: "translateY(-1px)",
-                        },
-                        transition: "all 0.3s ease",
-                    }}
-                >
-                    Go to Home
-                </Button>
-            </Box>
-
             <Paper
                 elevation={8}
                 sx={{
