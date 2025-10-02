@@ -18,6 +18,19 @@ function Home() {
   const ctaRef = useRef(null);
 
   useEffect(() => {
+    // Preload images for better performance and no lag
+    const imagesToPreload = [manImage, girlImage, dotImage, chatImage, pplImage];
+    imagesToPreload.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      // Force decode for better performance
+      if (img.decode) {
+        img.decode().catch(() => {
+          // Fallback for browsers that don't support decode
+        });
+      }
+    });
+
     // Advanced scroll-triggered animations with staggered timing
     const animateOnScroll = () => {
       const scrollTop = window.pageYOffset;
@@ -282,9 +295,27 @@ function Home() {
         }
       }
     },
+    '& .image-reveal': {
+      imageRendering: 'optimizeQuality',
+      imageRendering: '-webkit-optimize-contrast',
+      imageRendering: 'crisp-edges',
+      willChange: 'transform, opacity, filter',
+      contain: 'layout style paint',
+      '&:not(.animate-in)': {
+        opacity: 0,
+        transform: 'scale(0.8) translateY(30px)',
+        filter: 'blur(5px)'
+      },
+      '&.animate-in': {
+        opacity: 1,
+        transform: 'scale(1) translateY(0)',
+        filter: 'blur(0px)'
+      }
+    },
     '& .floating-element': {
       animation: 'floating 6s ease-in-out infinite',
-      transition: 'transform 0.3s ease-out'
+      transition: 'transform 0.3s ease-out',
+      willChange: 'transform'
     },
     '& .mouse-float': {
       transition: 'transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
@@ -312,14 +343,65 @@ function Home() {
       '50%': { transform: 'translateY(-20px) rotate(0deg)' },
       '75%': { transform: 'translateY(-10px) rotate(-1deg)' }
     },
+    '@keyframes slideInBounce': {
+      '0%': { 
+        opacity: 0, 
+        transform: 'translateX(-100px) translateY(50px) scale(0.3) rotateY(-30deg)',
+        filter: 'blur(10px)'
+      },
+      '60%': { 
+        opacity: 0.8, 
+        transform: 'translateX(10px) translateY(-10px) scale(1.1) rotateY(5deg)',
+        filter: 'blur(2px)'
+      },
+      '80%': { 
+        opacity: 0.9, 
+        transform: 'translateX(-5px) translateY(5px) scale(0.95) rotateY(-2deg)',
+        filter: 'blur(1px)'
+      },
+      '100%': { 
+        opacity: 1, 
+        transform: 'translateX(0) translateY(0) scale(1) rotateY(0deg)',
+        filter: 'blur(0px)'
+      }
+    },
+    '@keyframes slideInBounceRight': {
+      '0%': { 
+        opacity: 0, 
+        transform: 'translateX(100px) translateY(50px) scale(0.3) rotateY(30deg)',
+        filter: 'blur(10px)'
+      },
+      '60%': { 
+        opacity: 0.8, 
+        transform: 'translateX(-10px) translateY(-10px) scale(1.1) rotateY(-5deg)',
+        filter: 'blur(2px)'
+      },
+      '80%': { 
+        opacity: 0.9, 
+        transform: 'translateX(5px) translateY(5px) scale(0.95) rotateY(2deg)',
+        filter: 'blur(1px)'
+      },
+      '100%': { 
+        opacity: 1, 
+        transform: 'translateX(0) translateY(0) scale(1) rotateY(0deg)',
+        filter: 'blur(0px)'
+      }
+    },
     '@keyframes pulseGlow': {
       '0%': { 
         boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)',
-        transform: 'scale(1)'
+        transform: 'scale(1)',
+        opacity: 0.6
+      },
+      '50%': {
+        boxShadow: '0 0 60px rgba(184, 134, 11, 0.5)',
+        transform: 'scale(1.05)',
+        opacity: 0.8
       },
       '100%': { 
-        boxShadow: '0 0 40px rgba(184, 134, 11, 0.6)',
-        transform: 'scale(1.02)'
+        boxShadow: '0 0 40px rgba(184, 134, 11, 0.4)',
+        transform: 'scale(1.02)',
+        opacity: 0.7
       }
     },
     '@keyframes shimmer': {
@@ -579,57 +661,7 @@ function Home() {
           }}
         >
           <Box sx={{ position: "relative", minHeight: "400px", width: "100%" }}>
-            {/* Main person image */}
-            <Box
-              className="scale-in tilt-card floating-element stagger-child"
-              component="img"
-              src={manImage}
-              alt="Professional Mentor"
-              sx={{
-                width: { xs: "180px", md: "220px", lg: "250px" },
-                position: "absolute",
-                top: "20%",
-                left: "20%",
-                zIndex: 3,
-                borderRadius: 3,
-                boxShadow: "0 10px 30px rgba(0,0,0,0.2), 0 0 15px rgba(184, 134, 11, 0.1)",
-                border: "2px solid rgba(184, 134, 11, 0.2)",
-                transition: "all 0.4s ease",
-                animationDelay: '1.2s',
-                '&:hover': {
-                  transform: 'scale(1.08) rotateY(5deg)',
-                  boxShadow: "0 20px 50px rgba(0,0,0,0.3), 0 0 25px rgba(184, 134, 11, 0.3)",
-                  border: "2px solid rgba(184, 134, 11, 0.4)"
-                }
-              }}
-            />
-            
-            {/* Second person image */}
-            <Box
-              className="scale-in tilt-card floating-element stagger-child"
-              component="img"
-              src={girlImage}
-              alt="Professional Mentee"
-              sx={{
-                width: { xs: "180px", md: "220px", lg: "250px" },
-                position: "absolute",
-                top: "45%",
-                right: "15%",
-                zIndex: 3,
-                borderRadius: 3,
-                boxShadow: "0 10px 30px rgba(0,0,0,0.2), 0 0 15px rgba(184, 134, 11, 0.1)",
-                border: "2px solid rgba(184, 134, 11, 0.2)",
-                transition: "all 0.4s ease",
-                animationDelay: '2s',
-                '&:hover': {
-                  transform: 'scale(1.08) rotateY(-5deg)',
-                  boxShadow: "0 20px 50px rgba(0,0,0,0.3), 0 0 25px rgba(184, 134, 11, 0.3)",
-                  border: "2px solid rgba(184, 134, 11, 0.4)"
-                }
-              }}
-            />
-            
-            {/* Animated background dot pattern */}
+            {/* Enhanced animated background with better performance */}
             <Box
               className="rotate-in floating-element mouse-float stagger-child"
               component="img"
@@ -643,7 +675,113 @@ function Home() {
                 zIndex: 1,
                 opacity: 0.15,
                 filter: "sepia(1) hue-rotate(40deg) saturate(1.5)",
-                animationDelay: '1.6s'
+                animationDelay: '0.8s',
+                willChange: 'transform, opacity',
+                transform: 'translateZ(0)', // Hardware acceleration
+                backfaceVisibility: 'hidden'
+              }}
+            />
+
+            {/* Main person image with enhanced effects */}
+            <Box
+              className="scale-in tilt-card floating-element stagger-child image-reveal"
+              component="img"
+              src={manImage}
+              alt="Professional Mentor"
+              sx={{
+                width: { xs: "180px", md: "220px", lg: "250px" },
+                position: "absolute",
+                top: "20%",
+                left: "20%",
+                zIndex: 3,
+                borderRadius: 3,
+                boxShadow: "0 15px 40px rgba(0,0,0,0.25), 0 0 20px rgba(184, 134, 11, 0.15)",
+                border: "2px solid rgba(184, 134, 11, 0.3)",
+                transition: "all 0.6s cubic-bezier(0.23, 1, 0.32, 1)",
+                animationDelay: '1.0s',
+                willChange: 'transform, box-shadow, filter',
+                transform: 'translateZ(0)', // Hardware acceleration
+                backfaceVisibility: 'hidden',
+                filter: 'brightness(1.05) contrast(1.1)',
+                '&:hover': {
+                  transform: 'scale(1.12) rotateY(8deg) translateZ(20px)',
+                  boxShadow: "0 25px 60px rgba(0,0,0,0.35), 0 0 35px rgba(184, 134, 11, 0.4)",
+                  border: "2px solid rgba(184, 134, 11, 0.6)",
+                  filter: 'brightness(1.15) contrast(1.2) drop-shadow(0 0 15px rgba(184, 134, 11, 0.3))'
+                },
+                '&.animate-in': {
+                  animation: 'slideInBounce 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards'
+                }
+              }}
+            />
+            
+            {/* Second person image with staggered animation */}
+            <Box
+              className="scale-in tilt-card floating-element stagger-child image-reveal"
+              component="img"
+              src={girlImage}
+              alt="Professional Mentee"
+              sx={{
+                width: { xs: "180px", md: "220px", lg: "250px" },
+                position: "absolute",
+                top: "45%",
+                right: "15%",
+                zIndex: 3,
+                borderRadius: 3,
+                boxShadow: "0 15px 40px rgba(0,0,0,0.25), 0 0 20px rgba(184, 134, 11, 0.15)",
+                border: "2px solid rgba(184, 134, 11, 0.3)",
+                transition: "all 0.6s cubic-bezier(0.23, 1, 0.32, 1)",
+                animationDelay: '1.4s',
+                willChange: 'transform, box-shadow, filter',
+                transform: 'translateZ(0)', // Hardware acceleration
+                backfaceVisibility: 'hidden',
+                filter: 'brightness(1.05) contrast(1.1)',
+                '&:hover': {
+                  transform: 'scale(1.12) rotateY(-8deg) translateZ(20px)',
+                  boxShadow: "0 25px 60px rgba(0,0,0,0.35), 0 0 35px rgba(184, 134, 11, 0.4)",
+                  border: "2px solid rgba(184, 134, 11, 0.6)",
+                  filter: 'brightness(1.15) contrast(1.2) drop-shadow(0 0 15px rgba(184, 134, 11, 0.3))'
+                },
+                '&.animate-in': {
+                  animation: 'slideInBounceRight 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards'
+                }
+              }}
+            />
+
+            {/* Animated glow effects behind images */}
+            <Box
+              className="pulse-glow stagger-child"
+              sx={{
+                position: "absolute",
+                top: "18%",
+                left: "18%",
+                width: { xs: "190px", md: "230px", lg: "260px" },
+                height: { xs: "190px", md: "230px", lg: "260px" },
+                background: "radial-gradient(circle, rgba(184, 134, 11, 0.2) 0%, transparent 70%)",
+                borderRadius: "50%",
+                zIndex: 2,
+                filter: "blur(20px)",
+                animationDelay: '1.2s',
+                willChange: 'transform, opacity',
+                animation: 'pulseGlow 4s ease-in-out infinite alternate'
+              }}
+            />
+
+            <Box
+              className="pulse-glow stagger-child"
+              sx={{
+                position: "absolute",
+                top: "43%",
+                right: "13%",
+                width: { xs: "190px", md: "230px", lg: "260px" },
+                height: { xs: "190px", md: "230px", lg: "260px" },
+                background: "radial-gradient(circle, rgba(184, 134, 11, 0.2) 0%, transparent 70%)",
+                borderRadius: "50%",
+                zIndex: 2,
+                filter: "blur(20px)",
+                animationDelay: '1.6s',
+                willChange: 'transform, opacity',
+                animation: 'pulseGlow 4s ease-in-out infinite alternate'
               }}
             />
             

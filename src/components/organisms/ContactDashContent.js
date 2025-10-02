@@ -122,14 +122,24 @@ const ContactPage = () => {
 
         {/* Form Fields */}
         <TextField
-          placeholder="Subject"
+          placeholder="Name"
           variant="outlined"
           fullWidth
           sx={{ 
             marginBottom: "24px",
             '& .MuiOutlinedInput-root': {
-              background: "rgba(26, 43, 76, 0.3)",
-              backdropFilter: "blur(10px)",
+              background: "rgba(248, 250, 252, 0.9)",
+              borderRadius: 2,
+              transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+              '&:hover': {
+                background: "rgba(248, 250, 252, 0.95)",
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(184, 134, 11, 0.2)'
+              },
+              '&.Mui-focused': {
+                background: "rgba(248, 250, 252, 1)",
+                boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)'
+              },
               '& fieldset': {
                 borderColor: 'rgba(184, 134, 11, 0.3)',
               },
@@ -138,16 +148,101 @@ const ContactPage = () => {
               },
               '&.Mui-focused fieldset': {
                 borderColor: '#B8860B',
+                borderWidth: '2px'
               },
               '& input': {
-                color: '#ffffff',
-                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                '&::placeholder': {
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  opacity: 1
+                }
               }
             }
           }}
         />
         <TextField
-          placeholder="Message..."
+          placeholder="Email"
+          variant="outlined"
+          fullWidth
+          sx={{ 
+            marginBottom: "24px",
+            '& .MuiOutlinedInput-root': {
+              background: "rgba(248, 250, 252, 0.9)",
+              borderRadius: 2,
+              transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+              '&:hover': {
+                background: "rgba(248, 250, 252, 0.95)",
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(184, 134, 11, 0.2)'
+              },
+              '&.Mui-focused': {
+                background: "rgba(248, 250, 252, 1)",
+                boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)'
+              },
+              '& fieldset': {
+                borderColor: 'rgba(184, 134, 11, 0.3)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(184, 134, 11, 0.5)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#B8860B',
+                borderWidth: '2px'
+              },
+              '& input': {
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                '&::placeholder': {
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  opacity: 1
+                }
+              }
+            }
+          }}
+        />
+        <TextField
+          placeholder="Subject"
+          variant="outlined"
+          fullWidth
+          sx={{ 
+            marginBottom: "24px",
+            '& .MuiOutlinedInput-root': {
+              background: "rgba(248, 250, 252, 0.9)",
+              borderRadius: 2,
+              transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+              '&:hover': {
+                background: "rgba(248, 250, 252, 0.95)",
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(184, 134, 11, 0.2)'
+              },
+              '&.Mui-focused': {
+                background: "rgba(248, 250, 252, 1)",
+                boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)'
+              },
+              '& fieldset': {
+                borderColor: 'rgba(184, 134, 11, 0.3)',
+              },
+              '&:hover fieldset': {
+                borderColor: 'rgba(184, 134, 11, 0.5)',
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#B8860B',
+                borderWidth: '2px'
+              },
+              '& input': {
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                '&::placeholder': {
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  opacity: 1
+                }
+              }
+            }
+          }}
+        />
+        <TextField
+          placeholder="Message"
           variant="outlined"
           fullWidth
           multiline
@@ -155,8 +250,18 @@ const ContactPage = () => {
           sx={{ 
             marginBottom: "30px",
             '& .MuiOutlinedInput-root': {
-              background: "rgba(26, 43, 76, 0.3)",
-              backdropFilter: "blur(10px)",
+              background: "rgba(248, 250, 252, 0.9)",
+              borderRadius: 2,
+              transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+              '&:hover': {
+                background: "rgba(248, 250, 252, 0.95)",
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 15px rgba(184, 134, 11, 0.2)'
+              },
+              '&.Mui-focused': {
+                background: "rgba(248, 250, 252, 1)",
+                boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)'
+              },
               '& fieldset': {
                 borderColor: 'rgba(184, 134, 11, 0.3)',
               },
@@ -165,10 +270,15 @@ const ContactPage = () => {
               },
               '&.Mui-focused fieldset': {
                 borderColor: '#B8860B',
+                borderWidth: '2px'
               },
               '& textarea': {
-                color: '#ffffff',
-                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                color: 'rgba(0, 0, 0, 0.87)',
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                '&::placeholder': {
+                  color: 'rgba(0, 0, 0, 0.6)',
+                  opacity: 1
+                }
               }
             }
           }}
@@ -188,16 +298,42 @@ const ContactPage = () => {
           variant="contained"
           onClick={handleSendQuery}
           sx={{
-            width: isMobile ? "100%" : "auto", // Full-width button on small screens
+            width: isMobile ? "100%" : "auto",
             background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
             color: "#ffffff",
-            fontWeight: "600",
-            padding: "14px 32px",
+            fontWeight: "700",
+            padding: "16px 40px",
             borderRadius: "12px",
             boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
             fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
             fontSize: "16px",
             textTransform: "none",
+            border: "2px solid transparent",
+            transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
+              transition: 'left 0.6s ease'
+            },
+            "&:hover": {
+              background: "linear-gradient(135deg, #8B6914 0%, #B8860B 100%)",
+              transform: 'translateY(-2px) scale(1.02)',
+              boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
+              border: "2px solid rgba(184, 134, 11, 0.3)",
+              '&::before': {
+                left: '100%'
+              }
+            },
+            "&:active": {
+              transform: "translateY(0px) scale(1)",
+            },
             '&:hover': {
               background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
               boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
