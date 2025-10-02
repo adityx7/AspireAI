@@ -196,7 +196,8 @@ const Dashboard = () => {
                     <Box className="fade-in-up" sx={{ 
                         flexGrow: 1, 
                         overflowY: "auto",
-                        background: "transparent"
+                        background: "transparent",
+                        marginLeft: "250px" // Add margin equal to sidebar width
                     }}>
                         <Container sx={{ mt: 2 }}>
                             <DashboardContent />

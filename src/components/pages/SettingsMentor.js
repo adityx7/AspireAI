@@ -49,7 +49,11 @@ const SettingsMentor = () => {
                 </Box>
 
                 {/* Main Content */}
-                <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+                <Box sx={{ 
+                    flexGrow: 1, 
+                    overflowY: "auto",
+                    marginLeft: "250px" // Add margin equal to sidebar width
+                }}>
                     <Container sx={{ mt: 2 }}>
                         <MenSettingsPage/>
                     </Container>

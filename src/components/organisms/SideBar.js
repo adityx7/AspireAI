@@ -53,8 +53,11 @@ const Sidebar = ({ onMenuClick }) => {
                 height: "100vh",
                 boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
                 border: "1px solid rgba(184, 134, 11, 0.15)",
-                position: "relative",
+                position: "fixed", // Changed from relative to fixed
+                left: 0,
+                top: 0,
                 overflow: "hidden",
+                zIndex: 1200, // Ensure sidebar is above other content
                 '&::before': {
                     content: '""',
                     position: 'absolute',
@@ -113,14 +116,16 @@ const Sidebar = ({ onMenuClick }) => {
                                 : "transparent",
                             color: currentPath === path ? "#ffffff" : "#ffffff",
                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                            borderLeft: currentPath === path ? "3px solid #FFFFFF" : "3px solid transparent",
                             '&:hover': {
                                 background: currentPath === path
                                     ? "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)"
                                     : "rgba(184, 134, 11, 0.1)",
-                                transform: "translateX(4px)",
+                                // Removed transform property to prevent movement
                                 boxShadow: currentPath === path
                                     ? "0 8px 25px rgba(184, 134, 11, 0.3)"
-                                    : "0 4px 15px rgba(184, 134, 11, 0.1)"
+                                    : "0 4px 15px rgba(184, 134, 11, 0.1)",
+                                borderLeft: "3px solid #B8860B"
                             },
                             ...(currentPath === path && {
                                 boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
@@ -165,7 +170,7 @@ const Sidebar = ({ onMenuClick }) => {
                     '&::before, &::after': {
                         borderColor: 'rgba(184, 134, 11, 0.3)'
                     }
-                }} /> {/* Divider */
+                }} />
 
                 {secondaryMenuItems.map(({ text, path, icon }) => (
                     <ListItem
@@ -181,14 +186,16 @@ const Sidebar = ({ onMenuClick }) => {
                                 : "transparent",
                             color: currentPath === path ? "#ffffff" : "#ffffff",
                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                            borderLeft: currentPath === path ? "3px solid #FFFFFF" : "3px solid transparent",
                             '&:hover': {
                                 background: currentPath === path
                                     ? "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)"
                                     : "rgba(184, 134, 11, 0.1)",
-                                transform: "translateX(4px)",
+                                // Removed transform property to prevent movement
                                 boxShadow: currentPath === path
                                     ? "0 8px 25px rgba(184, 134, 11, 0.3)"
-                                    : "0 4px 15px rgba(184, 134, 11, 0.1)"
+                                    : "0 4px 15px rgba(184, 134, 11, 0.1)",
+                                borderLeft: "3px solid #B8860B"
                             },
                             ...(currentPath === path && {
                                 boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",

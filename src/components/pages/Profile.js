@@ -256,7 +256,8 @@ const ProfilePage = () => {
                         justifyContent: "center", 
                         alignItems: "center", 
                         minHeight: "80vh",
-                        background: "transparent"
+                        background: "transparent",
+                        marginLeft: "250px" // Add margin equal to sidebar width
                     }}>
                         <Container maxWidth="md">
                             <Paper 

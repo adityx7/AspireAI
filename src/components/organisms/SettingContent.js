@@ -547,11 +547,19 @@ const SettingsPage = () => {
 
                 {activeStep === 1 && (
                     <>
-                        <Typography variant="h6" sx={{ 
-                            fontWeight: "700", 
-                            mb: 3, 
+                        <Typography variant="h5" sx={{ 
+                            fontWeight: "800", 
+                            mb: 3,
+                            fontSize: "1.8rem",
+                            letterSpacing: "1px",
+                            textTransform: "uppercase",
+                            textAlign: "center",
                             fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
-                            color: "#B8860B"
+                            color: "#DAA520",
+                            textShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                            background: "linear-gradient(90deg, #B8860B, #FFC107)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent"
                         }}>
                             Academics
                         </Typography>
@@ -564,8 +572,16 @@ const SettingsPage = () => {
                         }} />
 
                         {/* Graduation Year */}
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <Typography fontFamily="Courier">What is your graduation year?</Typography>
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                            <Typography 
+                                fontFamily="Courier" 
+                                fontSize="1.1rem" 
+                                fontWeight="600" 
+                                color="#DAA520" 
+                                mb={1}
+                            >
+                                What is your graduation year?
+                            </Typography>
                             <TextField
                                 id="year"
                                 select
@@ -573,7 +589,23 @@ const SettingsPage = () => {
                                 SelectProps={{
                                     native: true,
                                 }}
-                                variant="standard"
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        color: '#FFFFFF',
+                                        '& fieldset': {
+                                            borderColor: '#DAA520',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#FFC107',
+                                        },
+                                    },
+                                    '& .MuiSelect-select': {
+                                        fontSize: '1.1rem',
+                                        padding: '12px',
+                                    },
+                                }}
                             >
                                 {[2023, 2024, 2025, 2026].map((year) => (
                                     <option key={year} value={year}>
@@ -584,18 +616,54 @@ const SettingsPage = () => {
                         </FormControl>
 
                         {/* College */}
-                        <FormControl fullWidth sx={{ mb: 2 }}>
-                            <Typography fontFamily="Courier">Choose the college you're attending or attended</Typography>
+                        <FormControl fullWidth sx={{ mb: 3 }}>
+                            <Typography 
+                                fontFamily="Courier" 
+                                fontSize="1.1rem" 
+                                fontWeight="600" 
+                                color="#DAA520" 
+                                mb={1}
+                            >
+                                Choose the college you're attending or attended
+                            </Typography>
                             <TextField
                                 placeholder="Enter your college name"
                                 value={formData.collegeName}
                                 onChange={(e) => handleInputChange("collegeName", e.target.value)}
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                        color: '#FFFFFF',
+                                        '& fieldset': {
+                                            borderColor: '#DAA520',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: '#FFC107',
+                                        },
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        fontSize: '1.1rem',
+                                        padding: '12px',
+                                    },
+                                    '& .MuiInputBase-input::placeholder': {
+                                        color: 'rgba(255, 255, 255, 0.7)',
+                                        opacity: 1,
+                                    },
+                                }}
                             />
                         </FormControl>
 
                         {/* Majors */}
                         <FormControl fullWidth>
-                            <Typography id="majors-label" fontFamily="Courier">
+                            <Typography 
+                                id="majors-label" 
+                                fontFamily="Courier" 
+                                fontSize="1.1rem" 
+                                fontWeight="600" 
+                                color="#DAA520" 
+                                mb={1}
+                            >
                                 Choose your major
                             </Typography>
                             <Select
@@ -606,6 +674,30 @@ const SettingsPage = () => {
                                 onChange={(e) =>
                                     setFormData({ ...formData, selectedMajors: e.target.value })
                                 }
+                                sx={{
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                    color: '#FFFFFF',
+                                    '.MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#DAA520',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#FFC107',
+                                    },
+                                    '.MuiSelect-icon': {
+                                        color: '#DAA520',
+                                    },
+                                    '.MuiChip-root': {
+                                        backgroundColor: 'rgba(218, 165, 32, 0.2)',
+                                        borderColor: '#DAA520',
+                                        color: '#FFFFFF',
+                                    },
+                                    '.MuiChip-deleteIcon': {
+                                        color: '#DAA520',
+                                        '&:hover': {
+                                            color: '#FFC107',
+                                        },
+                                    },
+                                }}
                             >
                                 {majorsOptions.map((option) => (
                                     <MenuItem key={option.value} value={option.value}>
@@ -618,19 +710,66 @@ const SettingsPage = () => {
                 )}
                 {activeStep === 2 && (
                     <>
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 1, fontFamily: "Courier" }}>
+                        <Typography variant="h5" sx={{ 
+                            fontWeight: "800", 
+                            mb: 3,
+                            fontSize: "1.8rem",
+                            letterSpacing: "1px",
+                            textTransform: "uppercase",
+                            textAlign: "center",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            color: "#DAA520",
+                            textShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
+                            background: "linear-gradient(90deg, #B8860B, #FFC107)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent"
+                        }}>
                             Profile Details
                         </Typography>
-                        <Divider sx={{ mb: 3 }} />
-                        <Typography variant="body1" sx={{ mb: 1, fontFamily: "Courier" }}>
+                        <Divider sx={{ 
+                            mb: 4,
+                            borderColor: "rgba(184, 134, 11, 0.3)",
+                            '&::before, &::after': {
+                                borderColor: 'rgba(184, 134, 11, 0.3)'
+                            }
+                        }} />
+                        <Typography 
+                            fontFamily="Courier" 
+                            fontSize="1.1rem" 
+                            fontWeight="600" 
+                            color="#DAA520" 
+                            mb={1}
+                        >
                             Short Bio
                         </Typography>
                         <TextField
                             fullWidth
-                            placeholder="State purpose..."
+                            placeholder="Tell us about yourself..."
                             multiline
+                            rows={4}
                             variant="outlined"
-                            sx={{ mb: 3 }}
+                            sx={{ 
+                                mb: 3,
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                    color: '#FFFFFF',
+                                    '& fieldset': {
+                                        borderColor: '#DAA520',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#FFC107',
+                                    },
+                                },
+                                '& .MuiInputBase-input': {
+                                    fontSize: '1.1rem',
+                                    padding: '12px',
+                                    lineHeight: '1.6',
+                                },
+                                '& .MuiInputBase-input::placeholder': {
+                                    color: 'rgba(255, 255, 255, 0.7)',
+                                    opacity: 1,
+                                }
+                            }}
                             value={formData.shortBio}
                             onChange={(e) => handleInputChange("shortBio", e.target.value)}
                         />
@@ -640,29 +779,34 @@ const SettingsPage = () => {
 
             <Box>
                 {/* Navigation Buttons */}
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 3, mt: 4 }}>
+                <Box sx={{ display: "flex", flexDirection: "row", pt: 3, mt: 4, justifyContent: "center" }}>
                     <Button
                         disabled={activeStep === 0}
                         onClick={() => setActiveStep((prev) => prev - 1)}
                         sx={{ 
                             mr: 2,
                             background: activeStep === 0 
-                                ? "linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.2) 100%)"
-                                : "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)",
-                            color: activeStep === 0 ? "rgba(184, 134, 11, 0.5)" : "#B8860B",
+                                ? "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)"
+                                : "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                            color: activeStep === 0 ? "rgba(255, 255, 255, 0.5)" : "#FFFFFF",
                             fontWeight: "600",
-                            padding: "12px 24px",
+                            padding: "15px 35px",
+                            fontSize: "1rem",
+                            letterSpacing: "1px",
                             borderRadius: "12px",
-                            border: "1px solid rgba(184, 134, 11, 0.3)",
+                            boxShadow: "0 4px 12px rgba(184, 134, 11, 0.3)",
+                            border: "1px solid #DAA520",
                             fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            transition: "all 0.3s ease",
                             '&:hover': activeStep !== 0 ? {
-                                background: "linear-gradient(135deg, rgba(184, 134, 11, 0.4) 0%, rgba(218, 165, 32, 0.4) 100%)",
-                                transform: "translateY(-1px)"
+                                background: "linear-gradient(135deg, #DAA520 0%, #FFC107 100%)",
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 6px 14px rgba(218, 165, 32, 0.4)"
                             } : {},
                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                         }}
                     >
-                        Back
+                        BACK
                     </Button>
                     <Box sx={{ flex: "1 1 auto" }} />
                     {activeStep < steps.length - 1 ? (
@@ -671,21 +815,27 @@ const SettingsPage = () => {
                             variant="contained"
                             sx={{
                                 background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
-                                color: "#ffffff",
-                                fontWeight: "600",
-                                padding: "12px 24px",
+                                color: "#FFFFFF",
+                                fontWeight: "700",
+                                padding: "15px 35px",
+                                fontSize: "1rem",
+                                letterSpacing: "1px",
                                 borderRadius: "12px",
-                                boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
+                                boxShadow: "0 8px 25px rgba(184, 134, 11, 0.5)",
+                                border: "1px solid #FFC107",
                                 fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                transition: "all 0.3s ease",
                                 '&:hover': {
-                                    background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+                                    background: "linear-gradient(135deg, #DAA520 0%, #FFC107 100%)",
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 10px 30px rgba(218, 165, 32, 0.6)",
                                     boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
                                     transform: "translateY(-2px)"
                                 },
                                 transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
                             }}
                         >
-                            Next
+                            NEXT
                         </Button>
                     ) : (
                         <>
