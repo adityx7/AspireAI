@@ -576,6 +576,157 @@ app.post("/api/academics/certification", async (req, res) => {
     }
 });
 
+// ✅ Update total credits
+app.put("/api/academics/credits", async (req, res) => {
+    try {
+        const { usn, credits } = req.body;
+
+        if (!usn || credits === undefined) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN and credits are required" 
+            });
+        }
+
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        // Initialize academics object if it doesn't exist
+        if (!student.academics) {
+            student.academics = { semesters: [], overallCGPA: 0, totalCredits: 0 };
+        }
+
+        student.academics.totalCredits = parseInt(credits);
+        await student.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Total credits updated successfully",
+            data: { totalCredits: student.academics.totalCredits }
+        });
+
+    } catch (error) {
+        console.error("❌ Error updating credits:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+// ✅ Add activity points
+app.post("/api/academics/activity", async (req, res) => {
+    try {
+        const { usn, activity, points, description } = req.body;
+
+        if (!usn || !activity || !points) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN, activity name, and points are required" 
+            });
+        }
+
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        // Initialize aictActivityPoints if it doesn't exist
+        if (!student.aictActivityPoints) {
+            student.aictActivityPoints = {
+                currentPoints: 0,
+                targetPoints: 100,
+                activities: []
+            };
+        }
+
+        const activityData = {
+            name: activity,
+            type: 'Academic', // Default type
+            points: parseInt(points),
+            status: 'Completed',
+            dateCompleted: new Date(),
+            description: description || ""
+        };
+
+        student.aictActivityPoints.activities.push(activityData);
+        
+        // Update current points
+        student.aictActivityPoints.currentPoints += parseInt(points);
+
+        await student.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Activity points added successfully",
+            data: student.aictActivityPoints
+        });
+
+    } catch (error) {
+        console.error("❌ Error adding activity points:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+// ✅ Test route to create sample student data
+app.post("/api/test/create-student", async (req, res) => {
+    try {
+        const testStudent = new Student({
+            name: "Aditya",
+            usn: "1BG21CS001",
+            email: "aditya@test.com",
+            academics: {
+                semesters: [],
+                overallCGPA: 8.49,
+                totalCredits: 0
+            },
+            certifications: [],
+            aictActivityPoints: {
+                currentPoints: 0,
+                targetPoints: 100,
+                activities: []
+            }
+        });
+
+        await testStudent.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Test student created successfully",
+            data: testStudent
+        });
+
+    } catch (error) {
+        // If student already exists, just return success
+        if (error.code === 11000) {
+            res.status(200).json({ 
+                success: true, 
+                message: "Test student already exists"
+            });
+        } else {
+            console.error("❌ Error creating test student:", error);
+            res.status(500).json({ 
+                success: false, 
+                message: "Server error", 
+                error: error.message 
+            });
+        }
+    }
+});
+
 /* -----------------------------------
    ✅ Student APIs (Existing)
 -------------------------------------*/

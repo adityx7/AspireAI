@@ -1,28 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-    Container,
-    Paper,
-    Typography,
-    Grid,
+    Box,
     Card,
     CardContent,
-    Box,
+    Typography,
+    Container,
+    Grid,
+    LinearProgress,
+    Chip,
     Button,
-    TextField,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
+    TextField,
     Alert,
+    CircularProgress,
+    Paper
 } from '@mui/material';
-import {
-    Add as AddIcon,
-    School as SchoolIcon,
-    Assignment as AssignmentIcon,
-    EmojiEvents as TrophyIcon,
-    TrendingUp as TrendingUpIcon,
-    Edit as EditIcon,
-} from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import SchoolIcon from '@mui/icons-material/School';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import AddIcon from '@mui/icons-material/Add';
 
 const shimmerBackground = {
     minHeight: "100vh",
@@ -82,7 +83,13 @@ const Academics = () => {
     const [academicData, setAcademicData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [openSemesterDialog, setOpenSemesterDialog] = useState(false);
+    
+    // Loading states for individual operations
+    const [creditsLoading, setCreditsLoading] = useState(false);
+    const [certificationsLoading, setCertificationsLoading] = useState(false);
+    const [activityLoading, setActivityLoading] = useState(false);
     const [newSemesterData, setNewSemesterData] = useState({
         semesterNumber: '',
         cgpa: '',
@@ -108,7 +115,39 @@ const Academics = () => {
         description: '' 
     });
 
-    const usn = localStorage.getItem('usn') || 'defaultUSN';
+    const usn = localStorage.getItem('userUSN') || localStorage.getItem('usn') || '1BG21CS001';
+
+    const fetchAcademicData = useCallback(async () => {
+        try {
+            console.log('🔄 Fetching academic data for USN:', usn);
+            setLoading(true);
+            const response = await fetch(`http://localhost:5002/api/academics/dashboard/${usn}`);
+            
+            console.log('📡 Response status:', response.status);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('📊 Academic data received:', result);
+            console.log('✅ Setting academic data state...');
+            
+            if (result.success) {
+                setAcademicData(result.data);
+                console.log('📈 Academic data state updated!');
+                setError('');
+            } else {
+                setError(result.message || 'Failed to fetch academic data');
+            }
+        } catch (err) {
+            console.error('❌ Error fetching academic data:', err);
+            setError('Network error: ' + err.message);
+        } finally {
+            console.log('🏁 Fetch complete, setting loading to false');
+            setLoading(false);
+        }
+    }, [usn]);
 
     useEffect(() => {
         fetchAcademicData();
@@ -120,25 +159,14 @@ const Academics = () => {
                 }, index * 150);
             });
         }, 300);
-    }, []);
+    }, [fetchAcademicData]); // Now fetchAcademicData is in dependency array
 
-    const fetchAcademicData = async () => {
-        try {
-            setLoading(true);
-            const response = await fetch(`http://localhost:5002/api/academics/dashboard/${usn}`);
-            const result = await response.json();
-            
-            if (result.success) {
-                setAcademicData(result.data);
-            } else {
-                setError(result.message || 'Failed to fetch academic data');
-            }
-        } catch (err) {
-            setError('Network error: ' + err.message);
-        } finally {
-            setLoading(false);
+    // Pre-populate forms when dialogs open
+    useEffect(() => {
+        if (openCreditsDialog && academicData?.academics?.totalCredits) {
+            setCreditsData({ credits: academicData.academics.totalCredits.toString() });
         }
-    };
+    }, [openCreditsDialog, academicData]);
 
     const handleAddSemester = async () => {
         try {
@@ -170,7 +198,13 @@ const Academics = () => {
 
     // Handler functions for editing credits, certifications, and activity points
     const handleUpdateCredits = async () => {
+        setCreditsLoading(true);
+        console.log('🔄 Updating credits for USN:', usn, 'Credits:', creditsData.credits);
+        
         try {
+            setError('');
+            setSuccess('');
+            
             const response = await fetch(`http://localhost:5002/api/academics/credits`, {
                 method: 'PUT',
                 headers: {
@@ -182,23 +216,35 @@ const Academics = () => {
                 }),
             });
 
+            console.log('📊 Credits response status:', response.status);
             const result = await response.json();
+            console.log('📊 Credits response data:', result);
             
             if (result.success) {
                 await fetchAcademicData();
                 setOpenCreditsDialog(false);
                 setCreditsData({ credits: '' });
-                setError('');
+                setSuccess('Credits updated successfully!');
+                setTimeout(() => setSuccess(''), 3000);
             } else {
                 setError(result.message || 'Failed to update credits');
             }
         } catch (err) {
+            console.error('❌ Error updating credits:', err);
             setError('Network error: ' + err.message);
+        } finally {
+            setCreditsLoading(false);
         }
     };
 
     const handleAddCertification = async () => {
+        setCertificationsLoading(true);
+        console.log('🔄 Adding certification for USN:', usn, 'Data:', certificationData);
+        
         try {
+            setError('');
+            setSuccess('');
+            
             const response = await fetch(`http://localhost:5002/api/academics/certification`, {
                 method: 'POST',
                 headers: {
@@ -206,27 +252,42 @@ const Academics = () => {
                 },
                 body: JSON.stringify({
                     usn,
-                    ...certificationData
+                    name: certificationData.name,
+                    issuer: certificationData.issuer,
+                    date: certificationData.date,
+                    description: certificationData.description
                 }),
             });
 
+            console.log('📊 Certification response status:', response.status);
             const result = await response.json();
+            console.log('📊 Certification response data:', result);
             
             if (result.success) {
                 await fetchAcademicData();
                 setOpenCertificationsDialog(false);
                 setCertificationData({ name: '', issuer: '', date: '', description: '' });
-                setError('');
+                setSuccess('Certification added successfully!');
+                setTimeout(() => setSuccess(''), 3000);
             } else {
                 setError(result.message || 'Failed to add certification');
             }
         } catch (err) {
+            console.error('❌ Error adding certification:', err);
             setError('Network error: ' + err.message);
+        } finally {
+            setCertificationsLoading(false);
         }
     };
 
     const handleAddActivityPoints = async () => {
+        setActivityLoading(true);
+        console.log('🔄 Adding activity points for USN:', usn, 'Data:', activityData);
+        
         try {
+            setError('');
+            setSuccess('');
+            
             const response = await fetch(`http://localhost:5002/api/academics/activity`, {
                 method: 'POST',
                 headers: {
@@ -240,22 +301,29 @@ const Academics = () => {
                 }),
             });
 
+            console.log('📊 Activity response status:', response.status);
             const result = await response.json();
+            console.log('📊 Activity response data:', result);
             
             if (result.success) {
                 await fetchAcademicData();
                 setOpenActivityPointsDialog(false);
                 setActivityData({ activity: '', points: '', description: '' });
-                setError('');
+                setSuccess('Activity points added successfully!');
+                setTimeout(() => setSuccess(''), 3000);
             } else {
                 setError(result.message || 'Failed to add activity points');
             }
         } catch (err) {
+            console.error('❌ Error adding activity points:', err);
             setError('Network error: ' + err.message);
+        } finally {
+            setActivityLoading(false);
         }
     };
 
     if (loading) {
+        console.log('🔄 Currently in loading state...');
         return (
             <Box sx={shimmerBackground}>
                 <Box sx={{ ...shimmerOverlay }} />
@@ -272,13 +340,15 @@ const Academics = () => {
                             fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
                             fontSize: "1.2rem"
                         }}>
-                            Loading academic data...
-                        </Typography>
+                            Loading Academic Data...</Typography>
                     </Box>
                 </Container>
             </Box>
         );
     }
+
+    console.log('📋 Rendering main content. Academic data:', academicData);
+    console.log('❌ Error state:', error);
 
     return (
         <Box sx={shimmerBackground}>
@@ -439,6 +509,23 @@ const Academics = () => {
                     </Alert>
                 )}
 
+                {success && (
+                    <Alert 
+                        severity="success" 
+                        className="fade-in-up"
+                        sx={{ 
+                            mb: 3,
+                            background: "linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(67, 160, 71, 0.15) 100%)",
+                            backdropFilter: "blur(10px)",
+                            border: "1px solid rgba(76, 175, 80, 0.2)",
+                            borderRadius: 2,
+                            color: "#c8e6c9"
+                        }}
+                    >
+                        {success}
+                    </Alert>
+                )}
+
                 {/* Overview Cards */}
                 <Grid container spacing={3} sx={{ mb: 3 }}>
                     <Grid item xs={12} sm={6} md={3}>
@@ -591,7 +678,7 @@ const Academics = () => {
                             <CardContent>
                                 <Box display="flex" alignItems="center" justifyContent="space-between">
                                     <Box display="flex" alignItems="center">
-                                        <TrophyIcon sx={{ 
+                                        <EmojiEventsIcon sx={{ 
                                             mr: 2, 
                                             fontSize: 40, 
                                             color: '#FF8042',
@@ -696,7 +783,7 @@ const Academics = () => {
                                                     filter: "drop-shadow(0 2px 4px rgba(136, 132, 216, 0.3))"
                                                 }}
                                             >
-                                                {academicData?.activityPoints || 0}
+                                                {academicData?.aictActivityPoints?.currentPoints || 0}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -932,14 +1019,19 @@ const Academics = () => {
                         <Button 
                             variant="contained" 
                             onClick={handleUpdateCredits}
+                            disabled={!creditsData.credits || creditsData.credits.trim() === '' || creditsLoading}
                             sx={{
                                 background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                },
+                                '&:disabled': {
+                                    background: 'rgba(184, 134, 11, 0.3)',
+                                    color: 'rgba(255, 255, 255, 0.5)'
                                 }
                             }}
                         >
-                            Update Credits
+                            {creditsLoading ? 'Updating...' : 'Update Credits'}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -1094,14 +1186,19 @@ const Academics = () => {
                         <Button 
                             variant="contained" 
                             onClick={handleAddCertification}
+                            disabled={!certificationData.name || !certificationData.issuer || !certificationData.date || certificationsLoading}
                             sx={{
                                 background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                },
+                                '&:disabled': {
+                                    background: 'rgba(184, 134, 11, 0.3)',
+                                    color: 'rgba(255, 255, 255, 0.5)'
                                 }
                             }}
                         >
-                            Add Certification
+                            {certificationsLoading ? 'Adding...' : 'Add Certification'}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -1229,14 +1326,19 @@ const Academics = () => {
                         <Button 
                             variant="contained" 
                             onClick={handleAddActivityPoints}
+                            disabled={!activityData.activity || !activityData.points || activityLoading}
                             sx={{
                                 background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
                                 '&:hover': {
                                     background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                },
+                                '&:disabled': {
+                                    background: 'rgba(184, 134, 11, 0.3)',
+                                    color: 'rgba(255, 255, 255, 0.5)'
                                 }
                             }}
                         >
-                            Add Activity
+                            {activityLoading ? 'Adding...' : 'Add Activity'}
                         </Button>
                     </DialogActions>
                 </Dialog>

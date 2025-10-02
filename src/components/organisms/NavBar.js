@@ -52,7 +52,14 @@ export default function Navbar() {
     !isDashbaord && !isMentormain && !isMentors && !isDocuments &&
     !isContactUs && !isSettings && !isMentorLoginPage && !isMentorContact && 
     !isMentorSettings && !isProfile && !isProfileMentor &&
-    <AppBar position="sticky" sx={{ backgroundColor: '#fff', color: 'text.primary', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.3)', borderBottom: '1px solid #e0e0e0' }} >
+    <AppBar position="sticky" sx={{ 
+      background: 'linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(26, 43, 76, 0.98) 100%)',
+      backdropFilter: 'blur(25px)',
+      border: '1px solid rgba(184, 134, 11, 0.15)',
+      boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)',
+      color: '#F8FAFC',
+      borderBottom: '1px solid rgba(184, 134, 11, 0.2)'
+    }} >
       <Toolbar sx={{ mt: "20px" }}>
         {/* Menu Icon - Visible only on smaller screens */}
         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
@@ -63,6 +70,13 @@ export default function Navbar() {
             aria-controls={anchorEl ? 'mobile-menu' : undefined}
             aria-haspopup="true"
             onClick={handleMenuClick}
+            sx={{
+              color: '#F8FAFC',
+              '&:hover': {
+                backgroundColor: 'rgba(184, 134, 11, 0.1)',
+                color: '#DAA520'
+              }
+            }}
           >
             <MenuIcon />
           </IconButton>
@@ -78,8 +92,24 @@ export default function Navbar() {
         {/* Icon and Logo/Text */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {/* Added HomeIcon here */}
-          <AcUnitIcon sx={{ fontSize: 30, mr: 1 }} />
-          <Typography variant="h6" sx={{ flexGrow: 1, display: "flex" }}>
+          <AcUnitIcon sx={{ 
+            fontSize: 30, 
+            mr: 1,
+            color: '#DAA520',
+            filter: 'drop-shadow(0 2px 4px rgba(184, 134, 11, 0.3))'
+          }} />
+          <Typography variant="h6" sx={{ 
+            flexGrow: 1, 
+            display: "flex",
+            color: '#F8FAFC',
+            fontWeight: 700,
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+            background: 'linear-gradient(135deg, #F8FAFC 0%, #DAA520 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+          }}>
             AspireAI
           </Typography>
         </Box>
