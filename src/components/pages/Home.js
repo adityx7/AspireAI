@@ -1,15 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Grid, Typography, Button, Link, Divider, Card } from "@mui/material";
+import { Box, Grid, Typography, Button, Link } from "@mui/material";
 import PhoneIphoneOutlinedIcon from "@mui/icons-material/PhoneIphoneOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import TextsmsRoundedIcon from "@mui/icons-material/TextsmsRounded";
 import manImage from "../../assets/man.png";
 import girlImage from "../../assets/girl.png";
 import dotImage from "../../assets/Dot.png";
-import ballImage from "../../assets/Ball.png";
-import arrow1 from "../../assets/Arrow.png";
-import arrow2 from "../../assets/Arrow2.png";
-import redBall from "../../assets/BallRed.png";
 import chatImage from "../../assets/Chat.png";
 import pplImage from "../../assets/pplImage.png";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +22,6 @@ function Home() {
     const animateOnScroll = () => {
       const scrollTop = window.pageYOffset;
       const windowHeight = window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
-      const scrollPercent = scrollTop / (docHeight - windowHeight);
       
       // Parallax background movement
       const bgElements = document.querySelectorAll('.parallax-bg');
@@ -626,7 +620,6 @@ function Home() {
                 boxShadow: "0 10px 30px rgba(0,0,0,0.2), 0 0 15px rgba(184, 134, 11, 0.1)",
                 border: "2px solid rgba(184, 134, 11, 0.2)",
                 transition: "all 0.4s ease",
-                animationDelay: '1.4s',
                 animationDelay: '2s',
                 '&:hover': {
                   transform: 'scale(1.08) rotateY(-5deg)',
