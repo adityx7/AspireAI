@@ -127,9 +127,55 @@ const SettingsPage = () => {
                 padding: "24px",
             }}
         >
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer 
+                position="top-right" 
+                autoClose={3000}
+                toastStyle={{
+                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                    backdropFilter: "blur(15px)",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                    borderRadius: "12px",
+                    color: "#ffffff",
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                }}
+            />
             {/* Stepper */}
-            <Stepper activeStep={activeStep} sx={{ width: "60%", mb: 4 }}>
+            <Stepper 
+                activeStep={activeStep} 
+                sx={{ 
+                    width: "60%", 
+                    mb: 4,
+                    '& .MuiStepLabel-root .Mui-completed': {
+                        color: '#B8860B',
+                    },
+                    '& .MuiStepLabel-label.Mui-completed.MuiStepLabel-alternativeLabel': {
+                        color: '#B8860B',
+                    },
+                    '& .MuiStepLabel-root .Mui-active': {
+                        color: '#B8860B',
+                    },
+                    '& .MuiStepLabel-label.Mui-active.MuiStepLabel-alternativeLabel': {
+                        color: '#B8860B',
+                        fontWeight: 600
+                    },
+                    '& .MuiStepLabel-label': {
+                        color: '#ffffff',
+                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                    },
+                    '& .MuiStepConnector-line': {
+                        borderColor: 'rgba(184, 134, 11, 0.3)'
+                    },
+                    '& .MuiStepIcon-root': {
+                        color: 'rgba(184, 134, 11, 0.3)',
+                        '&.Mui-active': {
+                            color: '#B8860B',
+                        },
+                        '&.Mui-completed': {
+                            color: '#B8860B',
+                        }
+                    }
+                }}
+            >
                 {steps.map((label) => (
                     <Step key={label}>
                         <StepLabel>{label}</StepLabel>
@@ -140,32 +186,79 @@ const SettingsPage = () => {
             {/* Step Content */}
             <Box
                 sx={{
-                    backgroundColor: "#fff",
+                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+                    backdropFilter: "blur(25px)",
+                    border: "1px solid rgba(184, 134, 11, 0.15)",
                     width: "60%",
-                    borderRadius: "8px",
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                    padding: "24px",
+                    borderRadius: "20px",
+                    boxShadow: "0 25px 80px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                    padding: "32px",
+                    position: "relative",
+                    overflow: "hidden",
+                    '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '1px',
+                        background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.5), transparent)'
+                    }
                 }}
             >
                 {activeStep === 0 && (
                     <>
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: "courier" }}>
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: "700", 
+                            mb: 3, 
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            color: "#B8860B"
+                        }}>
                             User Details
                         </Typography>
-                        <Divider sx={{ mb: 3 }} />
-                        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                            <Box sx={{ display: "flex", gap: 2 }}>
+                        <Divider sx={{ 
+                            mb: 4,
+                            borderColor: "rgba(184, 134, 11, 0.3)",
+                            '&::before, &::after': {
+                                borderColor: 'rgba(184, 134, 11, 0.3)'
+                            }
+                        }} />
+                        <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                            <Box sx={{ display: "flex", gap: 3 }}>
                                 <TextField
-                                    label="Name"
+                                    placeholder="Name"
                                     variant="outlined"
                                     fullWidth
                                     value={formData.name}
                                     onChange={(e) => handleInputChange("name", e.target.value)}
                                     error={!!formErrors.name}
                                     helperText={formErrors.name}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            background: "rgba(26, 43, 76, 0.3)",
+                                            backdropFilter: "blur(10px)",
+                                            '& fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#B8860B',
+                                            },
+                                            '& input': {
+                                                color: '#ffffff',
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                            }
+                                        },
+                                        '& .MuiFormHelperText-root': {
+                                            color: '#ff6b6b',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                        }
+                                    }}
                                 />
                                 <TextField
-                                    label="USN"
+                                    placeholder="USN"
                                     variant="outlined"
                                     fullWidth
                                     value={formData.usn.toUpperCase()} // Ensure input is displayed in uppercase
@@ -175,55 +268,215 @@ const SettingsPage = () => {
                                     }}
                                     error={!!formErrors.usn}
                                     helperText={formErrors.usn}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            background: "rgba(26, 43, 76, 0.3)",
+                                            backdropFilter: "blur(10px)",
+                                            '& fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#B8860B',
+                                            },
+                                            '& input': {
+                                                color: '#ffffff',
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                            }
+                                        },
+                                        '& .MuiFormHelperText-root': {
+                                            color: '#ff6b6b',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                        }
+                                    }}
                                 />
                             </Box>
-                            <Box sx={{ display: "flex", gap: 2 }}>
+                            <Box sx={{ display: "flex", gap: 3 }}>
                                 <TextField
-                                    label="Mobile Number"
+                                    placeholder="Mobile Number"
                                     variant="outlined"
                                     fullWidth
                                     value={formData.mobileNumber}
                                     onChange={(e) => handleInputChange("mobileNumber", e.target.value)}
                                     error={!!formErrors.mobileNumber}
                                     helperText={formErrors.mobileNumber}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            background: "rgba(26, 43, 76, 0.3)",
+                                            backdropFilter: "blur(10px)",
+                                            '& fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#B8860B',
+                                            },
+                                            '& input': {
+                                                color: '#ffffff',
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                            }
+                                        },
+                                        '& .MuiFormHelperText-root': {
+                                            color: '#ff6b6b',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                        }
+                                    }}
                                 />
                                 <TextField
-                                    label="Alternate Mobile Number"
+                                    placeholder="Alternate Mobile Number"
                                     variant="outlined"
                                     fullWidth
                                     value={formData.alternateMobileNumber}
                                     onChange={(e) =>
                                         handleInputChange("alternateMobileNumber", e.target.value)
                                     }
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            background: "rgba(26, 43, 76, 0.3)",
+                                            backdropFilter: "blur(10px)",
+                                            '& fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#B8860B',
+                                            },
+                                            '& input': {
+                                                color: '#ffffff',
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                            }
+                                        }
+                                    }}
                                 />
                             </Box>
                             <TextField
-                                label="Email ID"
+                                placeholder="Email ID"
                                 variant="outlined"
                                 fullWidth
                                 value={formData.email}
                                 onChange={(e) => handleInputChange("email", e.target.value)}
                                 error={!!formErrors.email}
                                 helperText={formErrors.email}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        background: "rgba(26, 43, 76, 0.3)",
+                                        backdropFilter: "blur(10px)",
+                                        '& fieldset': {
+                                            borderColor: 'rgba(184, 134, 11, 0.3)',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'rgba(184, 134, 11, 0.5)',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#B8860B',
+                                        },
+                                        '& input': {
+                                            color: '#ffffff',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                        }
+                                    },
+                                    '& .MuiFormHelperText-root': {
+                                        color: '#ff6b6b',
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                    }
+                                }}
                             />
                             <TextField
-                                label="College Email ID"
+                                placeholder="College Email ID"
                                 variant="outlined"
                                 fullWidth
                                 value={formData.collegeEmail}
                                 onChange={(e) => handleInputChange("collegeEmail", e.target.value)}
                                 error={!!formErrors.collegeEmail}
                                 helperText={formErrors.collegeEmail}
+                                sx={{
+                                    '& .MuiOutlinedInput-root': {
+                                        background: "rgba(26, 43, 76, 0.3)",
+                                        backdropFilter: "blur(10px)",
+                                        '& fieldset': {
+                                            borderColor: 'rgba(184, 134, 11, 0.3)',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'rgba(184, 134, 11, 0.5)',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: '#B8860B',
+                                        },
+                                        '& input': {
+                                            color: '#ffffff',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                        }
+                                    },
+                                    '& .MuiFormHelperText-root': {
+                                        color: '#ff6b6b',
+                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                    }
+                                }}
                             />
-                            <Box sx={{ display: "flex", gap: 2 }}>
+                            <Box sx={{ display: "flex", gap: 3 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel id="gender-label">Gender</InputLabel>
+                                    <InputLabel 
+                                        id="gender-label"
+                                        sx={{
+                                            color: '#B8860B',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                            '&.Mui-focused': {
+                                                color: '#B8860B',
+                                            },
+                                        }}
+                                    >
+                                        Gender
+                                    </InputLabel>
                                     <Select
                                         labelId="gender-label"
                                         id="gender-select"
                                         value={formData.gender}
                                         onChange={(e) => handleInputChange("gender", e.target.value)}
                                         error={!!formErrors.gender}
+                                        label="Gender"
+                                        sx={{
+                                            background: "rgba(26, 43, 76, 0.3)",
+                                            backdropFilter: "blur(10px)",
+                                            color: '#ffffff',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                                            },
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            },
+                                            '& .MuiSvgIcon-root': {
+                                                color: '#B8860B'
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                sx: {
+                                                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                                    backdropFilter: "blur(15px)",
+                                                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                                                    '& .MuiMenuItem-root': {
+                                                        color: '#ffffff',
+                                                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                                        '&:hover': {
+                                                            backgroundColor: 'rgba(184, 134, 11, 0.1)'
+                                                        },
+                                                        '&.Mui-selected': {
+                                                            backgroundColor: 'rgba(184, 134, 11, 0.2)'
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }}
                                     >
                                         <MenuItem value="">Select Gender</MenuItem> {/* Default empty option */}
                                         <MenuItem value="Male">Male</MenuItem>
@@ -232,7 +485,12 @@ const SettingsPage = () => {
                                         <MenuItem value="Prefer not to say">Prefer not to say</MenuItem>
                                     </Select>
                                     {formErrors.gender && (
-                                        <Typography color="error" variant="caption">
+                                        <Typography sx={{ 
+                                            color: "#ff6b6b", 
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                            fontSize: "12px",
+                                            mt: 1
+                                        }}>
                                             {formErrors.gender}
                                         </Typography>
                                     )}
@@ -250,6 +508,36 @@ const SettingsPage = () => {
                                     inputProps={{
                                         max: new Date().toISOString().split("T")[0] // Set the max date to today's date
                                     }}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            background: "rgba(26, 43, 76, 0.3)",
+                                            backdropFilter: "blur(10px)",
+                                            '& fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '&:hover fieldset': {
+                                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                                            },
+                                            '&.Mui-focused fieldset': {
+                                                borderColor: '#B8860B',
+                                            },
+                                            '& input': {
+                                                color: '#ffffff',
+                                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                            }
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#B8860B',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                            '&.Mui-focused': {
+                                                color: '#B8860B',
+                                            },
+                                        },
+                                        '& .MuiFormHelperText-root': {
+                                            color: '#ff6b6b',
+                                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                                        }
+                                    }}
                                 />
 
                             </Box>
@@ -259,10 +547,21 @@ const SettingsPage = () => {
 
                 {activeStep === 1 && (
                     <>
-                        <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: "Courier" }}>
+                        <Typography variant="h6" sx={{ 
+                            fontWeight: "700", 
+                            mb: 3, 
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            color: "#B8860B"
+                        }}>
                             Academics
                         </Typography>
-                        <Divider sx={{ mb: 3 }} />
+                        <Divider sx={{ 
+                            mb: 4,
+                            borderColor: "rgba(184, 134, 11, 0.3)",
+                            '&::before, &::after': {
+                                borderColor: 'rgba(184, 134, 11, 0.3)'
+                            }
+                        }} />
 
                         {/* Graduation Year */}
                         <FormControl fullWidth sx={{ mb: 2 }}>
@@ -341,30 +640,96 @@ const SettingsPage = () => {
 
             <Box>
                 {/* Navigation Buttons */}
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2, mt: 3 }}>
+                <Box sx={{ display: "flex", flexDirection: "row", pt: 3, mt: 4 }}>
                     <Button
-                        color="inherit"
                         disabled={activeStep === 0}
                         onClick={() => setActiveStep((prev) => prev - 1)}
-                        sx={{ mr: 1 }}
+                        sx={{ 
+                            mr: 2,
+                            background: activeStep === 0 
+                                ? "linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.2) 100%)"
+                                : "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)",
+                            color: activeStep === 0 ? "rgba(184, 134, 11, 0.5)" : "#B8860B",
+                            fontWeight: "600",
+                            padding: "12px 24px",
+                            borderRadius: "12px",
+                            border: "1px solid rgba(184, 134, 11, 0.3)",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            '&:hover': activeStep !== 0 ? {
+                                background: "linear-gradient(135deg, rgba(184, 134, 11, 0.4) 0%, rgba(218, 165, 32, 0.4) 100%)",
+                                transform: "translateY(-1px)"
+                            } : {},
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                        }}
                     >
                         Back
                     </Button>
                     <Box sx={{ flex: "1 1 auto" }} />
                     {activeStep < steps.length - 1 ? (
-                        <Button onClick={handleNext} variant="contained">
+                        <Button 
+                            onClick={handleNext} 
+                            variant="contained"
+                            sx={{
+                                background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                                color: "#ffffff",
+                                fontWeight: "600",
+                                padding: "12px 24px",
+                                borderRadius: "12px",
+                                boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                '&:hover': {
+                                    background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+                                    boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
+                                    transform: "translateY(-2px)"
+                                },
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                            }}
+                        >
                             Next
                         </Button>
                     ) : (
                         <>
-                            <Button onClick={handleReset} variant="contained" color="secondary" startIcon={<RestartAltIcon />} sx={{ mr: 2 }}>
+                            <Button 
+                                onClick={handleReset} 
+                                variant="contained" 
+                                startIcon={<RestartAltIcon />} 
+                                sx={{ 
+                                    mr: 3,
+                                    background: "linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.2) 100%)",
+                                    color: "#B8860B",
+                                    fontWeight: "600",
+                                    padding: "12px 24px",
+                                    borderRadius: "12px",
+                                    border: "1px solid rgba(184, 134, 11, 0.3)",
+                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                    '&:hover': {
+                                        background: "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)",
+                                        transform: "translateY(-1px)"
+                                    },
+                                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                                }}
+                            >
                                 Reset
                             </Button>
                             <Button
                                 onClick={handleSubmit}
                                 variant="contained"
-                                color="primary"
                                 endIcon={<CheckCircleIcon />}
+                                sx={{
+                                    background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                                    color: "#ffffff",
+                                    fontWeight: "600",
+                                    padding: "12px 24px",
+                                    borderRadius: "12px",
+                                    boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
+                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                    '&:hover': {
+                                        background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+                                        boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
+                                        transform: "translateY(-2px)"
+                                    },
+                                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                                }}
                             >
                                 Submit
                             </Button>

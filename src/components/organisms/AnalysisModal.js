@@ -9,7 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import MobileStepper from '@mui/material/MobileStepper';
 import html2canvas from "html2canvas";
 
-const COLORS = ['#FFE893', '#A294F9', '#FFE6C9', '#C4D9FF', '#AAB99A', '#FBB4A5', '#5AB2FF'];
+const COLORS = ['#B8860B', '#DAA520', '#CD853F', '#DEB887', '#F4A460', '#D2691E', '#B22222'];
 
 const AnalysisModal = ({ open, onClose, analysisResult, email }) => {
 
@@ -87,11 +87,48 @@ const AnalysisModal = ({ open, onClose, analysisResult, email }) => {
 
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ textAlign: "center", fontWeight: "bold", fontFamily: "Courier", bgcolor: "#FBF5DD", fontSize: '28px' }}>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+      sx={{
+        '& .MuiDialog-paper': {
+          background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+          backdropFilter: "blur(25px)",
+          border: "1px solid rgba(184, 134, 11, 0.15)",
+          borderRadius: "20px",
+          boxShadow: "0 25px 80px rgba(0, 0, 0, 0.4)"
+        }
+      }}
+    >
+      <DialogTitle sx={{ 
+        textAlign: "center", 
+        fontWeight: "700", 
+        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif", 
+        background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+        color: "#ffffff",
+        fontSize: '28px',
+        borderRadius: "20px 20px 0 0",
+        position: "relative",
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '60px',
+          height: '3px',
+          background: 'rgba(255, 255, 255, 0.3)',
+          borderRadius: '2px'
+        }
+      }}>
         Analysis Result
       </DialogTitle>
-      <DialogContent sx={{ bgcolor: "#FBF5DD" }}>
+      <DialogContent sx={{ 
+        background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+        color: "#ffffff"
+      }}>
         {analysisResult && (
           <SwipeableViews
             axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
@@ -99,53 +136,131 @@ const AnalysisModal = ({ open, onClose, analysisResult, email }) => {
             onChangeIndex={setActiveStep}
           >
             {/* Slide 1: SWOT Summary */}
-            <Box sx={{ p: 3, textAlign: "center", bgcolor: "white", borderRadius: "8px", boxShadow: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold", fontFamily: "Comic Sans MS" }}>
+            <Box sx={{ 
+              p: 4, 
+              textAlign: "center", 
+              background: "linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(184, 134, 11, 0.05) 100%)",
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              borderRadius: "16px", 
+              backdropFilter: "blur(10px)",
+              margin: "16px 0"
+            }}>
+              <Typography variant="h6" sx={{ 
+                fontWeight: "700", 
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                color: "#B8860B",
+                mb: 3
+              }}>
                 SWOT Scores
               </Typography>
-              <Grid container spacing={2} justifyContent="center" height={'120px'}>
+              <Grid container spacing={2} justifyContent="center" minHeight={'120px'}>
                 {swotData.map((item, index) => (
                   <Grid item xs={6} key={index} textAlign="center">
-                    <Typography sx={{ fontSize: "16px", fontWeight: "bold", color: "#0288d1" }}>
-                      {item.name}: {item.score}
+                    <Typography sx={{ 
+                      fontSize: "16px", 
+                      fontWeight: "600", 
+                      color: "#ffffff",
+                      fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                    }}>
+                      <span style={{ color: "#B8860B" }}>{item.name}:</span> {item.score}
                     </Typography>
                   </Grid>
                 ))}
               </Grid>
 
-              <Typography variant="h6" sx={{ fontWeight: "bold", mt: 3, fontFamily: "Comic Sans MS" }}>
+              <Typography variant="h6" sx={{ 
+                fontWeight: "700", 
+                mt: 3, 
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                color: "#B8860B"
+              }}>
                 Best Career Category
               </Typography>
-              <Typography sx={{ mt: 1, fontSize: "18px", color: "#0288d1", fontWeight: "bold" }}>
+              <Typography sx={{ 
+                mt: 1, 
+                fontSize: "18px", 
+                color: "#ffffff", 
+                fontWeight: "600",
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+              }}>
                 {analysisResult.bestCareerCategory}
               </Typography>
 
-              <Typography variant="h6" sx={{ fontWeight: "bold", mt: 3, fontFamily: "Comic Sans MS" }}>
+              <Typography variant="h6" sx={{ 
+                fontWeight: "700", 
+                mt: 3, 
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                color: "#B8860B"
+              }}>
                 Suggested Careers
               </Typography>
-              <Typography sx={{ mt: 1, fontSize: "14px" }}>
+              <Typography sx={{ 
+                mt: 1, 
+                fontSize: "14px",
+                color: "#ffffff",
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                lineHeight: 1.6
+              }}>
                 {analysisResult.suggestedCareers.join(", ")}
               </Typography>
             </Box>
 
             {/* Slide 2: SWOT Graph */}
-            <Box id="swot-chart" sx={{ p: 3, textAlign: "center", bgcolor: "white", borderRadius: "8px", boxShadow: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: "Comic Sans MS" }}>
+            <Box id="swot-chart" sx={{ 
+              p: 4, 
+              textAlign: "center", 
+              background: "linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(184, 134, 11, 0.05) 100%)",
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              borderRadius: "16px", 
+              backdropFilter: "blur(10px)",
+              margin: "16px 0"
+            }}>
+              <Typography variant="h6" sx={{ 
+                fontWeight: "700", 
+                mb: 3, 
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                color: "#B8860B"
+              }}>
                 SWOT Analysis Graph
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={swotData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="score" fill="#A3D8FF" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fill: '#B8860B', fontFamily: "'Inter', sans-serif" }}
+                  />
+                  <YAxis 
+                    tick={{ fill: '#B8860B', fontFamily: "'Inter', sans-serif" }}
+                  />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'rgba(26, 43, 76, 0.9)',
+                      border: '1px solid rgba(184, 134, 11, 0.3)',
+                      borderRadius: '8px',
+                      color: '#ffffff'
+                    }}
+                  />
+                  <Bar dataKey="score" fill="#B8860B" />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
 
             {/* Slide 3: Career Score Graph */}
-            <Box id="career-chart" sx={{ p: 3, textAlign: "center", bgcolor: "white", borderRadius: "8px", boxShadow: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2, fontFamily: "Comic Sans MS" }}>
+            <Box id="career-chart" sx={{ 
+              p: 4, 
+              textAlign: "center", 
+              background: "linear-gradient(135deg, rgba(184, 134, 11, 0.1) 0%, rgba(184, 134, 11, 0.05) 100%)",
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              borderRadius: "16px", 
+              backdropFilter: "blur(10px)",
+              margin: "16px 0"
+            }}>
+              <Typography variant="h6" sx={{ 
+                fontWeight: "700", 
+                mb: 3, 
+                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                color: "#B8860B"
+              }}>
                 Career Score Distribution
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
@@ -155,7 +270,14 @@ const AnalysisModal = ({ open, onClose, analysisResult, email }) => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: 'rgba(26, 43, 76, 0.9)',
+                      border: '1px solid rgba(184, 134, 11, 0.3)',
+                      borderRadius: '8px',
+                      color: '#ffffff'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             </Box>
@@ -166,33 +288,104 @@ const AnalysisModal = ({ open, onClose, analysisResult, email }) => {
       <MobileStepper
         steps={3}
         position="static"
-        bgcolor="#FBF5DD"
         activeStep={activeStep}
+        sx={{
+          background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+          color: "#ffffff",
+          '& .MuiMobileStepper-dots': {
+            '& .MuiMobileStepper-dot': {
+              backgroundColor: 'rgba(184, 134, 11, 0.3)',
+            },
+            '& .MuiMobileStepper-dotActive': {
+              backgroundColor: '#B8860B',
+            }
+          }
+        }}
         nextButton={
-          <Button size="small" onClick={handleNext} disabled={activeStep === 2}>
+          <Button 
+            size="small" 
+            onClick={handleNext} 
+            disabled={activeStep === 2}
+            sx={{
+              color: activeStep === 2 ? 'rgba(184, 134, 11, 0.3)' : '#B8860B',
+              fontWeight: '600',
+              fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+            }}
+          >
             Next
           </Button>
         }
         backButton={
-          <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
+          <Button 
+            size="small" 
+            onClick={handleBack} 
+            disabled={activeStep === 0}
+            sx={{
+              color: activeStep === 0 ? 'rgba(184, 134, 11, 0.3)' : '#B8860B',
+              fontWeight: '600',
+              fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+            }}
+          >
             Back
           </Button>
         }
       />
 
-      <DialogActions sx={{ justifyContent: "center", pb: 2, bgcolor: "#FBF5DD", gap: 8 }}>
+      <DialogActions sx={{ 
+        justifyContent: "center", 
+        pb: 3, 
+        pt: 2,
+        background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+        gap: 3,
+        borderRadius: "0 0 20px 20px"
+      }}>
         {/* Close Button */}
-        <Button onClick={onClose} color="primary" variant="contained">
+        <Button 
+          onClick={onClose} 
+          variant="contained"
+          sx={{
+            background: "linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.2) 100%)",
+            color: "#B8860B",
+            fontWeight: "600",
+            padding: "12px 24px",
+            borderRadius: "12px",
+            border: "1px solid rgba(184, 134, 11, 0.3)",
+            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+            '&:hover': {
+              background: "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)",
+              transform: "translateY(-1px)"
+            },
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+          }}
+        >
           Close
         </Button>
 
         {/* Download Button */}
         <Button
           onClick={handleDownload}
-          color="primary"
           variant="contained"
           startIcon={<DownloadIcon />}
           disabled={!analysisResult}
+          sx={{
+            background: analysisResult 
+              ? "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)"
+              : "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)",
+            color: analysisResult ? "#ffffff" : "rgba(255, 255, 255, 0.5)",
+            fontWeight: "600",
+            padding: "12px 24px",
+            borderRadius: "12px",
+            boxShadow: analysisResult 
+              ? "0 8px 25px rgba(184, 134, 11, 0.3)"
+              : "0 4px 15px rgba(184, 134, 11, 0.1)",
+            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+            '&:hover': analysisResult ? {
+              background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+              boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
+              transform: "translateY(-2px)"
+            } : {},
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+          }}
         >
           Download Report
         </Button>

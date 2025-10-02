@@ -53,45 +53,189 @@ const DocumentsPage = () => {
     };
 
     return (
-        <Box sx={{ mt: { xs: "40px", md: "180px" }, display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <Box sx={{ 
+            mt: { xs: "40px", md: "180px" }, 
+            display: "flex", 
+            flexDirection: "column", 
+            alignItems: "center" 
+        }}>
             {/* Top Section */}
-            <Box sx={{ textAlign: "center", padding: "24px", boxShadow: "0 5px 12px rgba(0, 0, 0, 0.4)", borderRadius: "8px", maxWidth: "500px", width: "100%" }}>
-                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", width: "80px", height: "80px", backgroundColor: "#D4EBF8", borderRadius: "50%", margin: "0 auto" }}>
-                    <FolderIcon sx={{ fontSize: 40, color: "#0288d1" }} />
+            <Box sx={{ 
+                textAlign: "center", 
+                padding: "32px",
+                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+                backdropFilter: "blur(25px)",
+                border: "1px solid rgba(184, 134, 11, 0.15)",
+                borderRadius: "24px",
+                maxWidth: "500px", 
+                width: "100%",
+                boxShadow: "0 25px 80px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                position: "relative",
+                overflow: "hidden",
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.5), transparent)'
+                }
+            }}>
+                <Box sx={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center", 
+                    width: "80px", 
+                    height: "80px", 
+                    background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                    borderRadius: "50%", 
+                    margin: "0 auto",
+                    boxShadow: "0 12px 40px rgba(184, 134, 11, 0.3)"
+                }}>
+                    <FolderIcon sx={{ fontSize: 40, color: "#ffffff" }} />
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: "bold", marginTop: "16px", color: "#333", fontFamily: "Courier" }}>
+                <Typography variant="h5" sx={{ 
+                    fontWeight: "700", 
+                    marginTop: "20px", 
+                    color: "#ffffff", 
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                }}>
                     Skill Analysis Questionnaire
                 </Typography>
-                <Typography variant="body2" sx={{ marginTop: "8px", color: "#666", fontFamily: "Courier" }}>
+                <Typography variant="body1" sx={{ 
+                    marginTop: "12px", 
+                    color: "#B8860B", 
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                    fontWeight: "500",
+                    lineHeight: 1.6
+                }}>
                     Start to assess yourself by knowing yourself better with the questionnaire.
                 </Typography>
 
                 {/* Divider */}
-                <Divider sx={{ width: "100%", maxWidth: "500px", marginTop: "24px", borderColor: "#ddd" }} />
+                <Divider sx={{ 
+                    width: "100%", 
+                    maxWidth: "500px", 
+                    marginTop: "24px", 
+                    borderColor: "rgba(184, 134, 11, 0.3)",
+                    '&::before, &::after': {
+                        borderColor: 'rgba(184, 134, 11, 0.3)'
+                    }
+                }} />
 
                 {/* Email Input */}
                 <TextField
                     label="Enter your email"
                     variant="outlined"
                     fullWidth
-                    sx={{ mt: 2 }}
+                    sx={{ 
+                        mt: 3,
+                        '& .MuiOutlinedInput-root': {
+                            background: "rgba(26, 43, 76, 0.3)",
+                            backdropFilter: "blur(10px)",
+                            '& fieldset': {
+                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'rgba(184, 134, 11, 0.5)',
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: '#B8860B',
+                            },
+                            '& input': {
+                                color: '#ffffff',
+                                fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                            }
+                        },
+                        '& .MuiInputLabel-root': {
+                            color: '#B8860B',
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            '&.Mui-focused': {
+                                color: '#B8860B',
+                            },
+                        },
+                    }}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
 
                 {/* Buttons */}
-                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "16px", gap: 6 }}>
-                    <Button variant="contained" color="primary" startIcon={<DynamicFormIcon />} onClick={handleQuestionnaireClick} sx={{ textTransform: "none" }}>
+                <Box sx={{ display: "flex", justifyContent: "center", marginTop: "24px", gap: 3 }}>
+                    <Button 
+                        variant="contained" 
+                        startIcon={<DynamicFormIcon />} 
+                        onClick={handleQuestionnaireClick} 
+                        sx={{ 
+                            textTransform: "none",
+                            background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                            color: "#ffffff",
+                            fontWeight: "600",
+                            padding: "12px 24px",
+                            borderRadius: "12px",
+                            boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            '&:hover': {
+                                background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+                                boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
+                                transform: "translateY(-2px)"
+                            },
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                        }}
+                    >
                         Questionnaire
                     </Button>
-                    <Button variant="contained" color="primary" startIcon={<QueryStatsIcon />} onClick={handleAnalysisClick} sx={{ textTransform: "none" }} disabled={!questionnaireCompleted}>
+                    <Button 
+                        variant="contained" 
+                        startIcon={<QueryStatsIcon />} 
+                        onClick={handleAnalysisClick} 
+                        disabled={!questionnaireCompleted}
+                        sx={{ 
+                            textTransform: "none",
+                            background: questionnaireCompleted 
+                                ? "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)"
+                                : "linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.3) 100%)",
+                            color: questionnaireCompleted ? "#ffffff" : "rgba(255, 255, 255, 0.5)",
+                            fontWeight: "600",
+                            padding: "12px 24px",
+                            borderRadius: "12px",
+                            boxShadow: questionnaireCompleted 
+                                ? "0 8px 25px rgba(184, 134, 11, 0.3)"
+                                : "0 4px 15px rgba(184, 134, 11, 0.1)",
+                            fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                            '&:hover': questionnaireCompleted ? {
+                                background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+                                boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
+                                transform: "translateY(-2px)"
+                            } : {},
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                        }}
+                    >
                         Start Analysis
                     </Button>
                 </Box>
 
                 {/* Loading and Error Handling */}
-                {loading && <Typography sx={{ mt: 2, color: "blue" }}>Fetching your data...</Typography>}
-                {error && <Typography sx={{ mt: 2, color: "red" }}>{error}</Typography>}
+                {loading && (
+                    <Typography sx={{ 
+                        mt: 3, 
+                        color: "#B8860B",
+                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                        fontWeight: "500"
+                    }}>
+                        Fetching your data...
+                    </Typography>
+                )}
+                {error && (
+                    <Typography sx={{ 
+                        mt: 3, 
+                        color: "#ff6b6b",
+                        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                        fontWeight: "500"
+                    }}>
+                        {error}
+                    </Typography>
+                )}
             </Box>
 
             {/* Analysis Modal with Download Report Button */}
@@ -105,7 +249,18 @@ const DocumentsPage = () => {
 
 
             {/* Toast Container */}
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer 
+                position="top-right" 
+                autoClose={3000}
+                toastStyle={{
+                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                    backdropFilter: "blur(15px)",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
+                    borderRadius: "12px",
+                    color: "#ffffff",
+                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+                }}
+            />
         </Box>
     );
 };
