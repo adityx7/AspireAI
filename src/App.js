@@ -3,10 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/organisms/NavBar';
 import HomePage from './components/pages/Home';
 import Contact from './components/pages/Contact';
-import Login from './components/pages/Login';
+import SimpleLogin from './components/pages/SimpleLogin';
+import SimpleStudentRegister from './components/pages/SimpleStudentRegister';
 import MentorLogin from './components/pages/MentorLogin';
-import StudentRegister from './components/pages/student/StudentRegister';
-import MentorRegister from './components/pages/mentor/MentorRegister';
 import Dashboard from './components/pages/Dashboard';
 import Documents from './components/pages/Documents';
 import Settings from './components/pages/Settings';
@@ -28,10 +27,9 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<SimpleLogin />} />
           <Route path="/mentor-login" element={<MentorLogin />} />
-          <Route path="/student/register" element={< StudentRegister />} />
-          <Route path="/mentor/register" element={< MentorRegister />} />
+          <Route path="/student/register" element={<SimpleStudentRegister />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/academics" element={<Academics />} />
           <Route path="/mentors" element={<Mentors />} />

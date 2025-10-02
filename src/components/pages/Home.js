@@ -1506,7 +1506,7 @@ function Home() {
         </Grid>
       </Box>
     </Box>
-    );
-  }
+  );
+}
 
 export default Home;

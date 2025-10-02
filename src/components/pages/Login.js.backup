@@ -7,12 +7,9 @@ import {
     Link, 
     Alert, 
     CircularProgress,
-    Container,
     Chip,
-    Divider,
-    Paper
+    Divider
 } from "@mui/material";
-import AcUnitIcon from "@mui/icons-material/AcUnit"; 
 import PersonIcon from "@mui/icons-material/Person"; // For student icon
 import axios from "axios"; // Import axios for API calls
 import { useNavigate } from "react-router-dom"; // To navigate after login
@@ -85,7 +82,7 @@ const hexToRgb = (hex) => {
 
 const usnRegex = /^1BG\d{2}(CS|IS|AI|ME|EE|EC)\d{3}$/;
 
-export default function SignInPage() {
+export default function Login() {
     const [usn, setUsn] = useState("");
     const [password, setPassword] = useState("");
     const [usnError, setUsnError] = useState("");
