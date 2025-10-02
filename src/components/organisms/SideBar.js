@@ -12,6 +12,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/SpaceDashboardOutlined";
 import PersonIcon from "@mui/icons-material/PersonOutlineOutlined";
 import AutoGraphOutlinedIcon from '@mui/icons-material/AutoGraphOutlined';
+import SchoolIcon from "@mui/icons-material/School"; // ✅ Import Academics Icon
 import SettingsIcon from "@mui/icons-material/Settings";
 import ContactMailIcon from "@mui/icons-material/DraftsOutlined";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
@@ -25,6 +26,7 @@ const Sidebar = ({ onMenuClick }) => {
 
     const menuItems = [
         { text: "Dashboard", path: "dashboard", icon: <DashboardIcon /> },
+        { text: "Academics", path: "academics", icon: <SchoolIcon /> }, // ✅ Added Academics
         { text: "Mentors", path: "mentors", icon: <PersonIcon /> },
         { text: "Skill Analysis", path: "documents", icon: <AutoGraphOutlinedIcon /> },
     ];

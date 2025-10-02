@@ -14,6 +14,7 @@ const Dashboard = () => {
 
     const sidebarOptions = [
         { label: "Dashboard", id: "dashboard" },
+        { label: "Academics", id: "academics" },
         { label: "Mentors", id: "mentors" },
         { label: "Documents", id: "dashboard" },
         { label: "Settings", id: "settings" },

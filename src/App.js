@@ -18,6 +18,7 @@ import SettingsMentor from './components/pages/SettingsMentor';
 import ProfilePage from './components/pages/Profile';
 import { AuthProvider } from './components/pages/AuthContext';
 import MentorProfile from './components/pages/ProfileMentor';
+import Academics from './components/pages/StudentDashboard/Academics';
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/student/register" element={< StudentRegister />} />
           <Route path="/mentor/register" element={< MentorRegister />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/academics" element={<Academics />} />
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/settings" element={<Settings />} />

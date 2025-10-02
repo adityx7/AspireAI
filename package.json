@@ -31,18 +31,19 @@
     "react-swipeable-views": "^0.14.0",
     "react-swipeable-views-core": "^0.14.0",
     "react-toastify": "^11.0.5",
-    "recharts": "^2.15.1",
+    "recharts": "^2.15.4",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.8.1",
     "uuid": "^11.0.5",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-  "start": "concurrently \"react-scripts start\" \"node src/components/pages/student/Server.js\" \"python src/AiAssistant.py\" \"node src/Analysis.js\"",
-  "build": "react-scripts build",
-  "test": "react-scripts test",
-  "eject": "react-scripts eject"
-},
+    "start": "concurrently \"react-scripts start\" \"node src/components/pages/student/Server.js\" \"python3 src/AiAssistant.py\"",
+    "start-all": "concurrently \"react-scripts start\" \"node src/components/pages/student/Server.js\" \"python3 src/AiAssistant.py\" \"node src/Analysis.js\"",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -67,7 +68,7 @@
     "@babel/preset-env": "^7.26.0",
     "@babel/preset-react": "^7.26.3",
     "babel-loader": "^9.2.1",
-    "concurrently": "^9.1.2",
+    "concurrently": "^9.2.1",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.0"

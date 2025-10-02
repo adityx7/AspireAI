@@ -33,16 +33,31 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
-// ✅ Mentor Schema
+// ✅ Mentor Schema (Updated for Phase 1)
 const mentorSchema = new mongoose.Schema({
     fullName: String,
     mentorID: String,
     email: String,
     password: String,
+    
+    // ✅ Phase 1: New field to link assigned students
+    menteeIDs: [{ 
+        type: String, // Student USN references
+        ref: 'Student'
+    }],
+    
+    // Additional mentor-specific fields
+    expertise: [String], // Areas of expertise
+    maxMentees: { type: Number, default: 10 }, // Maximum number of students a mentor can handle
+    availabilityStatus: { 
+        type: String, 
+        enum: ['Available', 'Busy', 'Unavailable'], 
+        default: 'Available' 
+    }
 });
 const Mentor = mongoose.model("Mentor", mentorSchema);
 
-// ✅ Student Schema
+// ✅ Student Schema (Updated for Phase 1)
 const studentSchema = new mongoose.Schema({
     name: String,   // ✅ Name should match ProfilePage
     usn: String,
@@ -56,6 +71,100 @@ const studentSchema = new mongoose.Schema({
     employeeId: String, // ✅ Match frontend `employeeId`
     selectedMajors: [],
     shortBio: String,
+    
+    // ✅ Phase 1: New fields for advanced features
+    academics: {
+        semesters: [{
+            semesterNumber: { type: Number, required: true },
+            cgpa: { type: Number, min: 0, max: 10 },
+            semesterCourses: [{
+                name: { type: String, required: true },
+                grade: { type: String },
+                credits: { type: Number, min: 0 },
+                performanceGraphData: [{
+                    assessment: String, // e.g., "Quiz 1", "Midterm", "Final"
+                    marks: Number,
+                    maxMarks: Number,
+                    date: Date
+                }]
+            }],
+            reflectionJournal: {
+                whatDidWell: String,
+                whatToImprove: String,
+                goals: String,
+                challenges: String,
+                reflectionDate: { type: Date, default: Date.now }
+            }
+        }],
+        overallCGPA: { type: Number, min: 0, max: 10 },
+        totalCredits: { type: Number, default: 0 }
+    },
+    
+    certifications: [{
+        name: { type: String, required: true },
+        issuer: { type: String, required: true },
+        date: { type: Date, required: true },
+        domainTags: [String], // e.g., ["Web Development", "Cloud Computing"]
+        verificationLink: String,
+        certificateImage: String // Optional: base64 or file path
+    }],
+    
+    aictActivityPoints: {
+        currentPoints: { type: Number, default: 0 },
+        targetPoints: { type: Number, default: 100 },
+        activities: [{
+            name: { type: String, required: true },
+            type: { 
+                type: String, 
+                enum: ['Academic', 'Extracurricular', 'Project', 'Certification', 'Event'], 
+                required: true 
+            },
+            points: { type: Number, required: true },
+            status: { 
+                type: String, 
+                enum: ['Completed', 'In Progress', 'Planned'], 
+                default: 'Planned' 
+            },
+            dateCompleted: Date,
+            description: String
+        }]
+    },
+    
+    attendance: [{
+        subjectName: { type: String, required: true },
+        attendedClasses: { type: Number, default: 0 },
+        totalClasses: { type: Number, default: 0 },
+        semester: Number,
+        attendancePercentage: { type: Number, min: 0, max: 100 }
+    }],
+    
+    // ✅ SWOT Analysis and Career Planning
+    swotAnalysis: {
+        strengths: [String],
+        weaknesses: [String],
+        opportunities: [String],
+        threats: [String],
+        lastUpdated: { type: Date, default: Date.now }
+    },
+    
+    careerInterests: [{
+        field: String, // e.g., "Software Development", "Data Science"
+        interestLevel: { type: Number, min: 1, max: 10 },
+        skills: [String],
+        experience: String
+    }],
+    
+    careerRoadmap: [{
+        milestone: { type: String, required: true },
+        targetDate: Date,
+        status: { 
+            type: String, 
+            enum: ['Not Started', 'In Progress', 'Completed'], 
+            default: 'Not Started' 
+        },
+        description: String,
+        requiredSkills: [String]
+    }]
 }, { strict: false });
 
 const Student = mongoose.model("Student", studentSchema);
@@ -199,7 +308,276 @@ app.get("/api/mentor/details", async (req, res) => {
 });
 
 /* -----------------------------------
-   ✅ Student APIs
+   ✅ Phase 2: Academics APIs
+-------------------------------------*/
+
+// ✅ Add/Update semester academic data
+app.post("/api/academics/semester", async (req, res) => {
+    try {
+        const { 
+            usn, 
+            semesterNumber, 
+            cgpa, 
+            semesterCourses, 
+            reflectionJournal 
+        } = req.body;
+
+        console.log("📩 Semester data received for USN:", usn);
+
+        if (!usn || !semesterNumber) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN and semester number are required" 
+            });
+        }
+
+        // Find the student
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        // Initialize academics object if it doesn't exist
+        if (!student.academics) {
+            student.academics = { semesters: [], overallCGPA: 0, totalCredits: 0 };
+        }
+
+        // Check if semester already exists
+        const existingSemesterIndex = student.academics.semesters.findIndex(
+            sem => sem.semesterNumber === semesterNumber
+        );
+
+        const semesterData = {
+            semesterNumber,
+            cgpa: cgpa || 0,
+            semesterCourses: semesterCourses || [],
+            reflectionJournal: reflectionJournal || {}
+        };
+
+        if (existingSemesterIndex !== -1) {
+            // Update existing semester
+            student.academics.semesters[existingSemesterIndex] = semesterData;
+        } else {
+            // Add new semester
+            student.academics.semesters.push(semesterData);
+        }
+
+        // Calculate overall CGPA and total credits
+        let totalCGPA = 0;
+        let totalCredits = 0;
+        
+        student.academics.semesters.forEach(semester => {
+            if (semester.cgpa) {
+                totalCGPA += semester.cgpa;
+            }
+            semester.semesterCourses.forEach(course => {
+                if (course.credits) {
+                    totalCredits += course.credits;
+                }
+            });
+        });
+
+        student.academics.overallCGPA = student.academics.semesters.length > 0 
+            ? totalCGPA / student.academics.semesters.length 
+            : 0;
+        student.academics.totalCredits = totalCredits;
+
+        await student.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Academic data updated successfully",
+            data: student.academics
+        });
+
+    } catch (error) {
+        console.error("❌ Error updating academic data:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+// ✅ Fetch all academic data for dashboard
+app.get("/api/academics/dashboard/:usn", async (req, res) => {
+    try {
+        const { usn } = req.params;
+
+        console.log("📩 Fetching academic dashboard for USN:", usn);
+
+        const student = await Student.findOne({ usn }).select(
+            'academics attendance certifications aictActivityPoints swotAnalysis careerInterests careerRoadmap name usn'
+        );
+
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        // Initialize empty objects if they don't exist
+        const academicData = {
+            studentInfo: {
+                name: student.name,
+                usn: student.usn
+            },
+            academics: student.academics || { semesters: [], overallCGPA: 0, totalCredits: 0 },
+            attendance: student.attendance || [],
+            certifications: student.certifications || [],
+            aictActivityPoints: student.aictActivityPoints || { 
+                currentPoints: 0, 
+                targetPoints: 100, 
+                activities: [] 
+            },
+            swotAnalysis: student.swotAnalysis || {
+                strengths: [],
+                weaknesses: [],
+                opportunities: [],
+                threats: []
+            },
+            careerInterests: student.careerInterests || [],
+            careerRoadmap: student.careerRoadmap || []
+        };
+
+        res.status(200).json({ 
+            success: true, 
+            data: academicData 
+        });
+
+    } catch (error) {
+        console.error("❌ Error fetching academic dashboard:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+// ✅ Add/Update attendance data
+app.post("/api/academics/attendance", async (req, res) => {
+    try {
+        const { usn, subjectName, attendedClasses, totalClasses, semester } = req.body;
+
+        if (!usn || !subjectName) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN and subject name are required" 
+            });
+        }
+
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        if (!student.attendance) {
+            student.attendance = [];
+        }
+
+        // Check if attendance record for this subject already exists
+        const existingAttendanceIndex = student.attendance.findIndex(
+            att => att.subjectName === subjectName && att.semester === semester
+        );
+
+        const attendancePercentage = totalClasses > 0 
+            ? (attendedClasses / totalClasses) * 100 
+            : 0;
+
+        const attendanceData = {
+            subjectName,
+            attendedClasses: attendedClasses || 0,
+            totalClasses: totalClasses || 0,
+            semester: semester || 1,
+            attendancePercentage: parseFloat(attendancePercentage.toFixed(2))
+        };
+
+        if (existingAttendanceIndex !== -1) {
+            student.attendance[existingAttendanceIndex] = attendanceData;
+        } else {
+            student.attendance.push(attendanceData);
+        }
+
+        await student.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Attendance updated successfully",
+            data: student.attendance
+        });
+
+    } catch (error) {
+        console.error("❌ Error updating attendance:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+// ✅ Add certification
+app.post("/api/academics/certification", async (req, res) => {
+    try {
+        const { usn, name, issuer, date, domainTags, verificationLink } = req.body;
+
+        if (!usn || !name || !issuer || !date) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN, certification name, issuer, and date are required" 
+            });
+        }
+
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        if (!student.certifications) {
+            student.certifications = [];
+        }
+
+        const certificationData = {
+            name,
+            issuer,
+            date: new Date(date),
+            domainTags: domainTags || [],
+            verificationLink: verificationLink || ""
+        };
+
+        student.certifications.push(certificationData);
+        await student.save();
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Certification added successfully",
+            data: student.certifications
+        });
+
+    } catch (error) {
+        console.error("❌ Error adding certification:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+/* -----------------------------------
+   ✅ Student APIs (Existing)
 -------------------------------------*/
 // ✅ Register API for Students
 app.post("/api/register", async (req, res) => {
