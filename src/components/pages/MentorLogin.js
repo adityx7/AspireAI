@@ -5,12 +5,140 @@ import {
     TextField,
     Typography,
     Link,
+    Alert,
+    CircularProgress,
+    Container,
+    Paper,
+    Chip,
+    Divider
 } from "@mui/material";
 import AcUnitIcon from "@mui/icons-material/AcUnit"; // Snowflake icon
+import SchoolIcon from "@mui/icons-material/School"; // For education/mentor icon
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// Constants for styling
+const NAVY_BLUE_MAIN = "#0A192F";
+const NAVY_BLUE_LIGHT = "#172A45";
+const NAVY_BLUE_DARK = "#0D1B2A";
+const GOLD_MAIN = "#B8860B";
+const GOLD_LIGHT = "#DAA520";
+const GOLD_DARK = "#8B6914";
+const FONT_FAMILY = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+// Animation constants
+const ANIMATIONS = {
+    fadeIn: "fadeIn",
+    slideUp: "slideUp",
+    slideLeft: "slideLeft",
+    slideRight: "slideRight",
+    float: "float",
+    pulse: "pulse",
+    shimmer: "shimmer",
+    "@keyframes fadeIn": {
+        "0%": { opacity: 0 },
+        "100%": { opacity: 1 },
+    },
+    "@keyframes slideUp": {
+        "0%": { opacity: 0, transform: "translateY(30px)" },
+        "100%": { opacity: 1, transform: "translateY(0)" },
+    },
+    "@keyframes slideLeft": {
+        "0%": { opacity: 0, transform: "translateX(30px)" },
+        "100%": { opacity: 1, transform: "translateX(0)" },
+    },
+    "@keyframes slideRight": {
+        "0%": { opacity: 0, transform: "translateX(-30px)" },
+        "100%": { opacity: 1, transform: "translateX(0)" },
+    },
+    "@keyframes float": {
+        "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+        "50%": { transform: "translateY(-20px) rotate(2deg)" },
+    },
+    "@keyframes pulse": {
+        "0%, 100%": { transform: "scale(1)" },
+        "50%": { transform: "scale(1.05)" },
+    },
+    "@keyframes shimmer": {
+        "0%": { backgroundPosition: "-200% 0" },
+        "100%": { backgroundPosition: "200% 0" }
+    }
+};
+
+// Floating elements for background design
+const floatingElements = [
+    { size: '300px', color: GOLD_MAIN, top: '15%', left: '10%', duration: '15s', delay: '0s', shape: 'circle' },
+    { size: '200px', color: NAVY_BLUE_LIGHT, top: '60%', left: '75%', duration: '12s', delay: '2s', shape: 'circle' },
+    { size: '150px', color: GOLD_LIGHT, top: '80%', left: '20%', duration: '10s', delay: '1s', shape: 'circle' },
+    { size: '250px', color: NAVY_BLUE_DARK, top: '20%', left: '80%', duration: '14s', delay: '3s', shape: 'circle' },
+    { width: '80px', height: '80px', color: GOLD_LIGHT, top: '30%', left: '15%', duration: '8s', delay: '1s', shape: 'square', rotation: '45deg' },
+    { width: '120px', height: '120px', color: NAVY_BLUE_LIGHT, top: '70%', left: '65%', duration: '9s', delay: '0.5s', shape: 'square', rotation: '30deg' },
+];
+
+// Helper function for RGB conversion (for transparency in styling)
+const hexToRgb = (hex) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : "0, 0, 0";
+};
+
 const mentorIDRegex = /^BNM\d{4}$/;
+
+const shimmerBackground = {
+    minHeight: "100vh",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
+    position: "relative",
+    overflow: "hidden",
+    color: "#F8FAFC",
+    // Enhanced animation styles
+    '& .fade-in-up': {
+      opacity: 1,
+      transform: 'translateY(0)',
+      transition: 'all 1.2s cubic-bezier(0.23, 1, 0.32, 1)',
+      '&:not(.animate-in)': {
+        opacity: 0,
+        transform: 'translateY(60px)'
+      }
+    },
+    '& .scale-in': {
+      opacity: 1,
+      transform: 'scale(1) rotateZ(0deg)',
+      transition: 'all 1s cubic-bezier(0.23, 1, 0.32, 1)',
+      '&:not(.animate-in)': {
+        opacity: 0.3,
+        transform: 'scale(0.7) rotateZ(-5deg)'
+      }
+    },
+    '& .floating-element': {
+      animation: 'floating 6s ease-in-out infinite',
+      transition: 'transform 0.3s ease-out'
+    },
+    '@keyframes floating': {
+      '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+      '25%': { transform: 'translateY(-10px) rotate(1deg)' },
+      '50%': { transform: 'translateY(-20px) rotate(0deg)' },
+      '75%': { transform: 'translateY(-10px) rotate(-1deg)' }
+    },
+    '@keyframes shimmer': {
+      '0%': { backgroundPosition: '-200% 0' },
+      '100%': { backgroundPosition: '200% 0' }
+    }
+};
+
+const shimmerOverlay = {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "linear-gradient(120deg, rgba(184, 134, 11, 0.1) 0%, rgba(26, 43, 76, 0.2) 100%)",
+    animation: "shimmer 3s infinite linear",
+    zIndex: 0,
+    pointerEvents: "none",
+};
 
 export default function MentorSignInPage() {
     const navigate = useNavigate();
@@ -19,6 +147,7 @@ export default function MentorSignInPage() {
     const [password, setPassword] = useState("");
     const [mentorIDError, setMentorIDError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // Refs for focusing on the fields
     const mentorIDRef = useRef(null);
@@ -29,40 +158,55 @@ export default function MentorSignInPage() {
         if (mentorIDRef.current) {
             mentorIDRef.current.focus(); // Focus on mentorID field
         }
+        
+        // Trigger animations on page load
+        setTimeout(() => {
+            const animatedElements = document.querySelectorAll('.fade-in-up, .scale-in');
+            animatedElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('animate-in');
+                }, index * 200);
+            });
+        }, 300);
     }, []);
 
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         // Reset errors
         setMentorIDError("");
         setPasswordError("");
         setErrorMessage(""); // Reset error message before login attempt
 
-        // Validate mentorID
-        if (!mentorID) {
-            setMentorIDError("Mentor ID is required.");
-            mentorIDRef.current.focus();
-            return;
-        } else if (!mentorIDRegex.test(mentorID)) {
-            setMentorIDError("Please enter a valid Mentor ID (e.g., BNM0001).");
-            mentorIDRef.current.focus();
-            return;
-        }
-
-        // Validate password
-        if (!password) {
-            setPasswordError("Password is required.");
-            passwordRef.current.focus();
-            return;
-        } else if (password.length < 6) {
-            setPasswordError("Password must be at least 6 characters.");
-            passwordRef.current.focus();
-            return;
-        }
-
         try {
+            // Validate mentorID
+            if (!mentorID) {
+                setMentorIDError("Mentor ID is required.");
+                mentorIDRef.current.focus();
+                setLoading(false);
+                return;
+            } else if (!mentorIDRegex.test(mentorID)) {
+                setMentorIDError("Please enter a valid Mentor ID (e.g., BNM0001).");
+                mentorIDRef.current.focus();
+                setLoading(false);
+                return;
+            }
+
+            // Validate password
+            if (!password) {
+                setPasswordError("Password is required.");
+                passwordRef.current.focus();
+                setLoading(false);
+                return;
+            } else if (password.length < 6) {
+                setPasswordError("Password must be at least 6 characters.");
+                passwordRef.current.focus();
+                setLoading(false);
+                return;
+            }
+
             console.log("Sending request with:", { mentorID, password });
         
             const response = await axios.post("http://localhost:5002/api/mentor/login", {
@@ -84,6 +228,8 @@ export default function MentorSignInPage() {
         } catch (error) {
             console.error("Login error:", error.response ? error.response.data : error);
             setErrorMessage("Login failed. Check your credentials.");
+        } finally {
+            setLoading(false);
         }        
     };
 
@@ -95,25 +241,129 @@ export default function MentorSignInPage() {
                 flexDirection: "column",
                 justifyContent: "center",
                 alignItems: "center",
-                background: "linear-gradient(to bottom, #f5f5f5 50%, #000 50%)",
-                px: 2, // Padding for smaller screens
+                background: `
+                    radial-gradient(circle at 10% 90%, ${NAVY_BLUE_DARK} 0%, transparent 60%),
+                    radial-gradient(circle at 90% 10%, ${GOLD_DARK} 0%, transparent 60%),
+                    linear-gradient(135deg, ${NAVY_BLUE_MAIN} 0%, ${NAVY_BLUE_DARK} 100%)
+                `,
+                px: 2,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: `
+                        radial-gradient(circle at 25% 25%, ${GOLD_MAIN}20 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, ${NAVY_BLUE_DARK}30 0%, transparent 50%)
+                    `,
+                    animation: `${ANIMATIONS.shimmer} 8s ease-in-out infinite alternate`,
+                    zIndex: 1,
+                },
             }}
         >
+            {/* Floating Background Elements */}
+            {floatingElements.map((el, index) => (
+                <Box
+                    key={index}
+                    sx={{
+                        position: 'absolute',
+                        width: el.shape === 'square' ? el.width : el.size,
+                        height: el.shape === 'square' ? el.height : el.size,
+                        background: el.shape === 'square' 
+                            ? `linear-gradient(45deg, ${el.color}30, ${el.color}10)`
+                            : `radial-gradient(circle, ${el.color}30, transparent 70%)`,
+                        borderRadius: el.shape === 'square' ? '12px' : '50%',
+                        top: el.top,
+                        left: el.left,
+                        transform: el.shape === 'square' ? `rotate(${el.rotation})` : 'none',
+                        animation: `${ANIMATIONS.float} ${el.duration} ease-in-out infinite ${el.delay}`,
+                        zIndex: 2,
+                        backdropFilter: 'blur(5px)',
+                        boxShadow: el.shape === 'square' 
+                            ? `0 10px 30px rgba(${hexToRgb(el.color)}, 0.1)`
+                            : 'none',
+                    }}
+                />
+            ))}
+
             {/* Main Container */}
             <Box
                 sx={{
-                    width: { xs: "100%", sm: "80%", md: "50%", lg: "40%" },
-                    maxWidth: 450,
-                    backgroundColor: "#F8FAFC", // Light gray
-                    borderRadius: 3,
-                    boxShadow: 3,
+                    width: { xs: "100%", sm: "85%", md: "55%", lg: "40%" },
+                    maxWidth: 480,
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(25px)',
+                    borderRadius: 4,
+                    boxShadow: `
+                        0 25px 50px -12px rgba(10, 25, 47, 0.25),
+                        0 4px 25px rgba(184, 134, 11, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                    `,
                     padding: { xs: 3, sm: 4, md: 5 },
+                    position: 'relative',
+                    zIndex: 10,
+                    border: `1px solid rgba(${hexToRgb(GOLD_MAIN)}, 0.2)`,
+                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    overflow: 'hidden',
+                    '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '5px',
+                        background: `linear-gradient(90deg, ${GOLD_MAIN}, ${GOLD_LIGHT}, ${GOLD_MAIN})`,
+                    },
+                    '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: `
+                            radial-gradient(circle at 50% 0%, rgba(${hexToRgb(GOLD_LIGHT)}, 0.05) 0%, transparent 70%)
+                        `,
+                        zIndex: 1,
+                        opacity: 0.8,
+                    },
+                    '&:hover': {
+                        transform: 'translateY(-3px)',
+                        boxShadow: `
+                            0 32px 64px -12px rgba(10, 25, 47, 0.35),
+                            0 8px 35px rgba(184, 134, 11, 0.2),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.2)
+                        `,
+                    },
                 }}
             >
                 {errorMessage && (
-                    <Typography color="error" sx={{ textAlign: "center", mb: 2 }}>
+                    <Alert 
+                        severity="error" 
+                        sx={{ 
+                            mb: 3,
+                            mt: 1,
+                            borderRadius: 2,
+                            border: '1px solid rgba(211, 47, 47, 0.2)',
+                            backgroundColor: 'rgba(211, 47, 47, 0.05)',
+                            '& .MuiAlert-icon': {
+                                color: 'error.main',
+                                opacity: 0.9
+                            },
+                            '& .MuiAlert-message': {
+                                fontFamily: FONT_FAMILY,
+                                fontSize: '0.875rem',
+                                fontWeight: 500,
+                            },
+                            animation: `${ANIMATIONS.slideUp} 0.4s ease-out forwards`
+                        }}
+                    >
                         {errorMessage}
-                    </Typography>
+                    </Alert>
                 )}
 
                 {/* Top Section */}
@@ -121,6 +371,10 @@ export default function MentorSignInPage() {
                     sx={{
                         textAlign: "center",
                         mb: 4,
+                        opacity: 0,
+                        animation: `${ANIMATIONS.slideUp} 0.6s ease-out 0.2s forwards`,
+                        position: 'relative',
+                        zIndex: 2
                     }}
                 >
                     <Box
@@ -128,50 +382,136 @@ export default function MentorSignInPage() {
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            gap: 1,
-                            mb: 2,
+                            gap: 1.2,
+                            mb: 2.5,
                         }}
                     >
-                        <AcUnitIcon sx={{ fontSize: 40, color: "black.main" }} />
+                        <Box sx={{ 
+                            position: 'relative', 
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <SchoolIcon sx={{ 
+                                fontSize: 42, 
+                                color: NAVY_BLUE_MAIN,
+                                filter: `drop-shadow(0 0 10px ${GOLD_MAIN}50)`,
+                                animation: `${ANIMATIONS.pulse} 3s ease-in-out infinite`,
+                                position: 'relative',
+                                zIndex: 2
+                            }} />
+                            <Box sx={{
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                background: `radial-gradient(circle, ${GOLD_LIGHT}40 0%, transparent 70%)`,
+                                borderRadius: '50%',
+                                animation: `${ANIMATIONS.pulse} 3s ease-in-out infinite 0.5s`,
+                                filter: 'blur(8px)'
+                            }} />
+                        </Box>
                         <Typography
-                            variant="h5"
+                            variant="h4"
                             fontWeight="bold"
                             sx={{
-                                fontSize: { xs: "1.5rem", sm: "1.8rem" },
-                                fontFamily: "Courier",
+                                fontFamily: FONT_FAMILY,
+                                background: `linear-gradient(135deg, ${NAVY_BLUE_MAIN} 0%, ${NAVY_BLUE_LIGHT} 100%)`,
+                                backgroundClip: 'text',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                textShadow: `0 2px 10px ${GOLD_MAIN}20`,
+                                fontSize: { xs: "1.6rem", sm: "2rem" },
+                                letterSpacing: '-0.02em'
                             }}
                         >
-                            Career Compass
+                            AspireAI
                         </Typography>
                     </Box>
+                    
+                    <Chip 
+                        label="MENTOR PORTAL" 
+                        sx={{
+                            mb: 3,
+                            backgroundColor: NAVY_BLUE_MAIN,
+                            color: GOLD_LIGHT,
+                            fontFamily: FONT_FAMILY,
+                            fontWeight: 600,
+                            fontSize: '0.75rem',
+                            letterSpacing: '1px',
+                            borderRadius: '4px',
+                            border: `1px solid ${GOLD_MAIN}40`,
+                            boxShadow: `0 4px 12px ${GOLD_MAIN}20`,
+                            '& .MuiChip-label': {
+                                px: 2
+                            }
+                        }}
+                    />
+                    
                     <Typography
-                        variant="h6"
+                        variant="h5"
                         fontWeight="bold"
-                        sx={{ mb: 1, fontSize: { xs: "1rem", sm: "1.2rem" } }}
+                        sx={{ 
+                            mb: 1, 
+                            fontSize: { xs: "1.3rem", sm: "1.5rem" },
+                            fontFamily: FONT_FAMILY,
+                            color: NAVY_BLUE_MAIN,
+                            textShadow: `0 1px 2px rgba(${hexToRgb(GOLD_MAIN)}, 0.2)`,
+                            position: 'relative'
+                        }}
                     >
-                        Account Login
+                        Welcome Back!
                     </Typography>
-                    <Typography variant="body3" color="text.secondary">
-                        Enter your account info below:
+                    <Typography 
+                        variant="body1" 
+                        sx={{
+                            fontFamily: FONT_FAMILY,
+                            color: NAVY_BLUE_LIGHT,
+                            opacity: 0.85,
+                            maxWidth: '85%',
+                            mx: 'auto',
+                            lineHeight: 1.5
+                        }}
+                    >
+                        Sign in to access your mentor dashboard and connect with students
                     </Typography>
                 </Box>
 
                 {/* Sign-In Form Section */}
                 <Box
                     sx={{
-                        backgroundColor: "#fff",
-                        borderRadius: 2,
-                        boxShadow: 1,
-                        padding: { xs: 2, sm: 4 },
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        backdropFilter: 'blur(15px)',
+                        borderRadius: 3,
+                        boxShadow: `
+                            0 10px 40px rgba(10, 25, 47, 0.12),
+                            inset 0 1px 0 rgba(255, 255, 255, 0.3)
+                        `,
+                        padding: { xs: 2.5, sm: 4 },
                         mb: 3,
+                        border: `1px solid rgba(${hexToRgb(GOLD_MAIN)}, 0.15)`,
+                        opacity: 0,
+                        animation: `${ANIMATIONS.slideUp} 0.6s ease-out 0.4s forwards`,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '60%',
+                            background: `linear-gradient(to top, rgba(${hexToRgb(NAVY_BLUE_MAIN)}, 0.02), transparent)`,
+                            pointerEvents: 'none',
+                            zIndex: 1
+                        }
                     }}
                 >
                     {/* mentorID and Password Section */}
-                    <Box sx={{ mb: 3 }}>
+                    <Box sx={{ mb: 3, position: 'relative', zIndex: 2 }}>
                         <TextField
                             fullWidth
                             variant="outlined"
-                            size="small"
+                            size="medium"
                             label="Mentor ID"
                             placeholder="BNM0001"
                             value={mentorID}
@@ -180,19 +520,58 @@ export default function MentorSignInPage() {
                             helperText={mentorIDError}
                             sx={{
                                 mb: 4,
-                                mt: 3,
+                                mt: 1.5,
                                 "& .MuiOutlinedInput-root": {
                                     borderRadius: "12px",
-                                    backgroundColor: "#fff",
-                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#FFA928",
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(10px)',
+                                    fontFamily: FONT_FAMILY,
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    height: '56px', // Taller input field
+                                    "&.Mui-focused": {
+                                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: `0 8px 25px rgba(${hexToRgb(GOLD_MAIN)}, 0.15)`,
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: GOLD_MAIN,
+                                            borderWidth: '2px',
+                                            boxShadow: `0 0 0 3px rgba(${hexToRgb(GOLD_MAIN)}, 0.1)`,
+                                        },
                                     },
-                                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#0073B1",
+                                    "&:hover": {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: `0 6px 15px rgba(${hexToRgb(GOLD_MAIN)}, 0.1)`,
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: NAVY_BLUE_LIGHT,
+                                            borderWidth: '1.5px',
+                                        },
                                     },
+                                    '& input': {
+                                        fontSize: '1rem',
+                                        fontWeight: 500,
+                                        padding: '14px 16px',
+                                        caretColor: GOLD_MAIN,
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    fontFamily: FONT_FAMILY,
+                                    color: NAVY_BLUE_MAIN,
+                                    fontWeight: 500,
+                                    fontSize: '0.95rem',
+                                    "&.Mui-focused": {
+                                        color: GOLD_MAIN,
+                                        fontWeight: 600,
+                                    },
+                                    "&.MuiFormLabel-filled": {
+                                        fontWeight: 600,
+                                    }
                                 },
                                 "& .MuiFormHelperText-root": {
                                     fontSize: "0.85rem",
+                                    fontFamily: FONT_FAMILY,
+                                    marginTop: '6px',
+                                    marginLeft: '4px',
                                 },
                             }}
                             inputRef={mentorIDRef}
@@ -200,7 +579,7 @@ export default function MentorSignInPage() {
                         <TextField
                             fullWidth
                             variant="outlined"
-                            size="small"
+                            size="medium"
                             label="Password"
                             type="password"
                             value={password}
@@ -211,16 +590,55 @@ export default function MentorSignInPage() {
                                 mt: 1,
                                 "& .MuiOutlinedInput-root": {
                                     borderRadius: "12px",
-                                    backgroundColor: "#fff",
-                                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#FFA928",
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(10px)',
+                                    fontFamily: FONT_FAMILY,
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    height: '56px', // Taller input field
+                                    "&.Mui-focused": {
+                                        backgroundColor: 'rgba(255, 255, 255, 1)',
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: `0 8px 25px rgba(${hexToRgb(GOLD_MAIN)}, 0.15)`,
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: GOLD_MAIN,
+                                            borderWidth: '2px',
+                                            boxShadow: `0 0 0 3px rgba(${hexToRgb(GOLD_MAIN)}, 0.1)`,
+                                        },
                                     },
-                                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                                        borderColor: "#0073B1",
+                                    "&:hover": {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                        transform: 'translateY(-1px)',
+                                        boxShadow: `0 6px 15px rgba(${hexToRgb(GOLD_MAIN)}, 0.1)`,
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: NAVY_BLUE_LIGHT,
+                                            borderWidth: '1.5px',
+                                        },
                                     },
+                                    '& input': {
+                                        fontSize: '1rem',
+                                        fontWeight: 500,
+                                        padding: '14px 16px',
+                                        caretColor: GOLD_MAIN,
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    fontFamily: FONT_FAMILY,
+                                    color: NAVY_BLUE_MAIN,
+                                    fontWeight: 500,
+                                    fontSize: '0.95rem',
+                                    "&.Mui-focused": {
+                                        color: GOLD_MAIN,
+                                        fontWeight: 600,
+                                    },
+                                    "&.MuiFormLabel-filled": {
+                                        fontWeight: 600,
+                                    }
                                 },
                                 "& .MuiFormHelperText-root": {
                                     fontSize: "0.85rem",
+                                    fontFamily: FONT_FAMILY,
+                                    marginTop: '6px',
+                                    marginLeft: '4px',
                                 },
                             }}
                             inputRef={passwordRef}
@@ -230,28 +648,121 @@ export default function MentorSignInPage() {
                     {/* Sign In Button */}
                     <Button
                         variant="contained"
-                        color="primary"
                         fullWidth
                         sx={{
-                            textTransform: "capitalize",
+                            textTransform: "none",
                             mb: 2,
-                            py: { xs: 1, sm: 1.5 },
-                            background: "#FFA928",
+                            py: { xs: 1.4, sm: 1.8 },
+                            mt: 4,
+                            fontFamily: FONT_FAMILY,
+                            fontWeight: 600,
+                            fontSize: '1.05rem',
+                            letterSpacing: '0.5px',
+                            borderRadius: '12px',
+                            background: `linear-gradient(135deg, ${GOLD_MAIN} 0%, ${GOLD_DARK} 100%)`,
+                            boxShadow: `0 8px 25px -5px rgba(${hexToRgb(GOLD_MAIN)}, 0.5)`,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            opacity: 0,
+                            animation: `${ANIMATIONS.slideUp} 0.6s ease-out 0.6s forwards`,
+                            height: '56px', // Taller button
+                            '&:hover': {
+                                background: `linear-gradient(135deg, ${GOLD_DARK} 0%, ${GOLD_MAIN} 100%)`,
+                                transform: 'translateY(-3px) scale(1.01)',
+                                boxShadow: `0 12px 30px -5px rgba(${hexToRgb(GOLD_MAIN)}, 0.6)`,
+                            },
+                            '&:active': {
+                                transform: 'translateY(-1px)',
+                                boxShadow: `0 5px 15px -5px rgba(${hexToRgb(GOLD_MAIN)}, 0.4)`,
+                            },
+                            '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)`,
+                                transform: 'translateX(-100%)',
+                                transition: 'all 0.6s ease',
+                            },
+                            '&:hover::before': {
+                                transform: 'translateX(100%)',
+                            },
+                            ...(loading && {
+                                opacity: 0.7,
+                                pointerEvents: 'none',
+                            }),
                         }}
                         onClick={handleSubmit}
+                        disabled={loading}
                     >
-                        Sign In
+                        {loading ? (
+                            <CircularProgress size={26} sx={{ color: 'white' }} />
+                        ) : (
+                            "Sign In to Dashboard"
+                        )}
                     </Button>
 
                     {/* Links Section */}
-                    <Box sx={{ textAlign: "center" }}>
+                    <Box 
+                        sx={{ 
+                            textAlign: "center",
+                            opacity: 0,
+                            animation: `${ANIMATIONS.fadeIn} 0.8s ease-out 0.8s forwards`,
+                            position: 'relative',
+                            zIndex: 2,
+                            mt: 1
+                        }}
+                    >
+                        <Divider sx={{ 
+                            my: 2.5, 
+                            '&::before, &::after': {
+                                borderColor: `rgba(${hexToRgb(NAVY_BLUE_MAIN)}, 0.1)`,
+                            },
+                        }}>
+                            <Typography variant="caption" sx={{ 
+                                color: `rgba(${hexToRgb(NAVY_BLUE_MAIN)}, 0.7)`, 
+                                px: 2, 
+                                fontFamily: FONT_FAMILY 
+                            }}>
+                                New to AspireAI?
+                            </Typography>
+                        </Divider>
+                        
                         <Typography
                             variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 1, fontSize: { xs: "0.85rem", sm: "0.95rem" } }}
+                            sx={{ 
+                                fontSize: { xs: "0.9rem", sm: "0.95rem" },
+                                fontFamily: FONT_FAMILY,
+                                color: NAVY_BLUE_LIGHT,
+                            }}
                         >
-                            <Link href="/mentor/register" underline="hover" color="primary">
-                                Create Mentor Account<br></br>
+                            <Link 
+                                href="/mentor/register" 
+                                underline="none" 
+                                sx={{
+                                    color: GOLD_MAIN,
+                                    fontWeight: 600,
+                                    textDecoration: 'none',
+                                    position: 'relative',
+                                    transition: 'all 0.3s ease',
+                                    padding: '6px 16px',
+                                    borderRadius: '8px',
+                                    border: `1px solid ${GOLD_MAIN}40`,
+                                    display: 'inline-block',
+                                    mt: 1,
+                                    '&:hover': {
+                                        color: GOLD_DARK,
+                                        backgroundColor: `rgba(${hexToRgb(GOLD_MAIN)}, 0.08)`,
+                                        borderColor: `${GOLD_MAIN}80`,
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: `0 5px 15px rgba(${hexToRgb(GOLD_MAIN)}, 0.15)`,
+                                    },
+                                }}
+                            >
+                                Register as a Mentor
                             </Link>
                         </Typography>
                     </Box>

@@ -597,7 +597,7 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
-// ✅ Student Login API (Fixed)
+// ✅ Student Login API (Fixed with token)
 app.post("/api/student/login", async (req, res) => {
     try {
         const { usn, password } = req.body;
@@ -609,7 +609,15 @@ app.post("/api/student/login", async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid USN or Password" });
         }
 
-        res.json({ success: true, message: "Login successful" });
+        // Generate a simple token (in production you would use JWT)
+        const token = Buffer.from(`${usn}-${Date.now()}`).toString('base64');
+        
+        res.json({ 
+            success: true, 
+            message: "Login successful",
+            token: token,
+            usn: usn
+        });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error });
     }
