@@ -21,6 +21,7 @@ import {
     Assignment as AssignmentIcon,
     EmojiEvents as TrophyIcon,
     TrendingUp as TrendingUpIcon,
+    Edit as EditIcon,
 } from '@mui/icons-material';
 
 const shimmerBackground = {
@@ -88,6 +89,25 @@ const Academics = () => {
         semesterCourses: []
     });
 
+    // New state for edit dialogs
+    const [openCreditsDialog, setOpenCreditsDialog] = useState(false);
+    const [openCertificationsDialog, setOpenCertificationsDialog] = useState(false);
+    const [openActivityPointsDialog, setOpenActivityPointsDialog] = useState(false);
+    
+    // State for edit forms
+    const [creditsData, setCreditsData] = useState({ credits: '' });
+    const [certificationData, setCertificationData] = useState({ 
+        name: '', 
+        issuer: '', 
+        date: '', 
+        description: '' 
+    });
+    const [activityData, setActivityData] = useState({ 
+        activity: '', 
+        points: '', 
+        description: '' 
+    });
+
     const usn = localStorage.getItem('usn') || 'defaultUSN';
 
     useEffect(() => {
@@ -142,6 +162,93 @@ const Academics = () => {
                 setError('');
             } else {
                 setError(result.message || 'Failed to add semester data');
+            }
+        } catch (err) {
+            setError('Network error: ' + err.message);
+        }
+    };
+
+    // Handler functions for editing credits, certifications, and activity points
+    const handleUpdateCredits = async () => {
+        try {
+            const response = await fetch(`http://localhost:5002/api/academics/credits`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usn,
+                    credits: parseInt(creditsData.credits)
+                }),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                await fetchAcademicData();
+                setOpenCreditsDialog(false);
+                setCreditsData({ credits: '' });
+                setError('');
+            } else {
+                setError(result.message || 'Failed to update credits');
+            }
+        } catch (err) {
+            setError('Network error: ' + err.message);
+        }
+    };
+
+    const handleAddCertification = async () => {
+        try {
+            const response = await fetch(`http://localhost:5002/api/academics/certification`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usn,
+                    ...certificationData
+                }),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                await fetchAcademicData();
+                setOpenCertificationsDialog(false);
+                setCertificationData({ name: '', issuer: '', date: '', description: '' });
+                setError('');
+            } else {
+                setError(result.message || 'Failed to add certification');
+            }
+        } catch (err) {
+            setError('Network error: ' + err.message);
+        }
+    };
+
+    const handleAddActivityPoints = async () => {
+        try {
+            const response = await fetch(`http://localhost:5002/api/academics/activity`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usn,
+                    activity: activityData.activity,
+                    points: parseInt(activityData.points),
+                    description: activityData.description
+                }),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                await fetchAcademicData();
+                setOpenActivityPointsDialog(false);
+                setActivityData({ activity: '', points: '', description: '' });
+                setError('');
+            } else {
+                setError(result.message || 'Failed to add activity points');
             }
         } catch (err) {
             setError('Network error: ' + err.message);
@@ -405,38 +512,61 @@ const Academics = () => {
                             }}
                         >
                             <CardContent>
-                                <Box display="flex" alignItems="center">
-                                    <AssignmentIcon sx={{ 
-                                        mr: 2, 
-                                        fontSize: 40, 
-                                        color: '#00C49F',
-                                        filter: "drop-shadow(0 2px 4px rgba(0, 196, 159, 0.3))"
-                                    }} />
-                                    <Box>
-                                        <Typography 
-                                            sx={{ 
-                                                color: "#F8FAFC", 
-                                                opacity: 0.8,
-                                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-                                            }} 
-                                            gutterBottom
-                                        >
-                                            Total Credits
-                                        </Typography>
-                                        <Typography 
-                                            variant="h5"
-                                            sx={{
-                                                background: "linear-gradient(135deg, #00C49F 0%, #4CAF50 100%)",
-                                                backgroundClip: "text",
-                                                WebkitBackgroundClip: "text",
-                                                WebkitTextFillColor: "transparent",
-                                                fontWeight: 700,
-                                                filter: "drop-shadow(0 2px 4px rgba(0, 196, 159, 0.3))"
-                                            }}
-                                        >
-                                            {academicData?.academics?.totalCredits || 0}
-                                        </Typography>
+                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                    <Box display="flex" alignItems="center">
+                                        <AssignmentIcon sx={{ 
+                                            mr: 2, 
+                                            fontSize: 40, 
+                                            color: '#00C49F',
+                                            filter: "drop-shadow(0 2px 4px rgba(0, 196, 159, 0.3))"
+                                        }} />
+                                        <Box>
+                                            <Typography 
+                                                sx={{ 
+                                                    color: "#F8FAFC", 
+                                                    opacity: 0.8,
+                                                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+                                                }} 
+                                                gutterBottom
+                                            >
+                                                Total Credits
+                                            </Typography>
+                                            <Typography 
+                                                variant="h5"
+                                                sx={{
+                                                    background: "linear-gradient(135deg, #00C49F 0%, #4CAF50 100%)",
+                                                    backgroundClip: "text",
+                                                    WebkitBackgroundClip: "text",
+                                                    WebkitTextFillColor: "transparent",
+                                                    fontWeight: 700,
+                                                    filter: "drop-shadow(0 2px 4px rgba(0, 196, 159, 0.3))"
+                                                }}
+                                            >
+                                                {academicData?.academics?.totalCredits || 0}
+                                            </Typography>
+                                        </Box>
                                     </Box>
+                                    <Button
+                                        size="small"
+                                        onClick={() => setOpenCreditsDialog(true)}
+                                        sx={{
+                                            minWidth: 'auto',
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                            color: 'white',
+                                            boxShadow: '0 4px 15px rgba(184, 134, 11, 0.3)',
+                                            transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                                transform: 'translateY(-2px) scale(1.1)',
+                                                boxShadow: '0 8px 25px rgba(184, 134, 11, 0.4)',
+                                            }
+                                        }}
+                                    >
+                                        <EditIcon sx={{ fontSize: 18 }} />
+                                    </Button>
                                 </Box>
                             </CardContent>
                         </Card>
@@ -459,38 +589,61 @@ const Academics = () => {
                             }}
                         >
                             <CardContent>
-                                <Box display="flex" alignItems="center">
-                                    <TrophyIcon sx={{ 
-                                        mr: 2, 
-                                        fontSize: 40, 
-                                        color: '#FF8042',
-                                        filter: "drop-shadow(0 2px 4px rgba(255, 128, 66, 0.3))"
-                                    }} />
-                                    <Box>
-                                        <Typography 
-                                            sx={{ 
-                                                color: "#F8FAFC", 
-                                                opacity: 0.8,
-                                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-                                            }} 
-                                            gutterBottom
-                                        >
-                                            Certifications
-                                        </Typography>
-                                        <Typography 
-                                            variant="h5"
-                                            sx={{
-                                                background: "linear-gradient(135deg, #FF8042 0%, #FF6B35 100%)",
-                                                backgroundClip: "text",
-                                                WebkitBackgroundClip: "text",
-                                                WebkitTextFillColor: "transparent",
-                                                fontWeight: 700,
-                                                filter: "drop-shadow(0 2px 4px rgba(255, 128, 66, 0.3))"
-                                            }}
-                                        >
-                                            {academicData?.certifications?.length || 0}
-                                        </Typography>
+                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                    <Box display="flex" alignItems="center">
+                                        <TrophyIcon sx={{ 
+                                            mr: 2, 
+                                            fontSize: 40, 
+                                            color: '#FF8042',
+                                            filter: "drop-shadow(0 2px 4px rgba(255, 128, 66, 0.3))"
+                                        }} />
+                                        <Box>
+                                            <Typography 
+                                                sx={{ 
+                                                    color: "#F8FAFC", 
+                                                    opacity: 0.8,
+                                                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+                                                }} 
+                                                gutterBottom
+                                            >
+                                                Certifications
+                                            </Typography>
+                                            <Typography 
+                                                variant="h5"
+                                                sx={{
+                                                    background: "linear-gradient(135deg, #FF8042 0%, #FF6B35 100%)",
+                                                    backgroundClip: "text",
+                                                    WebkitBackgroundClip: "text",
+                                                    WebkitTextFillColor: "transparent",
+                                                    fontWeight: 700,
+                                                    filter: "drop-shadow(0 2px 4px rgba(255, 128, 66, 0.3))"
+                                                }}
+                                            >
+                                                {academicData?.certifications?.length || 0}
+                                            </Typography>
+                                        </Box>
                                     </Box>
+                                    <Button
+                                        size="small"
+                                        onClick={() => setOpenCertificationsDialog(true)}
+                                        sx={{
+                                            minWidth: 'auto',
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                            color: 'white',
+                                            boxShadow: '0 4px 15px rgba(184, 134, 11, 0.3)',
+                                            transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                                transform: 'translateY(-2px) scale(1.1)',
+                                                boxShadow: '0 8px 25px rgba(184, 134, 11, 0.4)',
+                                            }
+                                        }}
+                                    >
+                                        <EditIcon sx={{ fontSize: 18 }} />
+                                    </Button>
                                 </Box>
                             </CardContent>
                         </Card>
@@ -513,38 +666,61 @@ const Academics = () => {
                             }}
                         >
                             <CardContent>
-                                <Box display="flex" alignItems="center">
-                                    <TrendingUpIcon sx={{ 
-                                        mr: 2, 
-                                        fontSize: 40, 
-                                        color: '#8884d8',
-                                        filter: "drop-shadow(0 2px 4px rgba(136, 132, 216, 0.3))"
-                                    }} />
-                                    <Box>
-                                        <Typography 
-                                            sx={{ 
-                                                color: "#F8FAFC", 
-                                                opacity: 0.8,
-                                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-                                            }} 
-                                            gutterBottom
-                                        >
-                                            Activity Points
-                                        </Typography>
-                                        <Typography 
-                                            variant="h5"
-                                            sx={{
-                                                background: "linear-gradient(135deg, #8884d8 0%, #9C88FF 100%)",
-                                                backgroundClip: "text",
-                                                WebkitBackgroundClip: "text",
-                                                WebkitTextFillColor: "transparent",
-                                                fontWeight: 700,
-                                                filter: "drop-shadow(0 2px 4px rgba(136, 132, 216, 0.3))"
-                                            }}
-                                        >
-                                            {academicData?.activityPoints || 0}
-                                        </Typography>
+                                <Box display="flex" alignItems="center" justifyContent="space-between">
+                                    <Box display="flex" alignItems="center">
+                                        <TrendingUpIcon sx={{ 
+                                            mr: 2, 
+                                            fontSize: 40, 
+                                            color: '#8884d8',
+                                            filter: "drop-shadow(0 2px 4px rgba(136, 132, 216, 0.3))"
+                                        }} />
+                                        <Box>
+                                            <Typography 
+                                                sx={{ 
+                                                    color: "#F8FAFC", 
+                                                    opacity: 0.8,
+                                                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+                                                }} 
+                                                gutterBottom
+                                            >
+                                                Activity Points
+                                            </Typography>
+                                            <Typography 
+                                                variant="h5"
+                                                sx={{
+                                                    background: "linear-gradient(135deg, #8884d8 0%, #9C88FF 100%)",
+                                                    backgroundClip: "text",
+                                                    WebkitBackgroundClip: "text",
+                                                    WebkitTextFillColor: "transparent",
+                                                    fontWeight: 700,
+                                                    filter: "drop-shadow(0 2px 4px rgba(136, 132, 216, 0.3))"
+                                                }}
+                                            >
+                                                {academicData?.activityPoints || 0}
+                                            </Typography>
+                                        </Box>
                                     </Box>
+                                    <Button
+                                        size="small"
+                                        onClick={() => setOpenActivityPointsDialog(true)}
+                                        sx={{
+                                            minWidth: 'auto',
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                            color: 'white',
+                                            boxShadow: '0 4px 15px rgba(184, 134, 11, 0.3)',
+                                            transition: 'all 0.3s cubic-bezier(0.23, 1, 0.32, 1)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                                transform: 'translateY(-2px) scale(1.1)',
+                                                boxShadow: '0 8px 25px rgba(184, 134, 11, 0.4)',
+                                            }
+                                        }}
+                                    >
+                                        <EditIcon sx={{ fontSize: 18 }} />
+                                    </Button>
                                 </Box>
                             </CardContent>
                         </Card>
@@ -674,6 +850,393 @@ const Academics = () => {
                             }}
                         >
                             Add Semester
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Credits Edit Dialog */}
+                <Dialog 
+                    open={openCreditsDialog} 
+                    onClose={() => setOpenCreditsDialog(false)} 
+                    maxWidth="sm" 
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderRadius: 3,
+                            color: "#F8FAFC"
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        color: "#F8FAFC",
+                        background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontWeight: 700
+                    }}>
+                        Update Total Credits
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ mt: 2 }}>
+                            <TextField
+                                fullWidth
+                                label="Total Credits"
+                                type="number"
+                                value={creditsData.credits}
+                                onChange={(e) => setCreditsData({ credits: e.target.value })}
+                                sx={{
+                                    mb: 2,
+                                    '& .MuiOutlinedInput-root': {
+                                        background: "rgba(248, 250, 252, 0.9)",
+                                        borderRadius: 2,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            background: "rgba(248, 250, 252, 0.95)",
+                                            boxShadow: '0 4px 15px rgba(184, 134, 11, 0.2)'
+                                        },
+                                        '&.Mui-focused': {
+                                            background: "rgba(248, 250, 252, 1)",
+                                            boxShadow: '0 0 20px rgba(184, 134, 11, 0.3)'
+                                        }
+                                    },
+                                    '& .MuiInputLabel-root': {
+                                        color: 'rgba(0, 0, 0, 0.7)',
+                                        '&.Mui-focused': {
+                                            color: '#B8860B'
+                                        }
+                                    },
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'rgba(184, 134, 11, 0.3)',
+                                    },
+                                    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'rgba(184, 134, 11, 0.5)',
+                                    },
+                                    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#B8860B',
+                                    }
+                                }}
+                            />
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button 
+                            onClick={() => setOpenCreditsDialog(false)}
+                            sx={{ color: "#F8FAFC" }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            onClick={handleUpdateCredits}
+                            sx={{
+                                background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                }
+                            }}
+                        >
+                            Update Credits
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Certifications Add Dialog */}
+                <Dialog 
+                    open={openCertificationsDialog} 
+                    onClose={() => setOpenCertificationsDialog(false)} 
+                    maxWidth="md" 
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderRadius: 3,
+                            color: "#F8FAFC"
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        color: "#F8FAFC",
+                        background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontWeight: 700
+                    }}>
+                        Add New Certification
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ mt: 2 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Certification Name"
+                                        value={certificationData.name}
+                                        onChange={(e) => setCertificationData({...certificationData, name: e.target.value})}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Issuing Organization"
+                                        value={certificationData.issuer}
+                                        onChange={(e) => setCertificationData({...certificationData, issuer: e.target.value})}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        fullWidth
+                                        label="Date Obtained"
+                                        type="date"
+                                        value={certificationData.date}
+                                        onChange={(e) => setCertificationData({...certificationData, date: e.target.value})}
+                                        InputLabelProps={{ shrink: true }}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Description (Optional)"
+                                        multiline
+                                        rows={3}
+                                        value={certificationData.description}
+                                        onChange={(e) => setCertificationData({...certificationData, description: e.target.value})}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button 
+                            onClick={() => setOpenCertificationsDialog(false)}
+                            sx={{ color: "#F8FAFC" }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            onClick={handleAddCertification}
+                            sx={{
+                                background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                }
+                            }}
+                        >
+                            Add Certification
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Activity Points Add Dialog */}
+                <Dialog 
+                    open={openActivityPointsDialog} 
+                    onClose={() => setOpenActivityPointsDialog(false)} 
+                    maxWidth="md" 
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderRadius: 3,
+                            color: "#F8FAFC"
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        color: "#F8FAFC",
+                        background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontWeight: 700
+                    }}>
+                        Add Activity Points
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ mt: 2 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={8}>
+                                    <TextField
+                                        fullWidth
+                                        label="Activity Name"
+                                        value={activityData.activity}
+                                        onChange={(e) => setActivityData({...activityData, activity: e.target.value})}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        fullWidth
+                                        label="Points"
+                                        type="number"
+                                        value={activityData.points}
+                                        onChange={(e) => setActivityData({...activityData, points: e.target.value})}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        label="Description (Optional)"
+                                        multiline
+                                        rows={3}
+                                        value={activityData.description}
+                                        onChange={(e) => setActivityData({...activityData, description: e.target.value})}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                                '&.Mui-focused': {
+                                                    color: '#B8860B'
+                                                }
+                                            },
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: 'rgba(184, 134, 11, 0.3)',
+                                            },
+                                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#B8860B',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button 
+                            onClick={() => setOpenActivityPointsDialog(false)}
+                            sx={{ color: "#F8FAFC" }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            onClick={handleAddActivityPoints}
+                            sx={{
+                                background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                }
+                            }}
+                        >
+                            Add Activity
                         </Button>
                     </DialogActions>
                 </Dialog>
