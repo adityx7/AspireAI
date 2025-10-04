@@ -169,40 +169,89 @@ const studentSchema = new mongoose.Schema({
 
 const Student = mongoose.model("Student", studentSchema);
 
+// ✅ Mentor Meeting Notes Schema
+const meetingNotesSchema = new mongoose.Schema({
+    mentorID: { type: String, required: true, ref: 'Mentor' },
+    studentUSN: { type: String, required: true, ref: 'Student' },
+    meetingDate: { type: Date, required: true },
+    summary: { type: String, required: true, maxlength: 500 },
+    actionItems: [{
+        item: { type: String, required: true, maxlength: 200 },
+        priority: { 
+            type: String, 
+            enum: ['High', 'Medium', 'Low'], 
+            default: 'Medium' 
+        },
+        dueDate: Date,
+        status: { 
+            type: String, 
+            enum: ['Pending', 'In Progress', 'Completed'], 
+            default: 'Pending' 
+        },
+        studentNotes: String, // Notes added by student
+        completedAt: Date
+    }],
+    mentorNotes: { type: String, maxlength: 1000 }, // Additional mentor observations
+    nextMeetingDate: Date,
+    tags: [String], // e.g., ['Academic', 'Career', 'Personal Development']
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now }
+}, { 
+    timestamps: true,
+    collection: "meeting_notes" 
+});
+
+// Index for faster queries
+meetingNotesSchema.index({ mentorID: 1, studentUSN: 1, meetingDate: -1 });
+meetingNotesSchema.index({ studentUSN: 1, createdAt: -1 });
+
+const MeetingNotes = mongoose.model("MeetingNotes", meetingNotesSchema);
+
 /* -----------------------------------
    ✅ Mentor APIs
 -------------------------------------*/
-app.post("/api/mentor/register", async (req, res) => {
+app.post("/api/mentors/register", async (req, res) => {
     try {
         console.log("📩 Mentor Registration Request Received:", req.body);
         const { fullName, mentorID, email, password, phoneNumber, alternatePhoneNumber, gender, tech, employeeIn, selectedMajors, bio } = req.body;
 
+        console.log("🔍 Checking if mentor already exists...");
         // Check if mentor exists
         const existingMentor = await Mentor.findOne({ $or: [{ mentorID }, { email }] });
-        if (existingMentor) return res.status(400).json({ message: "Mentor ID or Email already registered" });
+        if (existingMentor) {
+            console.log("❌ Mentor already exists:", existingMentor.mentorID);
+            return res.status(400).json({ success: false, message: "Mentor ID or Email already registered" });
+        }
 
+        console.log("✅ Mentor doesn't exist, creating new mentor...");
         // ✅ Store Mentor Authentication Info
         const newMentor = new Mentor({ fullName, mentorID, email, password });
         await newMentor.save();
+        console.log("✅ Mentor saved successfully:", mentorID);
 
-        // ✅ Store Mentor Profile Details
-        const newMentorDetails = new MentorDetails({
-            mentorID,
-            fullName,
-            phoneNumber,
-            alternatePhoneNumber,
-            email,
-            gender,
-            tech,
-            employeeIn,
-            selectedMajors,
-            bio, 
-        });
-        await newMentorDetails.save();
+        // ✅ Store Mentor Profile Details (only if additional fields are provided)
+        if (phoneNumber || alternatePhoneNumber || gender || tech || employeeIn || selectedMajors || bio) {
+            console.log("📝 Creating mentor details...");
+            const newMentorDetails = new MentorDetails({
+                mentorID,
+                fullName,
+                phoneNumber: phoneNumber || '',
+                alternatePhoneNumber: alternatePhoneNumber || '',
+                email,
+                gender: gender || '',
+                tech: tech || '',
+                employeeIn: employeeIn || '',
+                selectedMajors: selectedMajors || '',
+                bio: bio || '', 
+            });
+            await newMentorDetails.save();
+        }
 
+        console.log("✅ Mentor registered successfully:", mentorID);
         res.status(201).json({ success: true, message: "Mentor Registered Successfully" });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error });
+        console.error("❌ Registration error:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 });
 
@@ -240,23 +289,35 @@ app.post("/api/mentors/:mentorID", async (req, res) => {
     }
 });
 
-app.post("/api/mentor/login", async (req, res) => {
+app.post("/api/mentors/login", async (req, res) => {
     try {
+        console.log("📩 Mentor Login Request Received:", req.body);
         const { mentorID, password } = req.body;
 
         if (!mentorID || !password) {
+            console.log("❌ Missing mentorID or password");
             return res.status(400).json({ success: false, message: "Missing mentorID or password" });
         }
 
+        console.log("🔍 Searching for mentor with ID:", mentorID);
         const mentor = await Mentor.findOne({ mentorID: String(mentorID) });
+        console.log("🎯 Mentor found:", mentor ? "Yes" : "No");
 
-        if (!mentor || mentor.password !== password) {
-            return res.status(400).json({ success: false, message: "Invalid mentorID or Password" });
+        if (!mentor) {
+            console.log("❌ Mentor not found");
+            return res.status(400).json({ success: false, message: "Mentor not found. Please check your Mentor ID." });
         }
 
-        res.json({ success: true, message: "Login successful", mentorID }); // ✅ Include mentorID in response
+        if (mentor.password !== password) {
+            console.log("❌ Invalid password");
+            return res.status(400).json({ success: false, message: "Invalid password" });
+        }
+
+        console.log("✅ Login successful for mentor:", mentorID);
+        res.json({ success: true, message: "Login successful", mentorID, mentor: { fullName: mentor.fullName, email: mentor.email } });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Server error", error });
+        console.error("❌ Login error:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 });
 
@@ -728,7 +789,369 @@ app.post("/api/test/create-student", async (req, res) => {
 });
 
 /* -----------------------------------
-   ✅ Student APIs (Existing)
+   ✅ Meeting Notes APIs
+-------------------------------------*/
+
+// ✅ Get mentor's mentees list
+app.get("/api/mentor/:mentorID/mentees", async (req, res) => {
+    try {
+        const { mentorID } = req.params;
+        
+        // Find mentor and populate mentee data
+        const mentor = await Mentor.findOne({ mentorID }).select('menteeIDs');
+        if (!mentor) {
+            return res.status(404).json({ success: false, message: "Mentor not found" });
+        }
+
+        // Get student details for all mentees
+        const mentees = await Student.find({ 
+            usn: { $in: mentor.menteeIDs } 
+        }).select('name usn email academics.overallCGPA');
+
+        res.json({ success: true, mentees });
+    } catch (error) {
+        console.error("❌ Error fetching mentees:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Create new meeting note (Mentor only)
+app.post("/api/meeting-notes", async (req, res) => {
+    try {
+        const { 
+            mentorID, 
+            studentUSN, 
+            meetingDate, 
+            summary, 
+            actionItems, 
+            mentorNotes, 
+            nextMeetingDate, 
+            tags 
+        } = req.body;
+
+        // Validate required fields
+        if (!mentorID || !studentUSN || !meetingDate || !summary) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "MentorID, studentUSN, meetingDate, and summary are required" 
+            });
+        }
+
+        // Verify mentor exists and student is their mentee
+        const mentor = await Mentor.findOne({ mentorID });
+        if (!mentor) {
+            return res.status(404).json({ success: false, message: "Mentor not found" });
+        }
+
+        if (!mentor.menteeIDs.includes(studentUSN)) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Student is not assigned to this mentor" 
+            });
+        }
+
+        // Create new meeting note
+        const newMeetingNote = new MeetingNotes({
+            mentorID,
+            studentUSN,
+            meetingDate: new Date(meetingDate),
+            summary,
+            actionItems: actionItems || [],
+            mentorNotes,
+            nextMeetingDate: nextMeetingDate ? new Date(nextMeetingDate) : null,
+            tags: tags || []
+        });
+
+        await newMeetingNote.save();
+
+        res.status(201).json({ 
+            success: true, 
+            message: "Meeting note created successfully", 
+            meetingNote: newMeetingNote 
+        });
+    } catch (error) {
+        console.error("❌ Error creating meeting note:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Get all meeting notes for a student (Student view)
+app.get("/api/meeting-notes/student/:studentUSN", async (req, res) => {
+    try {
+        const { studentUSN } = req.params;
+        
+        const meetingNotes = await MeetingNotes.find({ studentUSN })
+            .populate({
+                path: 'mentorID',
+                select: 'fullName',
+                model: 'Mentor'
+            })
+            .sort({ meetingDate: -1 });
+
+        // Get mentor details for each note
+        const notesWithMentorDetails = await Promise.all(
+            meetingNotes.map(async (note) => {
+                const mentorDetails = await MentorDetails.findOne({ mentorID: note.mentorID });
+                return {
+                    ...note.toObject(),
+                    mentorName: mentorDetails ? mentorDetails.fullName : 'Unknown Mentor'
+                };
+            })
+        );
+
+        res.json({ success: true, meetingNotes: notesWithMentorDetails });
+    } catch (error) {
+        console.error("❌ Error fetching student meeting notes:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Get all meeting notes for a mentor (Mentor view)
+app.get("/api/meeting-notes/mentor/:mentorID", async (req, res) => {
+    try {
+        const { mentorID } = req.params;
+        const { studentUSN } = req.query; // Optional filter by specific student
+        
+        let query = { mentorID };
+        if (studentUSN) {
+            query.studentUSN = studentUSN;
+        }
+
+        const meetingNotes = await MeetingNotes.find(query)
+            .sort({ meetingDate: -1 });
+
+        // Get student details for each note
+        const notesWithStudentDetails = await Promise.all(
+            meetingNotes.map(async (note) => {
+                const student = await Student.findOne({ usn: note.studentUSN }).select('name');
+                return {
+                    ...note.toObject(),
+                    studentName: student ? student.name : 'Unknown Student'
+                };
+            })
+        );
+
+        res.json({ success: true, meetingNotes: notesWithStudentDetails });
+    } catch (error) {
+        console.error("❌ Error fetching mentor meeting notes:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Update meeting note (Mentor only)
+app.put("/api/meeting-notes/:noteId", async (req, res) => {
+    try {
+        const { noteId } = req.params;
+        const { mentorID, summary, actionItems, mentorNotes, nextMeetingDate, tags } = req.body;
+
+        // Find the meeting note
+        const meetingNote = await MeetingNotes.findById(noteId);
+        if (!meetingNote) {
+            return res.status(404).json({ success: false, message: "Meeting note not found" });
+        }
+
+        // Verify mentor ownership
+        if (meetingNote.mentorID !== mentorID) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Unauthorized: You can only edit your own meeting notes" 
+            });
+        }
+
+        // Update fields
+        if (summary) meetingNote.summary = summary;
+        if (actionItems) meetingNote.actionItems = actionItems;
+        if (mentorNotes !== undefined) meetingNote.mentorNotes = mentorNotes;
+        if (nextMeetingDate) meetingNote.nextMeetingDate = new Date(nextMeetingDate);
+        if (tags) meetingNote.tags = tags;
+        meetingNote.updatedAt = new Date();
+
+        await meetingNote.save();
+
+        res.json({ 
+            success: true, 
+            message: "Meeting note updated successfully", 
+            meetingNote 
+        });
+    } catch (error) {
+        console.error("❌ Error updating meeting note:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Delete meeting note (Mentor only)
+app.delete("/api/meeting-notes/:noteId", async (req, res) => {
+    try {
+        const { noteId } = req.params;
+        const { mentorID } = req.body;
+
+        // Find the meeting note
+        const meetingNote = await MeetingNotes.findById(noteId);
+        if (!meetingNote) {
+            return res.status(404).json({ success: false, message: "Meeting note not found" });
+        }
+
+        // Verify mentor ownership
+        if (meetingNote.mentorID !== mentorID) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Unauthorized: You can only delete your own meeting notes" 
+            });
+        }
+
+        await MeetingNotes.findByIdAndDelete(noteId);
+
+        res.json({ 
+            success: true, 
+            message: "Meeting note deleted successfully" 
+        });
+    } catch (error) {
+        console.error("❌ Error deleting meeting note:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Update action item status (Student only)
+app.put("/api/meeting-notes/:noteId/action-item/:actionIndex", async (req, res) => {
+    try {
+        const { noteId, actionIndex } = req.params;
+        const { studentUSN, status, studentNotes } = req.body;
+
+        // Find the meeting note
+        const meetingNote = await MeetingNotes.findById(noteId);
+        if (!meetingNote) {
+            return res.status(404).json({ success: false, message: "Meeting note not found" });
+        }
+
+        // Verify student ownership
+        if (meetingNote.studentUSN !== studentUSN) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Unauthorized: You can only update your own action items" 
+            });
+        }
+
+        // Validate action item index
+        if (actionIndex < 0 || actionIndex >= meetingNote.actionItems.length) {
+            return res.status(400).json({ success: false, message: "Invalid action item index" });
+        }
+
+        // Update action item
+        const actionItem = meetingNote.actionItems[actionIndex];
+        if (status) actionItem.status = status;
+        if (studentNotes !== undefined) actionItem.studentNotes = studentNotes;
+        if (status === 'Completed') actionItem.completedAt = new Date();
+
+        meetingNote.updatedAt = new Date();
+        await meetingNote.save();
+
+        res.json({ 
+            success: true, 
+            message: "Action item updated successfully", 
+            actionItem 
+        });
+    } catch (error) {
+        console.error("❌ Error updating action item:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Get meeting statistics for mentor dashboard
+app.get("/api/meeting-stats/mentor/:mentorID", async (req, res) => {
+    try {
+        const { mentorID } = req.params;
+
+        // Get total meetings count
+        const totalMeetings = await MeetingNotes.countDocuments({ mentorID });
+
+        // Get meetings this month
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        
+        const meetingsThisMonth = await MeetingNotes.countDocuments({
+            mentorID,
+            meetingDate: { $gte: startOfMonth }
+        });
+
+        // Get pending action items count
+        const pendingActionItems = await MeetingNotes.aggregate([
+            { $match: { mentorID } },
+            { $unwind: "$actionItems" },
+            { $match: { "actionItems.status": { $in: ["Pending", "In Progress"] } } },
+            { $count: "pendingCount" }
+        ]);
+
+        // Get active mentees count
+        const mentor = await Mentor.findOne({ mentorID }).select('menteeIDs');
+        const activeMentees = mentor ? mentor.menteeIDs.length : 0;
+
+        res.json({
+            success: true,
+            stats: {
+                totalMeetings,
+                meetingsThisMonth,
+                pendingActionItems: pendingActionItems[0]?.pendingCount || 0,
+                activeMentees
+            }
+        });
+    } catch (error) {
+        console.error("❌ Error fetching meeting stats:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+// ✅ Development Helper: Assign mentees to mentor (for testing)
+app.post("/api/mentor/assign-mentees", async (req, res) => {
+    try {
+        const { mentorID, menteeUSNs } = req.body;
+        
+        if (!mentorID || !menteeUSNs || !Array.isArray(menteeUSNs)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "MentorID and menteeUSNs array are required" 
+            });
+        }
+
+        // Find mentor
+        const mentor = await Mentor.findOne({ mentorID });
+        if (!mentor) {
+            return res.status(404).json({ success: false, message: "Mentor not found" });
+        }
+
+        // Verify students exist
+        const students = await Student.find({ usn: { $in: menteeUSNs } });
+        const foundUSNs = students.map(s => s.usn);
+        const notFoundUSNs = menteeUSNs.filter(usn => !foundUSNs.includes(usn));
+        
+        if (notFoundUSNs.length > 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Students not found: ${notFoundUSNs.join(', ')}` 
+            });
+        }
+
+        // Update mentor's menteeIDs
+        mentor.menteeIDs = [...new Set([...mentor.menteeIDs, ...menteeUSNs])]; // Avoid duplicates
+        await mentor.save();
+
+        res.json({ 
+            success: true, 
+            message: `${menteeUSNs.length} students assigned to mentor ${mentorID}`,
+            mentor: {
+                mentorID: mentor.mentorID,
+                fullName: mentor.fullName,
+                menteeIDs: mentor.menteeIDs
+            }
+        });
+    } catch (error) {
+        console.error("❌ Error assigning mentees:", error);
+        res.status(500).json({ success: false, message: "Server error", error });
+    }
+});
+
+/* -----------------------------------
+   ✅ Existing Student APIs
 -------------------------------------*/
 // ✅ Register API for Students
 app.post("/api/register", async (req, res) => {
