@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Drawer, Container, Paper, Typography, Avatar, Grid, CircularProgress } from "@mui/material";
+import { Box, Drawer, Container, Paper, Typography, Avatar, Grid, CircularProgress, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SideBar from "../organisms/SideBar";
@@ -61,8 +61,8 @@ const ProfilePage = () => {
     ];
     
     const fetchUserProfile = async () => {
-        const usn = localStorage.getItem("usn"); // Ensure 'usn' is stored correctly during login
-        console.log(usn)
+        const usn = localStorage.getItem("userUSN") || localStorage.getItem("usn"); // Check both keys
+        console.log("USN found:", usn)
         if (!usn) {
             setError("User USN not found. Please log in.");
             setLoading(false);
@@ -149,9 +149,24 @@ const ProfilePage = () => {
                         textAlign: "center",
                         boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)"
                     }}>
-                        <Typography variant="h6" sx={{ color: "#dc3545", fontWeight: "600" }}>
+                        <Typography variant="h6" sx={{ color: "#dc3545", fontWeight: "600", mb: 3 }}>
                             {error || "User profile not found!"}
                         </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => navigate("/login")}
+                            sx={{
+                                background: "linear-gradient(135deg, #B8860B, #DAA520)",
+                                color: "white",
+                                fontWeight: "bold",
+                                padding: "10px 30px",
+                                '&:hover': {
+                                    background: "linear-gradient(135deg, #DAA520, #B8860B)",
+                                }
+                            }}
+                        >
+                            Go to Login
+                        </Button>
                     </Box>
                 </Box>
             </Box>
@@ -159,7 +174,45 @@ const ProfilePage = () => {
     }
 
     return (
-        <Box sx={shimmerBackground}>
+        <Box sx={{
+            ...shimmerBackground,
+            // Animation classes
+            '& .fade-in-up': {
+                animation: 'fadeInUp 0.6s ease-out forwards',
+                opacity: 0,
+                transform: 'translateY(30px)',
+            },
+            '& .scale-in': {
+                animation: 'scaleIn 0.7s ease-out forwards',
+                opacity: 0,
+                transform: 'scale(0.9)',
+                animationDelay: '0.2s'
+            },
+            '& .slide-in-right': {
+                animation: 'slideInRight 0.8s ease-out forwards',
+                opacity: 0,
+                transform: 'translateX(30px)',
+                animationDelay: '0.4s'
+            },
+            '@keyframes fadeInUp': {
+                'to': {
+                    opacity: 1,
+                    transform: 'translateY(0)',
+                }
+            },
+            '@keyframes scaleIn': {
+                'to': {
+                    opacity: 1,
+                    transform: 'scale(1)',
+                }
+            },
+            '@keyframes slideInRight': {
+                'to': {
+                    opacity: 1,
+                    transform: 'translateX(0)',
+                }
+            }
+        }}>
             {/* Animated Background Elements */}
             <Box sx={{
                 position: 'fixed',
@@ -217,6 +270,7 @@ const ProfilePage = () => {
                 <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
                     {/* Sidebar */}
                     <Box
+                        className="scale-in"
                         sx={{
                             width: 250,
                             background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
@@ -259,7 +313,7 @@ const ProfilePage = () => {
                         background: "transparent",
                         marginLeft: "250px" // Add margin equal to sidebar width
                     }}>
-                        <Container maxWidth="md">
+                        <Container maxWidth="md" className="fade-in-up">
                             <Paper 
                                 elevation={0}
                                 sx={{ 

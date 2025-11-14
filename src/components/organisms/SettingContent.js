@@ -100,22 +100,46 @@ const SettingsPage = () => {
     };
     const handleSubmit = async () => {
         try {
-            const response = await fetch("http://localhost:5002/api/students", {
-                method: "POST",
+            const usn = localStorage.getItem("userUSN") || localStorage.getItem("usn");
+            
+            if (!usn) {
+                toast.error("User not logged in. Please login first.");
+                return;
+            }
+
+            // Try to update existing student first (PUT request)
+            let response = await fetch(`http://localhost:5002/api/students/${usn}`, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
             });
 
+            // If student doesn't exist (404), create new one (POST request)
+            if (response.status === 404) {
+                response = await fetch("http://localhost:5002/api/students", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                });
+            }
+
             if (response.ok) {
-                toast.success("Form submitted successfully!");
+                toast.success("Profile updated successfully!");
+                // Optionally reload the page or navigate to profile
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
-                toast.error("Failed to submit form. Try again.");
+                const errorData = await response.json();
+                toast.error(errorData.message || "Failed to update profile. Try again.");
             }
         } catch (error) {
             console.error("Error submitting form:", error);
-            toast.error("Error submitting form.");
+            toast.error("Error updating profile.");
         }
     };
     return (
@@ -669,11 +693,22 @@ const SettingsPage = () => {
                             <Select
                                 labelId="majors-label"
                                 id="majors-select"
-                                multiple
-                                value={formData.selectedMajors || []}
+                                value={formData.selectedMajors || ""}
                                 onChange={(e) =>
                                     setFormData({ ...formData, selectedMajors: e.target.value })
                                 }
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            backgroundColor: 'rgba(26, 43, 76, 0.95)',
+                                            backdropFilter: 'blur(10px)',
+                                            border: '1px solid rgba(184, 134, 11, 0.3)',
+                                            maxHeight: 300,
+                                        }
+                                    },
+                                    autoFocus: false,
+                                    disableAutoFocusItem: true,
+                                }}
                                 sx={{
                                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                                     color: '#FFFFFF',
@@ -700,7 +735,22 @@ const SettingsPage = () => {
                                 }}
                             >
                                 {majorsOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
+                                    <MenuItem 
+                                        key={option.value} 
+                                        value={option.value}
+                                        sx={{
+                                            color: '#FFFFFF',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(184, 134, 11, 0.2)',
+                                            },
+                                            '&.Mui-selected': {
+                                                backgroundColor: 'rgba(184, 134, 11, 0.3)',
+                                                '&:hover': {
+                                                    backgroundColor: 'rgba(184, 134, 11, 0.4)',
+                                                }
+                                            }
+                                        }}
+                                    >
                                         {option.label}
                                     </MenuItem>
                                 ))}

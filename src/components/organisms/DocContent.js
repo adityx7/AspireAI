@@ -60,7 +60,9 @@ const DocumentsPage = () => {
             alignItems: "center" 
         }}>
             {/* Top Section */}
-            <Box sx={{ 
+            <Box 
+                className="fade-in-up"
+                sx={{ 
                 textAlign: "center", 
                 padding: "32px",
                 background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",

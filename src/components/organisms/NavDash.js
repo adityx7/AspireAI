@@ -4,6 +4,14 @@ import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem } 
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
 
+// Constants for styling - matching the login theme
+const NAVY_BLUE_MAIN = "#0A192F";
+const NAVY_BLUE_LIGHT = "#112240";
+const NAVY_BLUE_DARK = "#020c1b";
+const GOLD_MAIN = "#B8860B";
+const GOLD_LIGHT = "#DAA520";
+const GOLD_DARK = "#8B6914";
+
 const Navbar = ({ onDrawerToggle, title }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate(); // Initialize navigate function
@@ -18,7 +26,7 @@ const Navbar = ({ onDrawerToggle, title }) => {
 
     const handleProfile = () => {
         handleMenuClose();
-        navigate("/profile-mentor"); // Navigate to the login
+        navigate("/profile"); // Navigate to student profile
     };
 
     const handleLogout = () => {
@@ -29,7 +37,7 @@ const Navbar = ({ onDrawerToggle, title }) => {
 
     const handleSettings = () => {
         handleMenuClose();
-        navigate("/settings"); // Navigate to the login
+        navigate("/settings"); // Navigate to settings
     };
 
     const handleTitleClick = () => {
@@ -40,9 +48,12 @@ const Navbar = ({ onDrawerToggle, title }) => {
         <AppBar
             position="static"
             sx={{
-                backgroundColor: "#FBF5E5",
-                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
-            }}>
+                backgroundColor: 'transparent',
+                boxShadow: `0px 4px 15px rgba(184, 134, 11, 0.15)`,
+                backdropFilter: 'blur(10px)',
+                borderBottom: `1px solid ${GOLD_MAIN}30`,
+            }}
+        >
             <Toolbar
                 sx={{
                     display: "flex",
@@ -57,7 +68,11 @@ const Navbar = ({ onDrawerToggle, title }) => {
                     onClick={onDrawerToggle}
                     sx={{
                         display: { sm: "none" },
-                        color: "black",
+                        color: GOLD_LIGHT,
+                        '&:hover': {
+                            color: GOLD_MAIN,
+                            background: 'rgba(184, 134, 11, 0.1)'
+                        }
                     }}
                 >
                     <MenuIcon />
@@ -66,11 +81,17 @@ const Navbar = ({ onDrawerToggle, title }) => {
                 <Typography
                     variant="h6"
                     sx={{
-                        color: "black",
+                        color: GOLD_LIGHT,
                         fontFamily: "Courier",
                         fontWeight: "bold",
                         cursor: "pointer",
-                        fontSize: 38
+                        fontSize: 38,
+                        textShadow: `0 0 10px ${GOLD_MAIN}40`,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                            color: GOLD_MAIN,
+                            textShadow: `0 0 15px ${GOLD_MAIN}60`,
+                        }
                     }}
                     onClick={handleTitleClick} // Make title clickable
                 >
@@ -79,7 +100,18 @@ const Navbar = ({ onDrawerToggle, title }) => {
 
                 <Box>
                     <Avatar
-                        sx={{ cursor: "pointer" }}
+                        sx={{ 
+                            cursor: "pointer",
+                            background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
+                            color: 'white',
+                            fontWeight: 'bold',
+                            boxShadow: `0 0 10px ${GOLD_MAIN}40`,
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                boxShadow: `0 0 15px ${GOLD_MAIN}60`,
+                                transform: 'scale(1.05)'
+                            }
+                        }}
                         onClick={handleAvatarClick}
                     >
                         S
@@ -88,6 +120,21 @@ const Navbar = ({ onDrawerToggle, title }) => {
                         anchorEl={anchorEl}
                         open={Boolean(anchorEl)}
                         onClose={handleMenuClose}
+                        sx={{
+                            '& .MuiPaper-root': {
+                                background: NAVY_BLUE_LIGHT,
+                                color: 'white',
+                                backdropFilter: 'blur(10px)',
+                                border: `1px solid ${GOLD_MAIN}30`,
+                                boxShadow: `0 8px 20px rgba(0, 0, 0, 0.3), 0 0 10px ${GOLD_MAIN}20`
+                            },
+                            '& .MuiMenuItem-root': {
+                                '&:hover': {
+                                    background: `rgba(184, 134, 11, 0.2)`,
+                                    color: GOLD_LIGHT
+                                }
+                            }
+                        }}
                     >
                         <MenuItem onClick={handleProfile}>Profile</MenuItem>
                         <MenuItem onClick={handleSettings}>Settings</MenuItem>

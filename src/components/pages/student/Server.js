@@ -1227,6 +1227,30 @@ app.get("/api/students/:usn", async (req, res) => {
     }
 });
 
+// ✅ Update Student Profile API
+app.put("/api/students/:usn", async (req, res) => {
+    try {
+        const { usn } = req.params;
+        console.log("Updating student data for USN:", usn);
+        console.log("Update Data:", req.body);
+
+        const updatedStudent = await Student.findOneAndUpdate(
+            { usn },
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedStudent) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+
+        res.json({ message: "Student data updated successfully!", student: updatedStudent });
+    } catch (error) {
+        console.error("❌ Error updating student data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 // ✅ Start Server on PORT 5002
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

@@ -33,21 +33,30 @@ const shimmerBackground = {
     overflow: "hidden",
     color: "#F8FAFC",
     '& .fade-in-up': {
-      opacity: 1,
-      transform: 'translateY(0)',
-      transition: 'all 1.2s cubic-bezier(0.23, 1, 0.32, 1)',
-      '&:not(.animate-in)': {
-        opacity: 0,
-        transform: 'translateY(60px)'
-      }
+      animation: 'fadeInUp 0.8s ease-out forwards',
     },
     '& .scale-in': {
-      opacity: 1,
-      transform: 'scale(1) rotateZ(0deg)',
-      transition: 'all 1s cubic-bezier(0.23, 1, 0.32, 1)',
-      '&:not(.animate-in)': {
-        opacity: 0.3,
-        transform: 'scale(0.7) rotateZ(-5deg)'
+      animation: 'scaleIn 0.8s ease-out forwards',
+      animationDelay: '0.2s',
+    },
+    '@keyframes fadeInUp': {
+      'from': {
+        opacity: 0,
+        transform: 'translateY(40px)'
+      },
+      'to': {
+        opacity: 1,
+        transform: 'translateY(0)'
+      }
+    },
+    '@keyframes scaleIn': {
+      'from': {
+        opacity: 0,
+        transform: 'scale(0.9)'
+      },
+      'to': {
+        opacity: 1,
+        transform: 'scale(1)'
       }
     },
     '& .floating-element': {
@@ -151,15 +160,8 @@ const Academics = () => {
 
     useEffect(() => {
         fetchAcademicData();
-        setTimeout(() => {
-            const animatedElements = document.querySelectorAll('.fade-in-up, .scale-in');
-            animatedElements.forEach((el, index) => {
-                setTimeout(() => {
-                    el.classList.add('animate-in');
-                }, index * 150);
-            });
-        }, 300);
-    }, [fetchAcademicData]); // Now fetchAcademicData is in dependency array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
 
     // Pre-populate forms when dialogs open
     useEffect(() => {

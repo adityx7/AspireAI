@@ -77,7 +77,45 @@ const ContactDash = () => {
     };
 
     return (
-        <Box sx={shimmerBackground}>
+        <Box sx={{
+            ...shimmerBackground,
+            // Animation classes
+            '& .fade-in-up': {
+                animation: 'fadeInUp 0.6s ease-out forwards',
+                opacity: 0,
+                transform: 'translateY(30px)',
+            },
+            '& .scale-in': {
+                animation: 'scaleIn 0.7s ease-out forwards',
+                opacity: 0,
+                transform: 'scale(0.9)',
+                animationDelay: '0.2s'
+            },
+            '& .slide-in-right': {
+                animation: 'slideInRight 0.8s ease-out forwards',
+                opacity: 0,
+                transform: 'translateX(30px)',
+                animationDelay: '0.4s'
+            },
+            '@keyframes fadeInUp': {
+                'to': {
+                    opacity: 1,
+                    transform: 'translateY(0)',
+                }
+            },
+            '@keyframes scaleIn': {
+                'to': {
+                    opacity: 1,
+                    transform: 'scale(1)',
+                }
+            },
+            '@keyframes slideInRight': {
+                'to': {
+                    opacity: 1,
+                    transform: 'translateX(0)',
+                }
+            }
+        }}>
             {/* Animated Background Elements */}
             <Box sx={{
                 position: 'fixed',

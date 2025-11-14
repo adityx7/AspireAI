@@ -3,6 +3,14 @@ import { Box, Typography, Divider, Card, CardContent, Grid, IconButton } from "@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Tick icon
 import CancelIcon from "@mui/icons-material/Cancel"; // Cross icon
 
+// Constants for styling - matching the login theme
+const NAVY_BLUE_MAIN = "#0A192F";
+const NAVY_BLUE_LIGHT = "#112240";
+const NAVY_BLUE_DARK = "#020c1b";
+const GOLD_MAIN = "#B8860B";
+const GOLD_LIGHT = "#DAA520";
+const GOLD_DARK = "#8B6914";
+
 export default function MentorTrainingPage() {
     // Array of student details
     const trainingModules = [
@@ -46,13 +54,33 @@ export default function MentorTrainingPage() {
                 }}
             >
                 {/* Heading */}
-                <Typography variant="h4" fontWeight="bold" sx={{ mb: 2, mt: 4, fontFamily: 'Courier', textAlign: "center" }}>
+                <Typography 
+                    variant="h4" 
+                    fontWeight="bold" 
+                    sx={{ 
+                        mb: 2, 
+                        mt: 4, 
+                        fontFamily: "'Inter', sans-serif", 
+                        textAlign: "center",
+                        color: "white",
+                        textShadow: `0 0 10px ${GOLD_MAIN}40`
+                    }}
+                    className="scale-in"
+                >
                     Mentor Training
                 </Typography>
 
                 {/* Subheading */}
-                <Box sx={{ width: '100%' }}>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 3, fontFamily: 'Gilroy', textAlign: "center" }}>
+                <Box sx={{ width: '100%' }} className="fade-in-up">
+                    <Typography 
+                        variant="body1" 
+                        sx={{ 
+                            mb: 3, 
+                            fontFamily: "'Inter', sans-serif", 
+                            textAlign: "center",
+                            color: "rgba(255, 255, 255, 0.8)",
+                        }}
+                    >
                         The below optional training modules provide additional information about what is expected of you as
                         a mentor and what you can expect from Career Compass; the tools and resources available to you as a Career Compass
                         mentor; and other helpful information to make your mentoring experience a success!
@@ -60,20 +88,36 @@ export default function MentorTrainingPage() {
                 </Box>
 
                 {/* Divider */}
-                <Divider sx={{ mb: 3 }} />
+                <Divider sx={{ mb: 3, borderColor: `${GOLD_MAIN}50`, width: '50%', mx: 'auto' }} />
 
                 {/* Cards Section */}
                 <Grid container spacing={4} justifyContent={'center'} alignItems={'stretch'}>
                     {trainingModules.map((module, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Grid 
+                            item 
+                            xs={12} 
+                            sm={6} 
+                            md={4} 
+                            key={index} 
+                            className="slide-in-right"
+                            sx={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                        >
                             <Card
                                 sx={{
                                     height: "auto",
                                     display: "flex",
                                     flexDirection: "column",
-                                    boxShadow: 3,
+                                    boxShadow: `0 10px 20px rgba(0, 0, 0, 0.3), 0 0 10px ${GOLD_MAIN}40`,
                                     borderRadius: 2,
                                     justifyContent: "space-between",
+                                    background: `rgba(17, 34, 64, 0.8)`,
+                                    backdropFilter: 'blur(5px)',
+                                    border: `1px solid ${GOLD_MAIN}30`,
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': {
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: `0 15px 30px rgba(0, 0, 0, 0.4), 0 0 15px ${GOLD_MAIN}60`,
+                                    }
                                 }}
                             >
                                 {/* Content */}
@@ -82,11 +126,25 @@ export default function MentorTrainingPage() {
                                         variant="h6"
                                         fontWeight="bold"
                                         gutterBottom
-                                        sx={{ textAlign: "center", fontSize: 16, fontFamily: "courier" }}
+                                        sx={{ 
+                                            textAlign: "center", 
+                                            fontSize: 16, 
+                                            fontFamily: "'Inter', sans-serif",
+                                            color: GOLD_LIGHT,
+                                            textShadow: `0 0 5px ${GOLD_MAIN}30`
+                                        }}
                                     >
                                         {module.title}
                                     </Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: "justify", fontSize: 14, fontFamily: 'gilroy' }}>
+                                    <Typography 
+                                        variant="body2" 
+                                        sx={{ 
+                                            textAlign: "justify", 
+                                            fontSize: 14, 
+                                            fontFamily: "'Inter', sans-serif",
+                                            color: 'rgba(255, 255, 255, 0.8)'
+                                        }}
+                                    >
                                         {module.description}
                                     </Typography>
                                 </CardContent>
@@ -94,16 +152,32 @@ export default function MentorTrainingPage() {
                                 {/* Action Buttons */}
                                 <Box sx={{ display: "flex", justifyContent: "space-around", p: 2 }}>
                                     <IconButton
-                                        color="primary"
                                         onClick={() => handleAccept(module.title)}
-                                        sx={{ bgcolor: "lightblue", "&:hover": { bgcolor: "blue", color: "white" } }}
+                                        sx={{ 
+                                            bgcolor: `${GOLD_MAIN}40`,
+                                            color: GOLD_LIGHT,
+                                            transition: 'all 0.3s ease',
+                                            "&:hover": { 
+                                                bgcolor: GOLD_MAIN,
+                                                color: "white",
+                                                transform: 'scale(1.1)'
+                                            } 
+                                        }}
                                     >
                                         <CheckCircleIcon />
                                     </IconButton>
                                     <IconButton
-                                        color="error"
                                         onClick={() => handleReject(module.title)}
-                                        sx={{ bgcolor: "lightcoral", "&:hover": { bgcolor: "red", color: "white" } }}
+                                        sx={{ 
+                                            bgcolor: "rgba(220, 50, 50, 0.3)", 
+                                            color: "rgba(255, 120, 120, 1)",
+                                            transition: 'all 0.3s ease',
+                                            "&:hover": { 
+                                                bgcolor: "rgba(220, 50, 50, 0.8)",
+                                                color: "white",
+                                                transform: 'scale(1.1)'
+                                            } 
+                                        }}
                                     >
                                         <CancelIcon />
                                     </IconButton>

@@ -1,7 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Typography, Divider, Button, Box } from "@mui/material";
+import { toast } from "react-toastify";
 
 const MentorCard = ({ mentor }) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handleChooseMentor = async () => {
+    const userUSN = localStorage.getItem("userUSN");
+    
+    if (!userUSN) {
+      toast.error("Please login to choose a mentor");
+      return;
+    }
+
+    try {
+      // You can add your API call here to save the mentor selection
+      // Example:
+      // const response = await fetch("http://localhost:5002/api/students/choose-mentor", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ usn: userUSN, mentorName: mentor.fullName })
+      // });
+
+      setIsSelected(true);
+      localStorage.setItem("selectedMentor", mentor.fullName);
+      toast.success(`${mentor.fullName} is now your mentor!`);
+    } catch (error) {
+      console.error("Error choosing mentor:", error);
+      toast.error("Failed to choose mentor. Please try again.");
+    }
+  };
   return (
     <Card
       sx={{
@@ -119,8 +147,12 @@ const MentorCard = ({ mentor }) => {
         </Typography>
         <Button
           fullWidth
+          onClick={handleChooseMentor}
+          disabled={isSelected}
           sx={{
-            background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+            background: isSelected 
+              ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)" 
+              : "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
             color: "#ffffff",
             fontWeight: "600",
             padding: "12px 20px",
@@ -130,14 +162,20 @@ const MentorCard = ({ mentor }) => {
             textTransform: "none",
             fontSize: "16px",
             '&:hover': {
-              background: "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
+              background: isSelected
+                ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)"
+                : "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)",
               boxShadow: "0 12px 35px rgba(184, 134, 11, 0.4)",
-              transform: "translateY(-2px)"
+              transform: isSelected ? "none" : "translateY(-2px)"
+            },
+            '&.Mui-disabled': {
+              color: "#ffffff",
+              opacity: 0.9
             },
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
           }}
         >
-          Choose as Mentor
+          {isSelected ? "✓ Selected as Mentor" : "Choose as Mentor"}
         </Button>
       </Box>
     </Card>

@@ -4,6 +4,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import SidebarMentor from "../organisms/SideBarMentor";
 import NavMentor from "../organisms/NavMentor";
+import MenSettingsPage from "../organisms/MenSettingsPage";React, { useState, useEffect } from "react";
+import { Box, Drawer, Container } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import SidebarMentor from "../organisms/SideBarMentor";
+import NavMentor from "../organisms/NavMentor";
 import MenSettingsPage from "../organisms/MenSettingsPage";
 
 // Constants for styling - matching the login theme

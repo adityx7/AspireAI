@@ -20,6 +20,7 @@ const ContactPage = () => {
 
   return (
     <Box
+      className="fade-in-up"
       sx={{
         width: "100%",
         minHeight: "80vh",
