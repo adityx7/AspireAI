@@ -95,17 +95,33 @@ const Chatbox = ({ open, onClose }) => {
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: { xs: "90%", sm: 800 },
-                    bgcolor: "#E9E6DE",
-                    boxShadow: 24,
+                    background: "linear-gradient(135deg, #FFF9E6 0%, #E8E4F3 100%)",
+                    boxShadow: "0 20px 60px rgba(91, 79, 207, 0.3), 0 0 40px rgba(212, 175, 55, 0.2)",
                     p: 2,
-                    borderRadius: 2,
+                    borderRadius: 3,
                     maxHeight: '90vh',
                     display: "flex",
                     flexDirection: "column",
+                    border: "2px solid rgba(212, 175, 55, 0.3)",
+                    animation: "fadeInScale 0.5s ease-out",
                 }}
             >
-                <Typography variant="h6" sx={{ mb: 2, fontFamily: "'Russo One', sans-serif", textAlign: "center" }}>
-                    Vishwakarm.ai
+                <Typography 
+                    variant="h6" 
+                    sx={{ 
+                        mb: 2, 
+                        fontFamily: "'Russo One', sans-serif", 
+                        textAlign: "center",
+                        background: "linear-gradient(135deg, #D4AF37 0%, #5B4FCF 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                        fontWeight: "bold",
+                        fontSize: "1.5rem",
+                        animation: "fadeInDown 0.6s ease-out",
+                    }}
+                >
+                    Kyro
                 </Typography>
 
                 <Paper
@@ -115,8 +131,8 @@ const Chatbox = ({ open, onClose }) => {
                         padding: "12px",
                         mb: "70px",
                         borderRadius: 2,
-                        backgroundColor: "#F7F6F2",
-                        boxShadow: "inset 0px 2px 8px rgba(0, 0, 0, 0.1)",
+                        background: "linear-gradient(to bottom, #FFFBF5, #F5F3FF)",
+                        boxShadow: "inset 0px 2px 8px rgba(91, 79, 207, 0.15)",
                         scrollbarWidth: "none",
                         "&::-webkit-scrollbar": { display: "none" },
                     }}
@@ -139,8 +155,10 @@ const Chatbox = ({ open, onClose }) => {
                                 )}
                                 <Box
                                     sx={{
-                                        bgcolor: msg.role === "user" ? '#85A947' : '#E4F1AC',
-                                        color: msg.role === "user" ? 'white' : 'black',
+                                        background: msg.role === "user" 
+                                            ? 'linear-gradient(135deg, #5B4FCF 0%, #7B6FE8 100%)' 
+                                            : 'linear-gradient(135deg, #FFE8A3 0%, #F4E5FF 100%)',
+                                        color: msg.role === "user" ? 'white' : '#2D2D2D',
                                         borderRadius: msg.role === "user"
                                             ? "18px 18px 0px 18px"
                                             : "0px 18px 18px 18px",
@@ -148,9 +166,22 @@ const Chatbox = ({ open, onClose }) => {
                                         maxWidth: '60%',
                                         minWidth: "auto",
                                         fontSize: "14px",
-                                        boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
+                                        boxShadow: msg.role === "user" 
+                                            ? "0px 4px 12px rgba(91, 79, 207, 0.4)" 
+                                            : "0px 4px 12px rgba(212, 175, 55, 0.3)",
                                         wordWrap: "break-word",
                                         display: "inline-block",
+                                        animation: "slideIn 0.4s ease-out",
+                                        border: msg.role === "user" 
+                                            ? "none" 
+                                            : "1px solid rgba(212, 175, 55, 0.3)",
+                                        transition: "all 0.3s ease",
+                                        "&:hover": {
+                                            transform: "translateY(-2px)",
+                                            boxShadow: msg.role === "user" 
+                                                ? "0px 6px 16px rgba(91, 79, 207, 0.5)" 
+                                                : "0px 6px 16px rgba(212, 175, 55, 0.4)",
+                                        }
                                     }}
                                     dangerouslySetInnerHTML={{
                                         __html: msg.role === "assistant"
@@ -175,13 +206,14 @@ const Chatbox = ({ open, onClose }) => {
                         bottom: 8,
                         left: 8,
                         right: 8,
-                        backgroundColor: "#EFF3EA",
+                        background: "linear-gradient(135deg, #FFFBF5 0%, #F0EDFF 100%)",
                         display: "flex",
                         alignItems: "center",
                         gap: 1,
                         padding: "8px",
                         borderRadius: 2,
-                        boxShadow: "0px -2px 10px rgba(0, 0, 0, 0.1)",
+                        boxShadow: "0px -2px 10px rgba(91, 79, 207, 0.2), 0 0 20px rgba(212, 175, 55, 0.1)",
+                        border: "1px solid rgba(212, 175, 55, 0.2)",
                     }}
                 >
                     <TextField
@@ -203,10 +235,44 @@ const Chatbox = ({ open, onClose }) => {
                             }
                         }}
                     />
-                    <IconButton onClick={handleSend} disabled={isLoading} color="primary">
+                    <IconButton 
+                        onClick={handleSend} 
+                        disabled={isLoading}
+                        sx={{
+                            background: "linear-gradient(135deg, #D4AF37 0%, #F4D03F 100%)",
+                            color: "white",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                background: "linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%)",
+                                transform: "scale(1.1) rotate(15deg)",
+                                boxShadow: "0 4px 12px rgba(212, 175, 55, 0.5)",
+                            },
+                            "&:disabled": {
+                                background: "#ccc",
+                                color: "#888",
+                            }
+                        }}
+                    >
                         <SendIcon />
                     </IconButton>
-                    <IconButton onClick={handleRefresh} disabled={isLoading} color="secondary">
+                    <IconButton 
+                        onClick={handleRefresh} 
+                        disabled={isLoading}
+                        sx={{
+                            background: "linear-gradient(135deg, #5B4FCF 0%, #7B6FE8 100%)",
+                            color: "white",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                                background: "linear-gradient(135deg, #7B6FE8 0%, #5B4FCF 100%)",
+                                transform: "scale(1.1) rotate(-15deg)",
+                                boxShadow: "0 4px 12px rgba(91, 79, 207, 0.5)",
+                            },
+                            "&:disabled": {
+                                background: "#ccc",
+                                color: "#888",
+                            }
+                        }}
+                    >
                         <RefreshIcon />
                     </IconButton>
                 </Box>
