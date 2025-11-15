@@ -43,7 +43,7 @@ const Chatbox = ({ open, onClose }) => {
             const thinkingMessage = { role: "assistant", content: "Thinking..." };
             setMessages(prev => [...prev, thinkingMessage]);
 
-            const response = await fetch('http://localhost:5000/chat', {
+            const response = await fetch('http://localhost:5001/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

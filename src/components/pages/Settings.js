@@ -9,7 +9,7 @@ import SettingsPage from "../organisms/SettingContent";
 const shimmerBackground = {
     minHeight: "100vh",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
+    background: "linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)",
     position: "relative",
     overflow: "hidden",
     color: "#F8FAFC",

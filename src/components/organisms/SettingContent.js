@@ -148,14 +148,14 @@ const SettingsPage = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                padding: "24px",
+                padding: "24px"
             }}
         >
             <ToastContainer 
                 position="top-right" 
                 autoClose={3000}
                 toastStyle={{
-                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                    background: "rgba(44, 62, 87, 0.95)",
                     backdropFilter: "blur(15px)",
                     border: "1px solid rgba(184, 134, 11, 0.2)",
                     borderRadius: "12px",
@@ -210,9 +210,9 @@ const SettingsPage = () => {
             {/* Step Content */}
             <Box
                 sx={{
-                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+                    background: "rgba(44, 62, 87, 0.5)",
                     backdropFilter: "blur(25px)",
-                    border: "1px solid rgba(184, 134, 11, 0.15)",
+                    border: "1px solid rgba(184, 134, 11, 0.2)",
                     width: "60%",
                     borderRadius: "20px",
                     boxShadow: "0 25px 80px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
@@ -485,7 +485,7 @@ const SettingsPage = () => {
                                         MenuProps={{
                                             PaperProps: {
                                                 sx: {
-                                                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                                    background: "rgba(44, 62, 87, 0.95)",
                                                     backdropFilter: "blur(15px)",
                                                     border: "1px solid rgba(184, 134, 11, 0.2)",
                                                     '& .MuiMenuItem-root': {

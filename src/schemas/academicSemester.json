@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Academic Semester Schema",
+  "description": "Schema for validating semester-wise academic records",
+  "type": "object",
+  "required": ["userId", "semester", "academicYear"],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the student"
+    },
+    "semester": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 8,
+      "description": "Semester number (1-8)"
+    },
+    "academicYear": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{4}$",
+      "description": "Academic year in format YYYY-YYYY"
+    },
+    "mentorId": {
+      "type": ["string", "null"],
+      "description": "Mentor's unique identifier"
+    },
+    "courses": {
+      "type": "array",
+      "description": "Array of courses for this semester",
+      "items": {
+        "type": "object",
+        "required": ["slNo", "courseCode", "courseName", "credits"],
+        "properties": {
+          "slNo": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Serial number of the course"
+          },
+          "courseCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20,
+            "description": "Course code identifier"
+          },
+          "courseName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "Full name of the course"
+          },
+          "attendancePercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Attendance percentage"
+          },
+          "ia1": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Internal Assessment 1 marks"
+          },
+          "ia2": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Internal Assessment 2 marks"
+          },
+          "ia3": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Internal Assessment 3 marks"
+          },
+          "labMarks": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Laboratory marks"
+          },
+          "otherMarks": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Other component marks"
+          },
+          "totalInternal": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Computed total internal marks"
+          },
+          "externalMarks": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "External examination marks"
+          },
+          "total": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 200,
+            "description": "Total marks (internal + external)"
+          },
+          "letterGrade": {
+            "type": "string",
+            "enum": ["", "S", "A", "B", "C", "D", "E", "F"],
+            "description": "Letter grade based on total marks"
+          },
+          "gradePoints": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10,
+            "description": "Grade points for SGPA calculation"
+          },
+          "credits": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 5,
+            "description": "Course credit value"
+          }
+        }
+      }
+    },
+    "sgpa": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 10,
+      "description": "Semester Grade Point Average"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Record creation timestamp"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Record last update timestamp"
+    }
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["insights", "planLength", "plan", "microSupport", "mentorActions", "confidence"],
+  "properties": {
+    "insights": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["title", "detail", "severity"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100
+          },
+          "detail": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "planLength": {
+      "type": "number",
+      "enum": [7, 14, 28]
+    },
+    "plan": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["day", "date", "tasks"],
+        "properties": {
+          "day": {
+            "type": "number",
+            "minimum": 1
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "tasks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "required": ["time", "task", "durationMinutes"],
+              "properties": {
+                "time": {
+                  "type": "string",
+                  "pattern": "^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
+                },
+                "task": {
+                  "type": "string",
+                  "minLength": 5,
+                  "maxLength": 200
+                },
+                "durationMinutes": {
+                  "type": "number",
+                  "minimum": 15,
+                  "maximum": 240
+                },
+                "resource": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "resourceUrl": {
+                  "type": "string",
+                  "maxLength": 500
+                },
+                "practiceProblemIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "microSupport": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "summary", "estimatedMinutes"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 100
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 500
+          },
+          "estimatedMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 120
+          },
+          "resourceUrl": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "exampleProblem": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "url"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 100
+          },
+          "url": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 500
+          },
+          "type": {
+            "type": "string",
+            "enum": ["video", "article", "course", "notes", "practice", "other"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "mentorActions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 200
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "additionalProperties": false
+}

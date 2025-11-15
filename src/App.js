@@ -19,6 +19,9 @@ import ProfilePage from './components/pages/Profile';
 import { AuthProvider } from './components/pages/AuthContext';
 import MentorProfile from './components/pages/ProfileMentor';
 import Academics from './components/pages/StudentDashboard/Academics';
+import InternalMarksOverview from './components/pages/StudentDashboard/InternalMarksOverview';
+import SemesterInternalMarks from './components/pages/StudentDashboard/SemesterInternalMarks';
+import SemesterMarksPage from './components/pages/StudentDashboard/SemesterMarksPage';
 import StudentMeetingNotesPage from './components/pages/StudentMeetingNotesPage';
 import MentorMeetingNotesPage from './components/pages/MentorMeetingNotesPage';
 import MeetingNotesTestPage from './components/pages/MeetingNotesTestPage';
@@ -37,6 +40,9 @@ export default function App() {
           <Route path="/student/register" element={<SimpleStudentRegister />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/academics" element={<Academics />} />
+          <Route path="/semester-marks/:semester" element={<SemesterMarksPage />} />
+          <Route path="/internal-marks" element={<InternalMarksOverview />} />
+          <Route path="/internal-marks/semester/:semester" element={<SemesterInternalMarks />} />
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/settings" element={<Settings />} />

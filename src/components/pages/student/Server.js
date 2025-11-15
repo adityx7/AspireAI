@@ -521,6 +521,97 @@ app.get("/api/academics/dashboard/:usn", async (req, res) => {
     }
 });
 
+// ✅ Add/Update internal marks data
+app.post("/api/academics/internals", async (req, res) => {
+    try {
+        const { usn, subjectCode, subjectName, semesterNumber, ia1, ia2, ia3, average, semesterEndMarks } = req.body;
+
+        if (!usn || !subjectCode || !subjectName || !semesterNumber) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN, subject code, subject name, and semester number are required" 
+            });
+        }
+
+        // Validate IA marks
+        if (ia1 > 30 || ia2 > 30 || ia3 > 30 || ia1 < 0 || ia2 < 0 || ia3 < 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Each IA mark must be between 0 and 30" 
+            });
+        }
+
+        // Validate semester end marks if provided
+        if (semesterEndMarks !== undefined && (semesterEndMarks > 100 || semesterEndMarks < 0)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Semester end marks must be between 0 and 100" 
+            });
+        }
+
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        if (!student.academics) {
+            student.academics = {};
+        }
+
+        if (!student.academics.internalMarks) {
+            student.academics.internalMarks = [];
+        }
+
+        // Check if internal marks record for this subject and semester already exists
+        const existingInternalIndex = student.academics.internalMarks.findIndex(
+            internal => internal.subjectCode === subjectCode && internal.semesterNumber === semesterNumber
+        );
+
+        const internalData = {
+            subjectCode,
+            subjectName,
+            semesterNumber,
+            ia1: ia1 || 0,
+            ia2: ia2 || 0,
+            ia3: ia3 || 0,
+            average: average || 0,
+            updatedAt: new Date()
+        };
+
+        // Add semester end marks if provided
+        if (semesterEndMarks !== undefined) {
+            internalData.semesterEndMarks = semesterEndMarks;
+        }
+
+        if (existingInternalIndex !== -1) {
+            // Update existing record
+            student.academics.internalMarks[existingInternalIndex] = internalData;
+        } else {
+            // Add new record
+            student.academics.internalMarks.push(internalData);
+        }
+
+        await student.save();
+
+        res.json({ 
+            success: true, 
+            message: existingInternalIndex !== -1 ? "Subject marks updated successfully" : "Subject marks added successfully",
+            data: internalData
+        });
+
+    } catch (error) {
+        console.error("Error adding/updating internal marks:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
 // ✅ Add/Update attendance data
 app.post("/api/academics/attendance", async (req, res) => {
     try {
@@ -1250,6 +1341,34 @@ app.put("/api/students/:usn", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+// ✅ Agentic AI Routes
+try {
+    const agentRoutes = require('../../../routes/agentRoutes');
+    app.use('/api/agents', agentRoutes);
+    app.use('/api', agentRoutes); // For routes like /api/notifications
+    console.log('✅ Agentic AI routes loaded');
+} catch (err) {
+    console.warn('⚠️  Agentic AI routes not available:', err.message);
+}
+
+// ✅ Semester-based Academics Routes
+try {
+    const academicsRoutes = require('../../../routes/academicsRoutes');
+    app.use('/api', academicsRoutes);
+    console.log('✅ Semester Academics routes loaded');
+} catch (err) {
+    console.warn('⚠️  Semester Academics routes not available:', err.message);
+}
+
+// ✅ Internal Marks Routes
+try {
+    const internalMarksRoutes = require('../../../routes/internalMarksRoutes');
+    app.use('/api', internalMarksRoutes);
+    console.log('✅ Internal Marks routes loaded');
+} catch (err) {
+    console.warn('⚠️  Internal Marks routes not available:', err.message);
+}
 
 // ✅ Start Server on PORT 5002
 app.listen(PORT, () => {

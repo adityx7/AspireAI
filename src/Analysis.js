@@ -8,7 +8,7 @@ require("dotenv").config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const spreadsheetId = "1tye61lCFDIK7gR0jiTuMLP1TJN0oZh7fuodeJT2mdXQ";
 const SHEET_NAME = "Form Responses 1";
-const key = "AIzaSyAvsbC4c8VMWqnxIqWfQ8zAeUXg2jvF8hE";
+const key = "AIzaSyAUzK6z5TDASTiOHhDAIK3gEf7Ga3ppXmQ";
 const genAI = new GoogleGenerativeAI(key);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 const app = express();

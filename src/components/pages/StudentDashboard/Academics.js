@@ -94,6 +94,7 @@ const Academics = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [openSemesterDialog, setOpenSemesterDialog] = useState(false);
+    const [openInternalsDialog, setOpenInternalsDialog] = useState(false);
     
     // Loading states for individual operations
     const [creditsLoading, setCreditsLoading] = useState(false);
@@ -103,6 +104,17 @@ const Academics = () => {
         semesterNumber: '',
         cgpa: '',
         semesterCourses: []
+    });
+    
+    // State for internals marks
+    const [newInternalData, setNewInternalData] = useState({
+        subjectCode: '',
+        subjectName: '',
+        ia1: '',
+        ia2: '',
+        ia3: '',
+        semesterEndMarks: '',
+        semesterNumber: ''
     });
 
     // New state for edit dialogs
@@ -171,7 +183,23 @@ const Academics = () => {
     }, [openCreditsDialog, academicData]);
 
     const handleAddSemester = async () => {
+        // Validate CGPA
+        if (newSemesterData.cgpa > 10) {
+            setError('CGPA cannot exceed 10');
+            return;
+        }
+
+        if (!newSemesterData.semesterNumber || newSemesterData.cgpa === '') {
+            setError('Please fill in all required fields');
+            return;
+        }
+
         try {
+            // Check if semester already exists
+            const existingSemester = academicData?.academics?.semesters?.find(
+                sem => sem.semesterNumber === parseInt(newSemesterData.semesterNumber)
+            );
+
             const response = await fetch('http://localhost:5002/api/academics/semester', {
                 method: 'POST',
                 headers: {
@@ -179,7 +207,9 @@ const Academics = () => {
                 },
                 body: JSON.stringify({
                     usn,
-                    ...newSemesterData
+                    semesterNumber: parseInt(newSemesterData.semesterNumber),
+                    cgpa: parseFloat(newSemesterData.cgpa),
+                    semesterCourses: newSemesterData.semesterCourses || []
                 }),
             });
 
@@ -190,8 +220,85 @@ const Academics = () => {
                 setOpenSemesterDialog(false);
                 setNewSemesterData({ semesterNumber: '', cgpa: '', semesterCourses: [] });
                 setError('');
+                
+                // Show appropriate success message
+                if (existingSemester) {
+                    setSuccess(`Semester ${newSemesterData.semesterNumber} updated successfully!`);
+                } else {
+                    setSuccess(`Semester ${newSemesterData.semesterNumber} added successfully!`);
+                }
+                
+                // Clear success message after 3 seconds
+                setTimeout(() => setSuccess(''), 3000);
             } else {
                 setError(result.message || 'Failed to add semester data');
+            }
+        } catch (err) {
+            setError('Network error: ' + err.message);
+        }
+    };
+
+    // Handler for adding/updating internal marks
+    const handleAddInternals = async () => {
+        // Validate marks
+        const ia1 = parseFloat(newInternalData.ia1);
+        const ia2 = parseFloat(newInternalData.ia2);
+        const ia3 = parseFloat(newInternalData.ia3);
+        const semEndMarks = newInternalData.semesterEndMarks ? parseFloat(newInternalData.semesterEndMarks) : null;
+
+        if (ia1 > 30 || ia2 > 30 || ia3 > 30) {
+            setError('Each IA mark cannot exceed 30');
+            return;
+        }
+
+        if (semEndMarks && semEndMarks > 100) {
+            setError('Semester end marks cannot exceed 100');
+            return;
+        }
+
+        if (!newInternalData.subjectCode || !newInternalData.subjectName || !newInternalData.semesterNumber) {
+            setError('Please fill in all required fields');
+            return;
+        }
+
+        try {
+            const average = ((ia1 + ia2 + ia3) / 3).toFixed(2);
+
+            const requestBody = {
+                usn,
+                subjectCode: newInternalData.subjectCode,
+                subjectName: newInternalData.subjectName,
+                semesterNumber: parseInt(newInternalData.semesterNumber),
+                ia1: ia1,
+                ia2: ia2,
+                ia3: ia3,
+                average: parseFloat(average)
+            };
+
+            // Add semester end marks only if provided
+            if (semEndMarks !== null) {
+                requestBody.semesterEndMarks = semEndMarks;
+            }
+
+            const response = await fetch('http://localhost:5002/api/academics/internals', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                await fetchAcademicData();
+                setOpenInternalsDialog(false);
+                setNewInternalData({ subjectCode: '', subjectName: '', ia1: '', ia2: '', ia3: '', semesterEndMarks: '', semesterNumber: '' });
+                setError('');
+                setSuccess('Subject marks added successfully!');
+                setTimeout(() => setSuccess(''), 3000);
+            } else {
+                setError(result.message || 'Failed to add internal marks');
             }
         } catch (err) {
             setError('Network error: ' + err.message);
@@ -826,7 +933,6 @@ const Academics = () => {
                         boxShadow: "0 15px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(184, 134, 11, 0.06)",
                         border: "1px solid rgba(184, 134, 11, 0.1)",
                         borderRadius: 3,
-                        textAlign: "center",
                         minHeight: "300px"
                     }}
                 >
@@ -835,20 +941,545 @@ const Academics = () => {
                         sx={{ 
                             color: "#F8FAFC",
                             fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-                            mb: 2
+                            mb: 3
                         }}
                     >
                         CGPA Trend Across Semesters
                     </Typography>
-                    <Typography 
-                        sx={{ 
-                            color: "#F8FAFC", 
-                            opacity: 0.7,
-                            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
-                        }}
-                    >
-                        No performance data available. Add semester data to see analytics.
-                    </Typography>
+                    
+                    {academicData?.academics?.semesters && academicData.academics.semesters.length > 0 ? (
+                        <Box sx={{ mt: 3 }}>
+                            {/* Bar Chart with Scale */}
+                            <Box sx={{ mb: 4 }}>
+                                <Typography sx={{ color: '#FFD700', fontSize: '18px', mb: 3, fontWeight: 'bold' }}>
+                                    CGPA Bar Chart (Scale: 0-10)
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    {/* Y-axis scale */}
+                                    <Box sx={{ 
+                                        display: 'flex', 
+                                        flexDirection: 'column', 
+                                        justifyContent: 'space-between',
+                                        height: '300px',
+                                        pr: 1,
+                                        borderRight: '2px solid rgba(184, 134, 11, 0.3)'
+                                    }}>
+                                        {[10, 8, 6, 4, 2, 0].map((value) => (
+                                            <Typography 
+                                                key={value} 
+                                                sx={{ 
+                                                    color: '#B8860B', 
+                                                    fontSize: '12px',
+                                                    fontWeight: 'bold',
+                                                    textAlign: 'right',
+                                                    minWidth: '25px'
+                                                }}
+                                            >
+                                                {value}
+                                            </Typography>
+                                        ))}
+                                    </Box>
+                                    
+                                    {/* Bar chart */}
+                                    <Box sx={{ 
+                                        display: 'flex', 
+                                        alignItems: 'flex-end', 
+                                        justifyContent: 'space-around', 
+                                        height: '300px',
+                                        flex: 1,
+                                        gap: 1,
+                                        p: 2,
+                                        background: 'rgba(10, 25, 47, 0.3)',
+                                        borderRadius: 2,
+                                        position: 'relative'
+                                    }}>
+                                        {/* Grid lines */}
+                                        {[0, 2, 4, 6, 8, 10].map((value) => (
+                                            <Box 
+                                                key={value}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: `${(value / 10) * 100}%`,
+                                                    height: '1px',
+                                                    background: 'rgba(184, 134, 11, 0.15)',
+                                                    borderTop: value === 0 ? '2px solid rgba(184, 134, 11, 0.3)' : 'none'
+                                                }}
+                                            />
+                                        ))}
+                                        
+                                        {academicData.academics.semesters
+                                            .sort((a, b) => a.semesterNumber - b.semesterNumber)
+                                            .map((semester, index) => {
+                                                const heightPercentage = (semester.cgpa / 10) * 100;
+                                                return (
+                                                    <Box 
+                                                        key={index} 
+                                                        sx={{ 
+                                                            textAlign: 'center', 
+                                                            flex: 1, 
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'flex-end',
+                                                            height: '100%',
+                                                            position: 'relative',
+                                                            zIndex: 1
+                                                        }}
+                                                    >
+                                                        <Typography 
+                                                            sx={{ 
+                                                                color: '#FFD700', 
+                                                                fontSize: '14px', 
+                                                                mb: 1, 
+                                                                fontWeight: 'bold',
+                                                                position: 'absolute',
+                                                                top: `${100 - heightPercentage - 10}%`,
+                                                                transform: 'translateY(-100%)'
+                                                            }}
+                                                        >
+                                                            {semester.cgpa}
+                                                        </Typography>
+                                                        <Box
+                                                            sx={{
+                                                                width: '100%',
+                                                                maxWidth: '60px',
+                                                                height: `${heightPercentage}%`,
+                                                                background: 'linear-gradient(180deg, #FFD700 0%, #DAA520 50%, #B8860B 100%)',
+                                                                borderRadius: '8px 8px 0 0',
+                                                                minHeight: heightPercentage > 0 ? '5px' : '0',
+                                                                transition: 'all 0.3s ease',
+                                                                boxShadow: '0 4px 10px rgba(184, 134, 11, 0.3)',
+                                                                '&:hover': {
+                                                                    background: 'linear-gradient(180deg, #FFFACD 0%, #FFD700 50%, #DAA520 100%)',
+                                                                    transform: 'scaleY(1.05)',
+                                                                    boxShadow: '0 8px 20px rgba(255, 215, 0, 0.5)',
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Typography 
+                                                            sx={{ 
+                                                                color: '#F8FAFC', 
+                                                                fontSize: '12px', 
+                                                                mt: 1,
+                                                                fontWeight: 'bold'
+                                                            }}
+                                                        >
+                                                            Sem {semester.semesterNumber}
+                                                        </Typography>
+                                                    </Box>
+                                                );
+                                            })}
+                                    </Box>
+                                </Box>
+                            </Box>
+                            
+                            {/* CGPA Details Table */}
+                            <Box sx={{ mt: 3, overflowX: 'auto' }}>
+                                <Grid container spacing={2}>
+                                    {academicData.academics.semesters.map((semester, index) => (
+                                        <Grid item xs={12} sm={6} md={4} key={index}>
+                                            <Box sx={{
+                                                p: 2,
+                                                background: 'rgba(184, 134, 11, 0.1)',
+                                                border: '1px solid rgba(184, 134, 11, 0.3)',
+                                                borderRadius: 2
+                                            }}>
+                                                <Typography sx={{ color: '#B8860B', fontWeight: 'bold' }}>
+                                                    Semester {semester.semesterNumber}
+                                                </Typography>
+                                                <Typography sx={{ color: '#F8FAFC', fontSize: '18px', fontWeight: 'bold', mt: 1 }}>
+                                                    CGPA: {semester.cgpa}
+                                                </Typography>
+                                            </Box>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Box>
+                        </Box>
+                    ) : (
+                        <Box sx={{ textAlign: 'center', mt: 4 }}>
+                            <Typography 
+                                sx={{ 
+                                    color: "#F8FAFC", 
+                                    opacity: 0.7,
+                                    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+                                }}
+                            >
+                                No performance data available. Add semester data to see analytics.
+                            </Typography>
+                        </Box>
+                    )}
+                </Paper>
+
+                {/* Internal & Semester End Marks Section */}
+                <Paper 
+                    className="fade-in-up"
+                    sx={{
+                        p: 4,
+                        mt: 3,
+                        background: "linear-gradient(135deg, rgba(26, 43, 76, 0.75) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                        backdropFilter: "blur(20px)",
+                        boxShadow: "0 15px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(184, 134, 11, 0.06)",
+                        border: "1px solid rgba(184, 134, 11, 0.1)",
+                        borderRadius: 3,
+                    }}
+                >
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                color: "#F8FAFC",
+                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 2
+                            }}
+                        >
+                            <AssignmentIcon sx={{ color: '#FFD700' }} />
+                            Semester-wise Marks (Internal & End Semester)
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            onClick={() => setOpenInternalsDialog(true)}
+                            sx={{
+                                background: 'linear-gradient(135deg, #B8860B 0%, #8B6914 100%)',
+                                color: '#0A192F',
+                                fontWeight: 'bold',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #DAA520 0%, #B8860B 100%)',
+                                }
+                            }}
+                        >
+                            Add Subject Marks
+                        </Button>
+                    </Box>
+
+                    {academicData?.academics?.internalMarks && academicData.academics.internalMarks.length > 0 ? (
+                        <Box>
+                            {/* Semester-wise Display */}
+                            {academicData.academics.semesters && academicData.academics.semesters.length > 0 ? (
+                                academicData.academics.semesters
+                                    .sort((a, b) => a.semesterNumber - b.semesterNumber)
+                                    .map((semester) => {
+                                        const semesterMarks = academicData.academics.internalMarks.filter(
+                                            mark => mark.semesterNumber === semester.semesterNumber
+                                        );
+                                        
+                                        if (semesterMarks.length === 0) return null;
+                                        
+                                        return (
+                                            <Box key={semester.semesterNumber} sx={{ mb: 4 }}>
+                                                <Typography sx={{ 
+                                                    color: '#FFD700', 
+                                                    fontSize: '20px', 
+                                                    fontWeight: 'bold', 
+                                                    mb: 3,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}>
+                                                    <SchoolIcon /> Semester {semester.semesterNumber}
+                                                </Typography>
+                                                
+                                                <Grid container spacing={2}>
+                                                    {semesterMarks.map((internal, index) => (
+                                                        <Grid item xs={12} md={6} key={index}>
+                                                            <Box sx={{
+                                                                p: 3,
+                                                                background: 'rgba(184, 134, 11, 0.1)',
+                                                                border: '1px solid rgba(184, 134, 11, 0.3)',
+                                                                borderRadius: 2,
+                                                                transition: 'all 0.3s ease',
+                                                                '&:hover': {
+                                                                    background: 'rgba(184, 134, 11, 0.15)',
+                                                                    transform: 'translateY(-4px)',
+                                                                    boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)'
+                                                                }
+                                                            }}>
+                                                                <Typography sx={{ color: '#B8860B', fontWeight: 'bold', fontSize: '16px', mb: 1 }}>
+                                                                    {internal.subjectCode}
+                                                                </Typography>
+                                                                <Typography sx={{ color: '#F8FAFC', mb: 3, fontSize: '14px' }}>
+                                                                    {internal.subjectName}
+                                                                </Typography>
+                                                                
+                                                                {/* Internal Marks Section */}
+                                                                <Box sx={{ mb: 2 }}>
+                                                                    <Typography sx={{ color: '#FFD700', fontSize: '14px', fontWeight: 'bold', mb: 2 }}>
+                                                                        Internal Assessment
+                                                                    </Typography>
+                                                                    <Grid container spacing={1}>
+                                                                        <Grid item xs={4}>
+                                                                            <Typography sx={{ color: '#F8FAFC', fontSize: '11px', opacity: 0.7 }}>
+                                                                                IA 1
+                                                                            </Typography>
+                                                                            <Typography sx={{ color: '#FFD700', fontSize: '16px', fontWeight: 'bold' }}>
+                                                                                {internal.ia1}/30
+                                                                            </Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={4}>
+                                                                            <Typography sx={{ color: '#F8FAFC', fontSize: '11px', opacity: 0.7 }}>
+                                                                                IA 2
+                                                                            </Typography>
+                                                                            <Typography sx={{ color: '#FFD700', fontSize: '16px', fontWeight: 'bold' }}>
+                                                                                {internal.ia2}/30
+                                                                            </Typography>
+                                                                        </Grid>
+                                                                        <Grid item xs={4}>
+                                                                            <Typography sx={{ color: '#F8FAFC', fontSize: '11px', opacity: 0.7 }}>
+                                                                                IA 3
+                                                                            </Typography>
+                                                                            <Typography sx={{ color: '#FFD700', fontSize: '16px', fontWeight: 'bold' }}>
+                                                                                {internal.ia3}/30
+                                                                            </Typography>
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                    <Box sx={{ 
+                                                                        mt: 2, 
+                                                                        p: 1.5, 
+                                                                        background: 'rgba(184, 134, 11, 0.15)',
+                                                                        borderRadius: 1,
+                                                                        textAlign: 'center'
+                                                                    }}>
+                                                                        <Typography sx={{ color: '#F8FAFC', fontSize: '11px', opacity: 0.7 }}>
+                                                                            IA Average
+                                                                        </Typography>
+                                                                        <Typography sx={{ color: '#FFD700', fontSize: '18px', fontWeight: 'bold' }}>
+                                                                            {internal.average.toFixed(2)}/30
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                                
+                                                                {/* Semester End Marks */}
+                                                                {internal.semesterEndMarks !== undefined && (
+                                                                    <Box sx={{ 
+                                                                        mt: 2, 
+                                                                        pt: 2, 
+                                                                        borderTop: '1px solid rgba(184, 134, 11, 0.3)'
+                                                                    }}>
+                                                                        <Typography sx={{ color: '#FFD700', fontSize: '14px', fontWeight: 'bold', mb: 2 }}>
+                                                                            Semester End Exam
+                                                                        </Typography>
+                                                                        <Box sx={{ 
+                                                                            p: 1.5, 
+                                                                            background: 'rgba(255, 215, 0, 0.2)',
+                                                                            borderRadius: 1,
+                                                                            textAlign: 'center'
+                                                                        }}>
+                                                                            <Typography sx={{ color: '#F8FAFC', fontSize: '11px', opacity: 0.7 }}>
+                                                                                Score
+                                                                            </Typography>
+                                                                            <Typography sx={{ color: '#FFD700', fontSize: '24px', fontWeight: 'bold' }}>
+                                                                                {internal.semesterEndMarks}/100
+                                                                            </Typography>
+                                                                        </Box>
+                                                                    </Box>
+                                                                )}
+                                                            </Box>
+                                                        </Grid>
+                                                    ))}
+                                                </Grid>
+                                            </Box>
+                                        );
+                                    })
+                            ) : (
+                                <Box sx={{ overflowX: 'auto' }}>
+                                    <Grid container spacing={2}>
+                                        {academicData.academics.internalMarks
+                                            .sort((a, b) => a.semesterNumber - b.semesterNumber)
+                                            .map((internal, index) => (
+                                            <Grid item xs={12} md={6} key={index}>
+                                                <Box sx={{
+                                                    p: 3,
+                                                    background: 'rgba(184, 134, 11, 0.1)',
+                                                    border: '1px solid rgba(184, 134, 11, 0.3)',
+                                                    borderRadius: 2
+                                                }}>
+                                                    <Chip 
+                                                        label={`Sem ${internal.semesterNumber}`} 
+                                                        size="small"
+                                                        sx={{ 
+                                                            background: 'rgba(184, 134, 11, 0.2)',
+                                                            color: '#FFD700',
+                                                            fontWeight: 'bold',
+                                                            mb: 2
+                                                        }} 
+                                                    />
+                                                    <Typography sx={{ color: '#B8860B', fontWeight: 'bold' }}>
+                                                        {internal.subjectCode} - {internal.subjectName}
+                                                    </Typography>
+                                                </Box>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Box>
+                            )}
+                        </Box>
+                    ) : (
+                        <Box sx={{ textAlign: 'center', py: 3 }}>
+                            <Typography sx={{ color: "#F8FAFC", opacity: 0.7 }}>
+                                No marks added yet. Click "Add Subject Marks" to add internal and semester end marks for each subject.
+                            </Typography>
+                        </Box>
+                    )}
+                </Paper>
+
+                {/* Certifications Section */}
+                <Paper 
+                    className="fade-in-up"
+                    sx={{
+                        p: 4,
+                        mt: 3,
+                        background: "linear-gradient(135deg, rgba(26, 43, 76, 0.75) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                        backdropFilter: "blur(20px)",
+                        boxShadow: "0 15px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(184, 134, 11, 0.06)",
+                        border: "1px solid rgba(184, 134, 11, 0.1)",
+                        borderRadius: 3,
+                    }}
+                >
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                color: "#F8FAFC",
+                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 2
+                            }}
+                        >
+                            <EmojiEventsIcon sx={{ color: '#FFD700' }} />
+                            Certifications ({academicData?.certifications?.length || 0})
+                        </Typography>
+                    </Box>
+
+                    {academicData?.certifications && academicData.certifications.length > 0 ? (
+                        <Grid container spacing={2}>
+                            {academicData.certifications.map((cert, index) => (
+                                <Grid item xs={12} sm={6} md={4} key={index}>
+                                    <Box sx={{
+                                        p: 2,
+                                        background: 'rgba(184, 134, 11, 0.1)',
+                                        border: '1px solid rgba(184, 134, 11, 0.3)',
+                                        borderRadius: 2,
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': {
+                                            background: 'rgba(184, 134, 11, 0.15)',
+                                            transform: 'translateY(-4px)',
+                                            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)'
+                                        }
+                                    }}>
+                                        <Typography sx={{ color: '#B8860B', fontWeight: 'bold', mb: 1 }}>
+                                            {cert.certificationName || cert.name}
+                                        </Typography>
+                                        <Typography sx={{ color: '#F8FAFC', fontSize: '14px', opacity: 0.8 }}>
+                                            Issuer: {cert.issuingOrganization || cert.issuer || 'N/A'}
+                                        </Typography>
+                                        {cert.dateObtained && (
+                                            <Typography sx={{ color: '#F8FAFC', fontSize: '12px', opacity: 0.6, mt: 1 }}>
+                                                Date: {new Date(cert.dateObtained).toLocaleDateString()}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : (
+                        <Box sx={{ textAlign: 'center', py: 3 }}>
+                            <Typography sx={{ color: "#F8FAFC", opacity: 0.7 }}>
+                                No certifications added yet. Click the edit button on the Certifications card to add certifications.
+                            </Typography>
+                        </Box>
+                    )}
+                </Paper>
+
+                {/* Activity Points Details Section */}
+                <Paper 
+                    className="fade-in-up"
+                    sx={{
+                        p: 4,
+                        mt: 3,
+                        background: "linear-gradient(135deg, rgba(26, 43, 76, 0.75) 0%, rgba(10, 25, 47, 0.8) 100%)",
+                        backdropFilter: "blur(20px)",
+                        boxShadow: "0 15px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(184, 134, 11, 0.06)",
+                        border: "1px solid rgba(184, 134, 11, 0.1)",
+                        borderRadius: 3,
+                    }}
+                >
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ 
+                                color: "#F8FAFC",
+                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 2
+                            }}
+                        >
+                            <TrendingUpIcon sx={{ color: '#8884d8' }} />
+                            Activity Points Details
+                        </Typography>
+                        <Box sx={{ textAlign: 'right' }}>
+                            <Typography sx={{ color: '#B8860B', fontSize: '14px' }}>
+                                Current Points
+                            </Typography>
+                            <Typography sx={{ color: '#F8FAFC', fontSize: '24px', fontWeight: 'bold' }}>
+                                {academicData?.aictActivityPoints?.currentPoints || 0}
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    {academicData?.aictActivityPoints?.activities && academicData.aictActivityPoints.activities.length > 0 ? (
+                        <Box>
+                            <Grid container spacing={2}>
+                                {academicData.aictActivityPoints.activities.map((activity, index) => (
+                                    <Grid item xs={12} sm={6} key={index}>
+                                        <Box sx={{
+                                            p: 2,
+                                            background: 'rgba(136, 132, 216, 0.1)',
+                                            border: '1px solid rgba(136, 132, 216, 0.3)',
+                                            borderRadius: 2,
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': {
+                                                background: 'rgba(136, 132, 216, 0.15)',
+                                                transform: 'translateY(-4px)',
+                                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)'
+                                            }
+                                        }}>
+                                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                                                <Typography sx={{ color: '#8884d8', fontWeight: 'bold' }}>
+                                                    {activity.activity || activity.name}
+                                                </Typography>
+                                                <Chip 
+                                                    label={`+${activity.points} pts`}
+                                                    size="small"
+                                                    sx={{
+                                                        background: 'linear-gradient(135deg, #8884d8 0%, #9C88FF 100%)',
+                                                        color: 'white',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                />
+                                            </Box>
+                                            {activity.description && (
+                                                <Typography sx={{ color: '#F8FAFC', fontSize: '13px', opacity: 0.7 }}>
+                                                    {activity.description}
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    ) : (
+                        <Box sx={{ textAlign: 'center', py: 3 }}>
+                            <Typography sx={{ color: "#F8FAFC", opacity: 0.7 }}>
+                                No activities added yet. Click the edit button on the Activity Points card to add activities.
+                            </Typography>
+                        </Box>
+                    )}
                 </Paper>
 
                 {/* Add Semester Dialog */}
@@ -867,9 +1498,18 @@ const Academics = () => {
                     }}
                 >
                     <DialogTitle sx={{ color: "#F8FAFC", fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}>
-                        Add Semester Academic Data
+                        {academicData?.academics?.semesters?.find(
+                            sem => sem.semesterNumber === parseInt(newSemesterData.semesterNumber)
+                        ) ? 'Update Semester Data' : 'Add Semester Academic Data'}
                     </DialogTitle>
                     <DialogContent>
+                        {newSemesterData.semesterNumber && academicData?.academics?.semesters?.find(
+                            sem => sem.semesterNumber === parseInt(newSemesterData.semesterNumber)
+                        ) && (
+                            <Alert severity="info" sx={{ mb: 2 }}>
+                                Semester {newSemesterData.semesterNumber} already exists. Submitting will update the existing data.
+                            </Alert>
+                        )}
                         <Box sx={{ mt: 2 }}>
                             <Grid container spacing={2}>
                                 <Grid item xs={12} sm={6}>
@@ -895,15 +1535,23 @@ const Academics = () => {
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <TextField
-                                        label="CGPA"
+                                        label="CGPA (0-10)"
                                         type="number"
                                         inputProps={{ min: 0, max: 10, step: 0.01 }}
                                         fullWidth
                                         value={newSemesterData.cgpa}
-                                        onChange={(e) => setNewSemesterData({
-                                            ...newSemesterData,
-                                            cgpa: parseFloat(e.target.value)
-                                        })}
+                                        onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            // Enforce max value of 10
+                                            if (value <= 10 || e.target.value === '') {
+                                                setNewSemesterData({
+                                                    ...newSemesterData,
+                                                    cgpa: e.target.value === '' ? '' : value
+                                                });
+                                            }
+                                        }}
+                                        error={newSemesterData.cgpa > 10}
+                                        helperText={newSemesterData.cgpa > 10 ? "CGPA cannot exceed 10" : ""}
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
                                                 background: "rgba(248, 250, 252, 0.9)",
@@ -911,6 +1559,9 @@ const Academics = () => {
                                             },
                                             '& .MuiInputLabel-root': {
                                                 color: 'rgba(0, 0, 0, 0.7)',
+                                            },
+                                            '& .MuiFormHelperText-root': {
+                                                color: '#f44336'
                                             }
                                         }}
                                     />
@@ -939,6 +1590,288 @@ const Academics = () => {
                             }}
                         >
                             Add Semester
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Add Internal Marks Dialog */}
+                <Dialog 
+                    open={openInternalsDialog} 
+                    onClose={() => setOpenInternalsDialog(false)} 
+                    maxWidth="md" 
+                    fullWidth
+                    PaperProps={{
+                        sx: {
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderRadius: 3,
+                            color: "#F8FAFC"
+                        }
+                    }}
+                >
+                    <DialogTitle sx={{ 
+                        color: "#F8FAFC",
+                        background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        fontWeight: 700
+                    }}>
+                        Add Subject Marks (Internal & End Semester)
+                    </DialogTitle>
+                    <DialogContent>
+                        <Box sx={{ mt: 3 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        label="Semester Number"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 1, max: 8 }}
+                                        value={newInternalData.semesterNumber}
+                                        onChange={(e) => setNewInternalData({
+                                            ...newInternalData,
+                                            semesterNumber: e.target.value
+                                        })}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField
+                                        label="Subject Code"
+                                        fullWidth
+                                        required
+                                        value={newInternalData.subjectCode}
+                                        onChange={(e) => setNewInternalData({
+                                            ...newInternalData,
+                                            subjectCode: e.target.value
+                                        })}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Subject Name"
+                                        fullWidth
+                                        required
+                                        value={newInternalData.subjectName}
+                                        onChange={(e) => setNewInternalData({
+                                            ...newInternalData,
+                                            subjectName: e.target.value
+                                        })}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Alert severity="info" sx={{ mb: 2 }}>
+                                        Each IA is out of 30 marks. The average will be calculated automatically.
+                                    </Alert>
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        label="IA 1 (0-30)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, max: 30, step: 0.5 }}
+                                        value={newInternalData.ia1}
+                                        onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            if (value <= 30 || e.target.value === '') {
+                                                setNewInternalData({
+                                                    ...newInternalData,
+                                                    ia1: e.target.value
+                                                });
+                                            }
+                                        }}
+                                        error={parseFloat(newInternalData.ia1) > 30}
+                                        helperText={parseFloat(newInternalData.ia1) > 30 ? "Cannot exceed 30" : ""}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            },
+                                            '& .MuiFormHelperText-root': {
+                                                color: '#f44336'
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        label="IA 2 (0-30)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, max: 30, step: 0.5 }}
+                                        value={newInternalData.ia2}
+                                        onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            if (value <= 30 || e.target.value === '') {
+                                                setNewInternalData({
+                                                    ...newInternalData,
+                                                    ia2: e.target.value
+                                                });
+                                            }
+                                        }}
+                                        error={parseFloat(newInternalData.ia2) > 30}
+                                        helperText={parseFloat(newInternalData.ia2) > 30 ? "Cannot exceed 30" : ""}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            },
+                                            '& .MuiFormHelperText-root': {
+                                                color: '#f44336'
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <TextField
+                                        label="IA 3 (0-30)"
+                                        type="number"
+                                        fullWidth
+                                        required
+                                        inputProps={{ min: 0, max: 30, step: 0.5 }}
+                                        value={newInternalData.ia3}
+                                        onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            if (value <= 30 || e.target.value === '') {
+                                                setNewInternalData({
+                                                    ...newInternalData,
+                                                    ia3: e.target.value
+                                                });
+                                            }
+                                        }}
+                                        error={parseFloat(newInternalData.ia3) > 30}
+                                        helperText={parseFloat(newInternalData.ia3) > 30 ? "Cannot exceed 30" : ""}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            },
+                                            '& .MuiFormHelperText-root': {
+                                                color: '#f44336'
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                                {newInternalData.ia1 && newInternalData.ia2 && newInternalData.ia3 && (
+                                    <Grid item xs={12}>
+                                        <Box sx={{ 
+                                            p: 2, 
+                                            background: 'rgba(184, 134, 11, 0.15)',
+                                            borderRadius: 2,
+                                            textAlign: 'center'
+                                        }}>
+                                            <Typography sx={{ color: '#F8FAFC', mb: 1 }}>
+                                                IA Average
+                                            </Typography>
+                                            <Typography sx={{ color: '#FFD700', fontSize: '24px', fontWeight: 'bold' }}>
+                                                {((parseFloat(newInternalData.ia1) + parseFloat(newInternalData.ia2) + parseFloat(newInternalData.ia3)) / 3).toFixed(2)} / 30
+                                            </Typography>
+                                        </Box>
+                                    </Grid>
+                                )}
+                                
+                                {/* Semester End Marks */}
+                                <Grid item xs={12}>
+                                    <Alert severity="warning" sx={{ mb: 1 }}>
+                                        Semester End Exam marks (optional - can be added later)
+                                    </Alert>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        label="Semester End Marks (0-100)"
+                                        type="number"
+                                        fullWidth
+                                        inputProps={{ min: 0, max: 100, step: 0.5 }}
+                                        value={newInternalData.semesterEndMarks}
+                                        onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            if (value <= 100 || e.target.value === '') {
+                                                setNewInternalData({
+                                                    ...newInternalData,
+                                                    semesterEndMarks: e.target.value
+                                                });
+                                            }
+                                        }}
+                                        error={parseFloat(newInternalData.semesterEndMarks) > 100}
+                                        helperText={parseFloat(newInternalData.semesterEndMarks) > 100 ? "Cannot exceed 100" : "Leave empty if not yet available"}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                background: "rgba(248, 250, 252, 0.9)",
+                                                borderRadius: 2,
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                color: 'rgba(0, 0, 0, 0.7)',
+                                            },
+                                            '& .MuiFormHelperText-root': {
+                                                color: parseFloat(newInternalData.semesterEndMarks) > 100 ? '#f44336' : 'rgba(0, 0, 0, 0.6)'
+                                            }
+                                        }}
+                                    />
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button 
+                            onClick={() => {
+                                setOpenInternalsDialog(false);
+                                setNewInternalData({ subjectCode: '', subjectName: '', ia1: '', ia2: '', ia3: '', semesterEndMarks: '', semesterNumber: '' });
+                            }}
+                            sx={{ color: "#F8FAFC" }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            onClick={handleAddInternals}
+                            sx={{
+                                background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                                '&:hover': {
+                                    background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                                }
+                            }}
+                        >
+                            Add Subject Marks
                         </Button>
                     </DialogActions>
                 </Dialog>

@@ -1,0 +1,469 @@
+{
+  "info": {
+    "name": "AspireAI Agentic AI APIs",
+    "description": "API collection for Agentic AI mentor suggestions and job management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Agents",
+      "item": [
+        {
+          "name": "Trigger Mentor Agent Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"1BG21CS091\",\n  \"type\": \"mentorAgent\",\n  \"force\": false\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5002/api/agents/trigger",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "agents", "trigger"]
+            },
+            "description": "Trigger an AI agent job for a student. Set force:true to bypass rate limits."
+          }
+        },
+        {
+          "name": "Get Job Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/agents/job/:jobId/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "agents", "job", ":jobId", "status"],
+              "variable": [
+                {
+                  "key": "jobId",
+                  "value": "mentor-1BG21CS091-1234567890"
+                }
+              ]
+            },
+            "description": "Get the current status of a queued or running job"
+          }
+        },
+        {
+          "name": "Get Agent Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/agents/metrics?days=7",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "agents", "metrics"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Get metrics and statistics for agent jobs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mentor Suggestions",
+      "item": [
+        {
+          "name": "Get Student Suggestions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:userId/mentor-suggestions?status=pending&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":userId", "mentor-suggestions"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "all, pending, reviewed, accepted, dismissed"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "1BG21CS091"
+                }
+              ]
+            },
+            "description": "Get mentor suggestions for a student with optional filtering"
+          }
+        },
+        {
+          "name": "Review Suggestion (Mentor)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"accept\",\n  \"notes\": \"Great plan! I've reviewed and approved this study schedule.\",\n  \"reviewedBy\": \"MENTOR_001\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5002/api/students/:userId/mentor-suggestions/:suggestionId/review",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":userId", "mentor-suggestions", ":suggestionId", "review"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "1BG21CS091"
+                },
+                {
+                  "key": "suggestionId",
+                  "value": "507f1f77bcf86cd799439011"
+                }
+              ]
+            },
+            "description": "Mentor reviews and accepts or dismisses a suggestion"
+          }
+        },
+        {
+          "name": "Apply Plan (Student)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:userId/mentor-suggestions/:suggestionId/apply",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":userId", "mentor-suggestions", ":suggestionId", "apply"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "1BG21CS091"
+                },
+                {
+                  "key": "suggestionId",
+                  "value": "507f1f77bcf86cd799439011"
+                }
+              ]
+            },
+            "description": "Student applies an accepted study plan to their schedule"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get User Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/notifications/:userId?read=false&limit=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "notifications", ":userId"],
+              "query": [
+                {
+                  "key": "read",
+                  "value": "false"
+                },
+                {
+                  "key": "type",
+                  "value": "mentor_suggestion",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "1BG21CS091"
+                }
+              ]
+            },
+            "description": "Get notifications for a user"
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "http://localhost:5002/api/notifications/:notificationId/read",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "notifications", ":notificationId", "read"],
+              "variable": [
+                {
+                  "key": "notificationId",
+                  "value": "507f1f77bcf86cd799439011"
+                }
+              ]
+            },
+            "description": "Mark a notification as read"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Semester Academics",
+      "item": [
+        {
+          "name": "Get All Semesters",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                }
+              ]
+            },
+            "description": "Get all semester records for a student with CGPA"
+          }
+        },
+        {
+          "name": "Get Single Semester",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get a specific semester record"
+          }
+        },
+        {
+          "name": "Create/Update Semester",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"academicYear\": \"2024-2025\",\n  \"mentorId\": \"MENTOR1\",\n  \"courses\": [\n    {\n      \"slNo\": 1,\n      \"courseCode\": \"CS101\",\n      \"courseName\": \"Introduction to Computer Science\",\n      \"attendancePercent\": 90,\n      \"ia1\": 85,\n      \"ia2\": 90,\n      \"ia3\": 88,\n      \"labMarks\": 92,\n      \"otherMarks\": 88,\n      \"externalMarks\": 85,\n      \"credits\": 4\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Create or update a semester record"
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ia1\": 90,\n  \"ia2\": 92,\n  \"externalMarks\": 88\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester/courses/:courseId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester", "courses", ":courseId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                },
+                {
+                  "key": "courseId",
+                  "value": "CS101"
+                }
+              ]
+            },
+            "description": "Update a single course in a semester"
+          }
+        },
+        {
+          "name": "Add Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseCode\": \"CS102\",\n  \"courseName\": \"Data Structures\",\n  \"credits\": 4,\n  \"attendancePercent\": 85,\n  \"ia1\": 0,\n  \"ia2\": 0,\n  \"ia3\": 0,\n  \"labMarks\": 0,\n  \"otherMarks\": 0,\n  \"externalMarks\": 0\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester/courses",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester", "courses"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Add a new course to a semester"
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester/courses/:courseId",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester", "courses", ":courseId"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                },
+                {
+                  "key": "courseId",
+                  "value": "CS101"
+                }
+              ]
+            },
+            "description": "Delete a course from a semester"
+          }
+        },
+        {
+          "name": "Delete Semester",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete an entire semester record"
+          }
+        },
+        {
+          "name": "Export Semester",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5002/api/students/:id/academics/:semester/export?format=html",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5002",
+              "path": ["api", "students", ":id", "academics", ":semester", "export"],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "html"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "USER123"
+                },
+                {
+                  "key": "semester",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Export semester as printable HTML"
+          }
+        }
+      ]
+    }
+  ]
+}
