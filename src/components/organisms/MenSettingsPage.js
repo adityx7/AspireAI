@@ -161,21 +161,26 @@ const MenSettingsPage = () => {
         e.preventDefault();
         setIsSubmitting(true);
         try {
+            console.log("Submitting mentor details:", formData);
             const response = await fetch('http://localhost:5002/api/mentor/details', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
 
+            console.log("Response status:", response.status);
+            const responseData = await response.json();
+            console.log("Response data:", responseData);
+
             if (response.ok) {
                 toast.success("Form submitted successfully!");
                 setTimeout(() => navigate("/dashboard-mentor"), 1000);
             } else {
-                const errorData = await response.json();
-                toast.error(errorData.message || "An error occurred.");
+                toast.error(responseData.message || "An error occurred.");
             }
         } catch (error) {
-            toast.error("Error submitting form.");
+            console.error("Error submitting form:", error);
+            toast.error("Error submitting form. Please check if the server is running.");
         } finally {
             setIsSubmitting(false);
         }

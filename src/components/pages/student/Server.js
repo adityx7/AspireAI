@@ -270,13 +270,34 @@ const mentorDetailsSchema = new mongoose.Schema({
 
 const MentorDetails = mongoose.model("MentorDetails", mentorDetailsSchema);
 
+// GET endpoint for fetching mentor profile
+app.get("/api/mentors/:mentorID", async (req, res) => {
+    try {
+        const { mentorID } = req.params;
+        console.log("📩 GET - Fetching mentor details for:", mentorID);
+
+        const mentorDetails = await MentorDetails.findOne({ mentorID });
+        console.log("🎯 Mentor Details Found:", mentorDetails);
+
+        if (!mentorDetails) {
+            return res.status(404).json({ message: "Mentor profile not found" });
+        }
+
+        res.json(mentorDetails);
+    } catch (error) {
+        console.error("❌ Error fetching mentor details:", error);
+        res.status(500).json({ message: "Server error", error });
+    }
+});
+
+// POST endpoint for updating mentor profile (keeping for backwards compatibility)
 app.post("/api/mentors/:mentorID", async (req, res) => {
     try {
         const { mentorID } = req.params;
-        console.log("📩 Fetching mentor details for:", mentorID); // ✅ Log request
+        console.log("📩 POST - Fetching mentor details for:", mentorID);
 
         const mentorDetails = await MentorDetails.findOne({ mentorID });
-        console.log("🎯 Mentor Details Found:", mentorDetails); // ✅ Log fetched data
+        console.log("🎯 Mentor Details Found:", mentorDetails);
 
         if (!mentorDetails) {
             return res.status(404).json({ message: "Mentor profile not found" });
@@ -332,7 +353,21 @@ app.post("/api/mentor/details", async (req, res) => {
         // ✅ Check if mentor already exists
         const existingMentor = await MentorDetails.findOne({ mentorID });
         if (existingMentor) {
-            return res.status(400).json({ message: "Mentor details already exist" });
+            // Update existing mentor details instead of returning error
+            console.log("📝 Updating existing mentor details for:", mentorID);
+            existingMentor.fullName = fullName || existingMentor.fullName;
+            existingMentor.phoneNumber = phoneNumber || existingMentor.phoneNumber;
+            existingMentor.alternatePhoneNumber = alternatePhoneNumber || existingMentor.alternatePhoneNumber;
+            existingMentor.email = email || existingMentor.email;
+            existingMentor.gender = gender || existingMentor.gender;
+            existingMentor.tech = tech || existingMentor.tech;
+            existingMentor.employeeIn = employeeIn || existingMentor.employeeIn;
+            existingMentor.selectedMajors = selectedMajors || existingMentor.selectedMajors;
+            existingMentor.bio = bio || existingMentor.bio;
+            
+            await existingMentor.save();
+            console.log("✅ Mentor Details Updated:", existingMentor);
+            return res.status(200).json({ success: true, message: "Mentor details updated successfully" });
         }
 
         // ✅ Create new mentor details
@@ -354,7 +389,7 @@ app.post("/api/mentor/details", async (req, res) => {
         res.status(201).json({ success: true, message: "Mentor details stored successfully" });
     } catch (error) {
         console.error("❌ Error storing mentor details:", error);
-        res.status(500).json({ message: "Server error", error });
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 });
 
