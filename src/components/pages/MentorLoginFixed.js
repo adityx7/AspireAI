@@ -572,7 +572,7 @@ export default function MentorSignInPage() {
                                 mb: 3
                             }}
                         >
-                            Welcome to Career Compass!
+                            Welcome to AspireAI!
                         </Typography>
                         
                         <Typography 
@@ -585,9 +585,9 @@ export default function MentorSignInPage() {
                                 mb: 3
                             }}
                         >
-                            Thank you for your interest in volunteering as a Compass mentor 
+                            Thank you for your interest in volunteering as an AspireAI mentor 
                             to help students who are in need to achieve their college and 
-                            career dreams. The Compass mentoring model is completely 
+                            career dreams. The AspireAI mentoring model is completely 
                             virtual: you will conduct all communication through our online 
                             platform, without ever having to share your personal contact info 
                             with your mentee.

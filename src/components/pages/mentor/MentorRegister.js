@@ -663,7 +663,7 @@ export default function MentorRegister() {
                                     fontFamily: FONT_FAMILY,
                                     textShadow: `0 2px 10px rgba(184, 134, 11, 0.3)`,
                                 }}>
-                                    Welcome to Career Compass!
+                                    Welcome to AspireAI!
                                 </Typography>
                                 <Typography variant="body1" sx={{ 
                                     color: "#F8FAFC", 
@@ -672,7 +672,7 @@ export default function MentorRegister() {
                                     lineHeight: 1.7,
                                     fontSize: '1.1rem'
                                 }}>
-                                    Thank you for your interest in volunteering as a Compass mentor to help students who are in need to achieve their college and career dreams. The Compass mentoring model is completely virtual: you will conduct all communication through our online platform, without ever having to share your personal contact info with your mentee.
+                                    Thank you for your interest in volunteering as an AspireAI mentor to help students who are in need to achieve their college and career dreams. The AspireAI mentoring model is completely virtual: you will conduct all communication through our online platform, without ever having to share your personal contact info with your mentee.
                                 </Typography>
                                 <Typography variant="body1" sx={{ 
                                     color: "rgba(248, 250, 252, 0.8)", 

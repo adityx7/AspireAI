@@ -67,7 +67,7 @@ const SidebarMentor = () => {
                         textShadow: `0 0 5px ${GOLD_MAIN}40`
                     }}
                 >
-                    Career Compass
+                    AspireAI
                 </Typography>
             </Box>
 
@@ -166,7 +166,7 @@ const SidebarMentor = () => {
                 }}
             >
                 <Typography variant="caption" sx={{ color: GOLD_LIGHT, fontSize: '0.7rem' }}>
-                    Career Compass v1.0.2
+                    AspireAI v1.0.2
                 </Typography>
             </Box>
         </Box>

@@ -1,7 +1,7 @@
  HEAD
-# 🎓 Career Compass – A Mentorship Platform for Student Growth
+# 🎓 AspireAI – A Mentorship Platform for Student Growth
 
-MentorLink is an intelligent full-stack web application built using the **MERN stack (MongoDB, Express.js, React.js, Node.js)**. It connects degree-level students with experienced mentors to foster both **technical and non-technical growth**. The platform includes **SWOT analysis**, **roadmap generation**, and an **AI-powered chatbot** to deliver personalized career guidance.
+AspireAI is an intelligent full-stack web application built using the **MERN stack (MongoDB, Express.js, React.js, Node.js)**. It connects degree-level students with experienced mentors to foster both **technical and non-technical growth**. The platform includes **SWOT analysis**, **roadmap generation**, and an **AI-powered chatbot** to deliver personalized career guidance.
 
 
 ## 🚀 Key Features

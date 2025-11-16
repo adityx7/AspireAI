@@ -82,7 +82,7 @@ export default function MentorTrainingPage() {
                         }}
                     >
                         The below optional training modules provide additional information about what is expected of you as
-                        a mentor and what you can expect from Career Compass; the tools and resources available to you as a Career Compass
+                        a mentor and what you can expect from AspireAI; the tools and resources available to you as an AspireAI
                         mentor; and other helpful information to make your mentoring experience a success!
                     </Typography>
                 </Box>
