@@ -5,6 +5,12 @@ import axios from "axios";
 import SideBar from "../organisms/SideBarMentor";
 import NavDash from "../organisms/NavMentor";
 
+// Gold and Indigo Theme Colors
+const NAVY_BLUE_MAIN = "#0A192F";
+const NAVY_BLUE_LIGHT = "#112240";
+const GOLD_MAIN = "#B8860B";
+const GOLD_LIGHT = "#DAA520";
+
 const MentorProfile = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [title, setTitle] = useState("Mentor Profile");
@@ -65,61 +71,146 @@ const MentorProfile = () => {
 
     if (loading) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <CircularProgress />
+            <Box 
+                display="flex" 
+                justifyContent="center" 
+                alignItems="center" 
+                minHeight="100vh"
+                sx={{ background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)" }}
+            >
+                <CircularProgress sx={{ color: GOLD_LIGHT }} />
             </Box>
         );
     }
 
     if (error || !userData) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-                <Typography variant="h6" color="error">{error || "Mentor profile not found!"}</Typography>
+            <Box 
+                display="flex" 
+                justifyContent="center" 
+                alignItems="center" 
+                minHeight="100vh"
+                sx={{ background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)" }}
+            >
+                <Typography variant="h6" sx={{ color: GOLD_LIGHT }}>
+                    {error || "Mentor profile not found!"}
+                </Typography>
             </Box>
         );
     }
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        <Box sx={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            height: "100vh",
+            background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
+        }}>
             <NavDash onDrawerToggle={handleDrawerToggle} title={title} />
 
             <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                <Box sx={{ width: 250, backgroundColor: "#FBFBFB", boxShadow: "2px 0px 5px rgba(0, 0, 0, 0.1)", display: { xs: "none", sm: "block" } }}>
+                <Box sx={{ 
+                    width: 250, 
+                    background: "rgba(10, 25, 47, 0.95)", 
+                    boxShadow: `2px 0px 15px rgba(184, 134, 11, 0.2)`, 
+                    display: { xs: "none", sm: "block" },
+                    borderRight: `1px solid rgba(184, 134, 11, 0.3)`,
+                }}>
                     <SideBar onMenuClick={handleMenuClick} />
                 </Box>
 
                 <Box sx={{ display: "flex", flexGrow: 1, justifyContent: "center", alignItems: "center", minHeight: "80vh" }}>
                     <Container maxWidth="md">
-                        <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+                        <Paper 
+                            elevation={3} 
+                            sx={{ 
+                                p: 4, 
+                                borderRadius: 3,
+                                background: `rgba(17, 34, 64, 0.8)`,
+                                backdropFilter: 'blur(10px)',
+                                boxShadow: `0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px ${GOLD_MAIN}40`,
+                                border: `1px solid ${GOLD_MAIN}30`,
+                            }}
+                        >
                             <Box display="flex" flexDirection="column" alignItems="center">
-                                <Avatar sx={{ width: 100, height: 100, mb: 2 }}>
+                                <Avatar 
+                                    sx={{ 
+                                        width: 100, 
+                                        height: 100, 
+                                        mb: 2,
+                                        background: `linear-gradient(135deg, ${GOLD_MAIN} 0%, ${GOLD_LIGHT} 100%)`,
+                                        color: NAVY_BLUE_MAIN,
+                                        fontSize: "2.5rem",
+                                        fontWeight: "bold",
+                                        boxShadow: `0 4px 15px ${GOLD_MAIN}60`,
+                                    }}
+                                >
                                     {userData.fullName ? userData.fullName.charAt(0).toUpperCase() : "?"}
                                 </Avatar>
-                                <Typography variant="h5" fontWeight="bold">
+                                <Typography 
+                                    variant="h5" 
+                                    fontWeight="bold"
+                                    sx={{ 
+                                        color: GOLD_LIGHT,
+                                        textShadow: `0 0 10px ${GOLD_MAIN}40`,
+                                    }}
+                                >
                                     {userData.fullName || "N/A"}
                                 </Typography>
-                                <Typography variant="subtitle1" color="textSecondary">
+                                <Typography 
+                                    variant="subtitle1" 
+                                    sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+                                >
                                     {userData.employeeIn || "N/A"} - {userData.selectedMajors?.join(", ") || "N/A"}
                                 </Typography>
                             </Box>
 
                             <Grid container spacing={3} sx={{ mt: 3 }}>
                                 <Grid item xs={12} sm={6}>
-                                    <Typography variant="body1"><strong>Mentor ID:</strong> {userData.mentorID || "N/A"}</Typography>
-                                    <Typography variant="body1"><strong>Name:</strong> {userData.fullName || "N/A"}</Typography>
-                                    <Typography variant="body1"><strong>Email:</strong> {userData.email || "N/A"}</Typography>
-                                    <Typography variant="body1"><strong>Employee In: </strong> {userData.employeeIn || "N/A"}</Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Mentor ID:</strong> {userData.mentorID || "N/A"}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Name:</strong> {userData.fullName || "N/A"}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Email:</strong> {userData.email || "N/A"}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Employee In: </strong> {userData.employeeIn || "N/A"}
+                                    </Typography>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
-                                    <Typography variant="body1"><strong>Mobile:</strong> {userData.phoneNumber || "N/A"}</Typography>
-                                    <Typography variant="body1"><strong>Alt Mobile:</strong> {userData.alternatePhoneNumber || "N/A"}</Typography>
-                                    <Typography variant="body1"><strong>Gender:</strong> {userData.gender || "N/A"}</Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Mobile:</strong> {userData.phoneNumber || "N/A"}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Alt Mobile:</strong> {userData.alternatePhoneNumber || "N/A"}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ color: "white", mb: 1 }}>
+                                        <strong style={{ color: GOLD_LIGHT }}>Gender:</strong> {userData.gender || "N/A"}
+                                    </Typography>
                                 </Grid>
                             </Grid>
 
                             <Box mt={3}>
-                                <Typography variant="h6">About Me</Typography>
-                                <Typography variant="body1" sx={{ mt: 1, fontStyle: "italic" }}>
+                                <Typography 
+                                    variant="h6" 
+                                    sx={{ 
+                                        color: GOLD_LIGHT,
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    About Me
+                                </Typography>
+                                <Typography 
+                                    variant="body1" 
+                                    sx={{ 
+                                        mt: 1, 
+                                        fontStyle: "italic",
+                                        color: "rgba(255, 255, 255, 0.8)",
+                                    }}
+                                >
                                     {userData.bio || "No bio available"}
                                 </Typography>
                             </Box>
@@ -133,7 +224,14 @@ const MentorProfile = () => {
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
                 ModalProps={{ keepMounted: true }}
-                sx={{ display: { xs: "block", sm: "none" }, color: "black" }}
+                sx={{ 
+                    display: { xs: "block", sm: "none" },
+                    '& .MuiDrawer-paper': {
+                        background: "rgba(10, 25, 47, 0.98)",
+                        backdropFilter: 'blur(10px)',
+                        borderRight: `1px solid rgba(184, 134, 11, 0.3)`,
+                    }
+                }}
             >
                 <SideBar onMenuClick={handleMenuClick} />
             </Drawer>

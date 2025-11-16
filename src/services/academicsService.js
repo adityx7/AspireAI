@@ -167,8 +167,14 @@ async function getUserAcademics(userId) {
  */
 async function upsertSemester(userId, semester, data) {
   try {
+    console.log('🔄 upsertSemester called');
+    console.log('   userId:', userId);
+    console.log('   semester:', semester);
+    console.log('   data:', JSON.stringify(data, null, 2));
+    
     // Compute grades for all courses
     if (data.courses) {
+      console.log('   Computing grades for', data.courses.length, 'courses');
       data.courses = data.courses.map(course => computeCourseGrades(course));
     }
     
@@ -176,10 +182,12 @@ async function upsertSemester(userId, semester, data) {
     let semesterDoc = await AcademicSemester.findOne({ userId, semester });
     
     if (semesterDoc) {
+      console.log('   Updating existing semester document');
       // Update existing
       Object.assign(semesterDoc, data);
       await semesterDoc.save();
     } else {
+      console.log('   Creating new semester document');
       // Create new
       semesterDoc = new AcademicSemester({
         userId,
@@ -190,15 +198,20 @@ async function upsertSemester(userId, semester, data) {
     }
     
     // Compute SGPA
+    console.log('   Computing SGPA');
     semesterDoc.computeSGPA();
     await semesterDoc.save();
     
     // Trigger CGPA recomputation
+    console.log('   Recomputing CGPA');
     await recomputeCGPA(userId);
     
+    console.log('✅ upsertSemester completed successfully');
     return semesterDoc.toObject();
   } catch (error) {
-    console.error('Error upserting semester:', error);
+    console.error('❌ Error upserting semester:', error);
+    console.error('   Error message:', error.message);
+    console.error('   Error stack:', error.stack);
     throw error;
   }
 }

@@ -40,7 +40,12 @@ const MentorContact = () => {
 
 
     return (
-        <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+        <Box sx={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            height: "100vh",
+            background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
+        }}>
             {/* Navbar */}
             <NavMentor onDrawerToggle={handleDrawerToggle} title={title} />
 
@@ -49,9 +54,10 @@ const MentorContact = () => {
                 <Box
                     sx={{
                         width: 250,
-                        backgroundColor: "#FBFBFB",
-                        boxShadow: "2px 0px 5px rgba(0, 0, 0, 0.1)",
+                        background: "rgba(10, 25, 47, 0.95)",
+                        boxShadow: `2px 0px 15px rgba(184, 134, 11, 0.2)`,
                         display: { xs: "none", sm: "block" },
+                        borderRight: `1px solid rgba(184, 134, 11, 0.3)`,
                     }}
                 >
                     <SidebarMentor onMenuClick={handleMenuClick} />
@@ -61,7 +67,7 @@ const MentorContact = () => {
                 <Box sx={{ 
                     flexGrow: 1, 
                     overflowY: "auto",
-                    marginLeft: "250px" // Add margin equal to sidebar width
+                    marginLeft: "250px"
                 }}>
                     <Container sx={{ mt: 2 }}>
                         <MentorContactPage />
@@ -75,7 +81,14 @@ const MentorContact = () => {
                 open={mobileOpen}
                 onClose={handleDrawerToggle}
                 ModalProps={{ keepMounted: true }}
-                sx={{ display: { xs: "block", sm: "none" }, color: "black" }}
+                sx={{ 
+                    display: { xs: "block", sm: "none" },
+                    '& .MuiDrawer-paper': {
+                        background: "rgba(10, 25, 47, 0.98)",
+                        backdropFilter: 'blur(10px)',
+                        borderRight: `1px solid rgba(184, 134, 11, 0.3)`,
+                    }
+                }}
             >
                 <SidebarMentor onMenuClick={handleMenuClick} />
             </Drawer>

@@ -177,6 +177,7 @@ const SemesterMarksPage = () => {
 
   const addNewCourse = () => {
     const newCourse = {
+      slNo: semesterData.courses.length + 1,
       courseCode: '',
       courseName: '',
       attendancePercentage: 0,
@@ -216,24 +217,62 @@ const SemesterMarksPage = () => {
       setSaving(true);
       setError(null);
 
+      console.log('🔵 Frontend: Starting save operation');
+      console.log('🔵 Frontend: userId =', userId);
+      console.log('🔵 Frontend: semester =', semester);
+      console.log('🔵 Frontend: semesterData.courses =', semesterData.courses);
+
+      // Transform courses to match backend schema
+      const transformedCourses = semesterData.courses.map((course, index) => ({
+        slNo: index + 1,
+        courseCode: course.courseCode || '',
+        courseName: course.courseName || '',
+        attendancePercent: course.attendancePercentage || course.attendancePercent || 0,
+        ia1: course.ia1 || 0,
+        ia2: course.ia2 || 0,
+        ia3: course.ia3 || 0,
+        labMarks: course.lab || course.labMarks || 0,
+        otherMarks: course.other || course.otherMarks || 0,
+        totalInternal: course.totalInternal || 0,
+        externalMarks: course.external || course.externalMarks || 0,
+        total: course.total || 0,
+        letterGrade: course.letterGrade || '',
+        gradePoints: course.gradePoints || 0,
+        credits: course.credits || 0
+      }));
+
+      console.log('🔵 Frontend: transformedCourses =', transformedCourses);
+
       // Calculate SGPA before saving
       const sgpa = computeSemesterSGPA(semesterData.courses);
       const dataToSave = {
-        ...semesterData,
+        userId: userId,
+        semester: semester,
+        academicYear: semesterData.academicYear || `${new Date().getFullYear()}-${new Date().getFullYear() + 1}`,
+        courses: transformedCourses,
         sgpa: parseFloat(sgpa)
       };
+
+      console.log('🔵 Frontend: Sending data to backend:', JSON.stringify(dataToSave, null, 2));
+      console.log('🔵 Frontend: URL:', `http://localhost:5002/api/students/${userId}/academics/${semester}`);
 
       const response = await axios.put(
         `http://localhost:5002/api/students/${userId}/academics/${semester}`,
         dataToSave
       );
 
+      console.log('🔵 Frontend: Response received:', response);
+
       if (response.data.success) {
+        console.log('✅ Frontend: Save successful!');
         toast.success('Semester marks saved successfully!');
         fetchSemesterData(); // Refresh to get updated CGPA
       }
     } catch (err) {
-      console.error('Error saving data:', err);
+      console.error('❌ Frontend: Error saving data:', err);
+      console.error('❌ Frontend: Error response:', err.response?.data);
+      console.error('❌ Frontend: Error status:', err.response?.status);
+      console.error('❌ Frontend: Error message:', err.message);
       setError('Failed to save semester marks. Please check all fields and try again.');
       toast.error('Failed to save marks');
     } finally {
