@@ -45,8 +45,8 @@ const TodayTasks = ({ userId }) => {
           )
         );
         
-        setProgress(response.data.data.progress);
-        setStreak(response.data.data.streak);
+        // Fix: progress is directly in response.data, not nested in response.data.data
+        setProgress(response.data.progress || { completedTasks: 0, totalTasks: 0, progressPercent: 0 });
         
         // Show success message
         showNotification('✅ Task completed! Great job!');

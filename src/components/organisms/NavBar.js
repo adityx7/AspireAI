@@ -53,7 +53,8 @@ export default function Navbar() {
     !isContactUs && !isSettings && !isMentorLoginPage && !isMentorContact && 
     !isMentorSettings && !isProfile && !isProfileMentor &&
     <AppBar position="sticky" sx={{ 
-      background: 'linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(26, 43, 76, 0.98) 100%)',
+      background: 'linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(26, 43, 76, 0.98) 100%) !important',
+      backgroundColor: 'rgba(10, 25, 47, 0.95) !important',
       backdropFilter: 'blur(25px)',
       border: '1px solid rgba(184, 134, 11, 0.15)',
       boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)',

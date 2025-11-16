@@ -48,10 +48,10 @@ const Navbar = ({ onDrawerToggle, title }) => {
         <AppBar
             position="static"
             sx={{
-                backgroundColor: 'transparent',
-                boxShadow: `0px 4px 15px rgba(184, 134, 11, 0.15)`,
-                backdropFilter: 'blur(10px)',
-                borderBottom: `1px solid ${GOLD_MAIN}30`,
+                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+                boxShadow: "0 25px 80px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                backdropFilter: 'blur(25px)',
+                borderBottom: `1px solid rgba(184, 134, 11, 0.15)`,
             }}
         >
             <Toolbar
