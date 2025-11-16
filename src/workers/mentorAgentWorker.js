@@ -1,53 +1,221 @@
-const { Worker } = require('bullmq');
+const { Queue, Worker } = require('bullmq');
 const mongoose = require('mongoose');
-const { connection } = require('../services/queueService');
-const { generateAIInsight } = require('../services/aiService');
 const MentorSuggestion = require('../models/MentorSuggestion');
-const AgentJob = require('../models/AgentJob');
+const StudyPlan = require('../models/StudyPlan');
 const Notification = require('../models/Notification');
+const academicRiskService = require('../services/academicRiskService');
+const aiService = require('../services/aiService');
 
-// Import student model (adjust path as needed)
-let Student;
-try {
-  Student = require('../models/Student');
-} catch (e) {
-  // Fallback if model path is different
-  console.warn('⚠️  Student model not found at expected path, will need to import manually');
-}
+// Redis configuration
+const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || '';
+
+const redisConnection = {
+  host: REDIS_HOST,
+  port: REDIS_PORT,
+  password: REDIS_PASSWORD || undefined,
+  maxRetriesPerRequest: null
+};
+
+// Create queue
+const mentorAgentQueue = new Queue('mentorAgentQueue', {
+  connection: redisConnection,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000
+    },
+    removeOnComplete: {
+      count: 100,
+      age: 24 * 3600 // Keep completed jobs for 24 hours
+    },
+    removeOnFail: {
+      age: 7 * 24 * 3600 // Keep failed jobs for 7 days
+    }
+  }
+});
 
 /**
- * Load comprehensive student data
+ * Process mentor agent job
+ * @param {Object} job - BullMQ job
+ * @returns {Promise<Object>} - Processing result
  */
-async function loadStudentData(userId) {
-  console.log(`📊 Loading student data for ${userId}`);
+async function processMentorAgentJob(job) {
+  const { userId, triggerType, manual } = job.data;
   
-  if (!Student) {
-    throw new Error('Student model not available');
+  console.log('======================================');
+  console.log(`🤖 AGENT WORKER STARTED`);
+  console.log(`User ID: ${userId}`);
+  console.log(`Trigger: ${triggerType}`);
+  console.log(`Manual: ${manual || false}`);
+  console.log('======================================');
+
+  try {
+    // Update job progress
+    await job.updateProgress(10);
+
+    // Step 1: Load student data
+    console.log('📥 Loading student data...');
+    const User = mongoose.model('User');
+    const student = await User.findById(userId)
+      .populate('attendance')
+      .populate('internalMarks')
+      .populate('semesterMarks');
+
+    if (!student) {
+      throw new Error(`Student not found: ${userId}`);
+    }
+
+    console.log(`✅ Loaded data for ${student.name} (${student.usn})`);
+    await job.updateProgress(20);
+
+    // Step 2: Generate risk profile
+    console.log('🔍 Analyzing academic risks...');
+    const riskProfile = await academicRiskService.generateRiskProfile(student);
+    
+    console.log(`📊 Risk Level: ${riskProfile.overallRisk.toUpperCase()}`);
+    console.log(`   - Low Attendance: ${riskProfile.lowAttendance.length} subjects`);
+    console.log(`   - Weak Subjects: ${riskProfile.weakSubjects.length} subjects`);
+    console.log(`   - CGPA Drop: ${riskProfile.cgpaDrop ? 'YES' : 'NO'}`);
+
+    await job.updateProgress(40);
+
+    // Step 3: Generate student snapshot for AI
+    const studentSnapshot = academicRiskService.generateStudentSnapshot(student, riskProfile);
+
+    // Step 4: Call AI to generate study plan
+    console.log('🧠 Generating AI study plan...');
+    const aiPlan = await aiService.generateStudyPlan(studentSnapshot, {
+      maxRetries: 3,
+      temperature: 0.7
+    });
+
+    console.log(`✅ AI plan generated: ${aiPlan.planLength} days, ${aiPlan.plan.length} days of tasks`);
+    await job.updateProgress(70);
+
+    // Step 5: Deactivate old plans
+    console.log('🗑️  Deactivating old plans...');
+    await MentorSuggestion.deactivateOldPlans(userId);
+
+    // Step 6: Save new plan to database
+    console.log('💾 Saving study plan to database...');
+    const mentorSuggestion = new MentorSuggestion({
+      userId: userId,
+      insights: aiPlan.insights,
+      planLength: aiPlan.planLength,
+      plan: aiPlan.plan,
+      resources: aiPlan.resources,
+      mentorActions: aiPlan.mentorActions,
+      riskProfile: aiPlan.riskProfile,
+      generatedBy: manual ? 'manual' : triggerType || 'auto',
+      active: true,
+      reviewed: false,
+      accepted: false
+    });
+
+    await mentorSuggestion.save();
+    console.log(`✅ Saved suggestion ID: ${mentorSuggestion._id}`);
+
+    await job.updateProgress(80);
+
+    // Step 7: Update or create StudyPlan document
+    console.log('� Updating study plan tracker...');
+    const studyPlan = await StudyPlan.getOrCreate(userId);
+    
+    studyPlan.activePlanId = mentorSuggestion._id;
+    studyPlan.statistics.totalPlansGenerated += 1;
+    await studyPlan.updateProgress(mentorSuggestion);
+
+    console.log('✅ Study plan tracker updated');
+
+    await job.updateProgress(90);
+
+    // Step 8: Create notifications
+    console.log('🔔 Creating notifications...');
+    
+    // Notify student
+    await Notification.create({
+      userId: userId,
+      type: 'study_plan_generated',
+      title: '📚 Your Personalized Study Plan is Ready!',
+      message: `A ${aiPlan.planLength}-day study plan has been generated based on your academic performance. Check it out now!`,
+      actionUrl: '/student/study-plan',
+      priority: riskProfile.overallRisk === 'high' ? 'high' : 'medium',
+      read: false
+    });
+
+    // Notify mentor if risk is medium or high
+    if (riskProfile.overallRisk === 'high' || riskProfile.overallRisk === 'medium') {
+      const mentorId = student.mentorId;
+      
+      if (mentorId) {
+        await Notification.create({
+          userId: mentorId,
+          type: 'student_at_risk',
+          title: `⚠️ Student Requires Attention: ${student.name}`,
+          message: `${student.name} (${student.usn}) has been flagged with ${riskProfile.overallRisk} risk. Review their study plan and consider intervention.`,
+          actionUrl: `/mentor/review-plan/${mentorSuggestion._id}`,
+          priority: 'high',
+          metadata: {
+            studentId: userId,
+            suggestionId: mentorSuggestion._id,
+            riskLevel: riskProfile.overallRisk
+          },
+          read: false
+        });
+        
+        console.log(`🔔 Mentor notified about ${riskProfile.overallRisk} risk student`);
+      }
+    }
+
+    console.log('✅ Notifications created');
+
+    await job.updateProgress(100);
+
+    // Final summary
+    console.log('======================================');
+    console.log('✅ AGENT PROCESSING COMPLETED');
+    console.log(`Plan ID: ${mentorSuggestion._id}`);
+    console.log(`Risk Level: ${riskProfile.overallRisk}`);
+    console.log(`Plan Length: ${aiPlan.planLength} days`);
+    console.log(`Total Tasks: ${aiPlan.plan.reduce((sum, day) => sum + day.tasks.length, 0)}`);
+    console.log('======================================');
+
+    return {
+      success: true,
+      userId: userId,
+      suggestionId: mentorSuggestion._id,
+      riskLevel: riskProfile.overallRisk,
+      planLength: aiPlan.planLength,
+      tasksCount: aiPlan.plan.reduce((sum, day) => sum + day.tasks.length, 0)
+    };
+
+  } catch (error) {
+    console.error('======================================');
+    console.error('❌ AGENT PROCESSING FAILED');
+    console.error(`User ID: ${userId}`);
+    console.error(`Error: ${error.message}`);
+    console.error(`Stack: ${error.stack}`);
+    console.error('======================================');
+
+    // Create error notification for student
+    try {
+      await Notification.create({
+        userId: userId,
+        type: 'system_error',
+        title: '⚠️ Study Plan Generation Failed',
+        message: 'We encountered an error while generating your study plan. Our team has been notified. Please try again later.',
+        priority: 'medium',
+        read: false
+      });
+    } catch (notifError) {
+      console.error('Failed to create error notification:', notifError);
+    }
+
+    throw error;
   }
-
-  const student = await Student.findOne({ usn: userId }).lean();
-  
-  if (!student) {
-    throw new Error(`Student not found: ${userId}`);
-  }
-
-  // Load related data
-  const recentSuggestions = await MentorSuggestion.find({
-    userId,
-    generatedAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
-  }).sort({ generatedAt: -1 }).limit(5).lean();
-
-  return {
-    student,
-    recentSuggestions
-  };
-}
-
-/**
- * Perform rule-based quick checks
- */
-function performRuleChecks(student) {
-  const flags = [];
   const academics = student.academics || {};
   
   // Check attendance
@@ -165,196 +333,61 @@ function normalizeStudentData(studentData, ruleFlags) {
   };
 }
 
-/**
- * Get mentor ID for student
- */
-async function getMentorIdForStudent(userId) {
-  // This would typically query a mentorships collection
-  // For now, returning a placeholder
-  // TODO: Implement actual mentor lookup
-  return 'MENTOR_' + userId.substring(0, 5);
-}
-
-/**
- * Process mentor agent job
- */
-async function processMentorAgentJob(job) {
-  const { userId, force, triggeredBy } = job.data;
-  const jobId = job.id;
-
-  console.log(`\n🚀 Processing mentor agent job ${jobId} for user ${userId}`);
-  job.updateProgress(10);
-
-  // Create AgentJob record
-  const agentJob = await AgentJob.create({
-    jobId,
-    userId,
-    type: 'mentorAgent',
-    status: 'processing',
-    triggeredBy,
-    forced: force,
-    startedAt: new Date()
-  });
-
-  try {
-    // Step 1: Check rate limit (unless forced)
-    if (!force) {
-      const canEnqueue = await AgentJob.canEnqueueJob(userId, 'mentorAgent', 6);
-      if (!canEnqueue) {
-        throw new Error('Rate limit: Recent job exists for this user within 6 hours');
-      }
+// Create worker
+const worker = new Worker(
+  'mentorAgentQueue',
+  processMentorAgentJob,
+  {
+    connection: redisConnection,
+    concurrency: 5, // Process up to 5 students concurrently
+    limiter: {
+      max: 10, // Max 10 jobs
+      duration: 60000 // Per minute
     }
-    job.updateProgress(20);
-
-    // Step 2: Load student data
-    const studentData = await loadStudentData(userId);
-    job.updateProgress(30);
-
-    // Step 3: Perform rule-based checks
-    const ruleFlags = performRuleChecks(studentData.student);
-    console.log(`🚩 Rule flags detected: ${ruleFlags.length}`);
-    job.updateProgress(40);
-
-    // Step 4: Normalize data for LLM
-    const studentJson = normalizeStudentData(studentData, ruleFlags);
-    job.updateProgress(50);
-
-    // Step 5: Generate AI insights
-    console.log(`🤖 Calling LLM for user ${userId}...`);
-    const aiResult = await generateAIInsight(studentJson, 'mentor_plan', {
-      maxRetries: 1,
-      timeout: 60000
-    });
-    job.updateProgress(70);
-
-    const { data: aiOutput, metadata } = aiResult;
-
-    // Step 6: Add dates to plan
-    const planWithDates = aiOutput.plan.map((dayPlan, index) => {
-      const date = new Date();
-      date.setDate(date.getDate() + index);
-      return {
-        ...dayPlan,
-        day: index + 1,
-        date
-      };
-    });
-
-    // Step 7: Save mentor suggestion
-    const mentorSuggestion = await MentorSuggestion.create({
-      userId,
-      agent: 'mentorAgent',
-      insights: aiOutput.insights,
-      planLength: aiOutput.planLength,
-      plan: planWithDates,
-      microSupport: aiOutput.microSupport || [],
-      resources: aiOutput.resources || [],
-      suggestedMentorActions: aiOutput.mentorActions,
-      confidence: aiOutput.confidence,
-      generatedAt: new Date(),
-      studentSnapshot: studentJson,
-      promptHash: metadata.promptHash,
-      modelUsed: metadata.modelUsed,
-      tokenCostEstimate: metadata.tokenCostEstimate,
-      outputHash: metadata.outputHash
-    });
-
-    console.log(`✅ Mentor suggestion created: ${mentorSuggestion._id}`);
-    job.updateProgress(85);
-
-    // Step 8: Mark job as completed
-    await agentJob.markCompleted(mentorSuggestion._id);
-
-    // Step 9: Send notifications
-    // Notify student
-    await Notification.createMentorSuggestionNotification(
-      userId,
-      mentorSuggestion._id,
-      'student'
-    );
-
-    // Notify mentor
-    const mentorId = await getMentorIdForStudent(userId);
-    if (mentorId) {
-      await Notification.createMentorSuggestionNotification(
-        mentorId,
-        mentorSuggestion._id,
-        'mentor'
-      );
-    }
-
-    job.updateProgress(100);
-    console.log(`✅ Job ${jobId} completed successfully\n`);
-
-    return {
-      success: true,
-      suggestionId: mentorSuggestion._id,
-      insights: aiOutput.insights.length,
-      planLength: aiOutput.planLength
-    };
-
-  } catch (error) {
-    console.error(`❌ Job ${jobId} failed:`, error);
-    
-    // Mark job as failed
-    await agentJob.markFailed(error);
-
-    // Create alert notification for admin
-    await Notification.create({
-      userId: 'ADMIN',
-      type: 'agent_alert',
-      title: '🚨 Agent Job Failed',
-      body: `Mentor agent job failed for user ${userId}: ${error.message}`,
-      priority: 'high',
-      payload: {
-        jobId,
-        userId,
-        error: error.message
-      }
-    });
-
-    throw error;
   }
-}
+);
 
-/**
- * Create and start the worker
- */
-function createMentorAgentWorker() {
-  const worker = new Worker(
-    'mentor-agent',
-    processMentorAgentJob,
-    {
-      connection,
-      concurrency: parseInt(process.env.WORKER_CONCURRENCY || '2'),
-      limiter: {
-        max: 10,
-        duration: 60000 // Max 10 jobs per minute
-      }
-    }
-  );
+// Worker event listeners
+worker.on('completed', (job, result) => {
+  console.log(`✅ Job ${job.id} completed successfully`);
+  console.log(`   Result:`, result);
+});
 
-  worker.on('completed', (job, returnvalue) => {
-    console.log(`✅ Job ${job.id} completed:`, returnvalue);
-  });
+worker.on('failed', (job, error) => {
+  console.error(`❌ Job ${job.id} failed:`, error.message);
+  console.error(`   Attempts: ${job.attemptsMade}/${job.opts.attempts}`);
+});
 
-  worker.on('failed', (job, error) => {
-    console.error(`❌ Job ${job.id} failed:`, error.message);
-  });
+worker.on('error', (error) => {
+  console.error('❌ Worker error:', error);
+});
 
-  worker.on('error', (error) => {
-    console.error('❌ Worker error:', error);
-  });
+worker.on('stalled', (jobId) => {
+  console.warn(`⚠️ Job ${jobId} stalled`);
+});
 
-  console.log('👷 Mentor agent worker started');
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('🛑 SIGTERM received, closing worker...');
+  await worker.close();
+  process.exit(0);
+});
 
-  return worker;
-}
+process.on('SIGINT', async () => {
+  console.log('🛑 SIGINT received, closing worker...');
+  await worker.close();
+  process.exit(0);
+});
+
+console.log('======================================');
+console.log('🚀 MENTOR AGENT WORKER STARTED');
+console.log(`Redis: ${REDIS_HOST}:${REDIS_PORT}`);
+console.log(`Queue: mentorAgentQueue`);
+console.log(`Concurrency: 5`);
+console.log('======================================');
 
 module.exports = {
-  createMentorAgentWorker,
-  processMentorAgentJob,
-  loadStudentData,
-  performRuleChecks,
-  normalizeStudentData
+  worker,
+  mentorAgentQueue,
+  processMentorAgentJob
 };

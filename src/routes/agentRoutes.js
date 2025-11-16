@@ -1,12 +1,56 @@
 const express = require('express');
 const router = express.Router();
+const agentController = require('../controllers/agentController');
+
+// Middleware to verify authentication (adjust based on your auth implementation)
+const authenticate = (req, res, next) => {
+  // TODO: Implement your authentication middleware
+  // For now, passing through - replace with actual auth
+  next();
+};
+
+// ==========================================
+// NEW AGENTIC AI ROUTES
+// ==========================================
+
+// Manual trigger agent
+router.post('/run', authenticate, agentController.runAgent);
+
+// Get suggestions for a user
+router.get('/:userId/suggestions', authenticate, agentController.getSuggestions);
+
+// Get active study plan
+router.get('/:userId/active-plan', authenticate, agentController.getActivePlan);
+
+// Accept a suggestion
+router.put('/:userId/accept/:suggestionId', authenticate, agentController.acceptSuggestion);
+
+// Complete a task
+router.put('/:userId/task/:taskId/complete', authenticate, agentController.completeTask);
+
+// Get today's tasks
+router.get('/:userId/today', authenticate, agentController.getTodayTasks);
+
+// Get risk profile
+router.get('/:userId/risk-profile', authenticate, agentController.getRiskProfile);
+
+// Review suggestion (mentor only)
+router.put('/review/:suggestionId', authenticate, agentController.reviewSuggestion);
+
+// Get scheduler status (admin only)
+router.get('/scheduler/status', authenticate, agentController.getSchedulerStatus);
+
+// ==========================================
+// LEGACY ROUTES (Keeping for backward compatibility)
+// ==========================================
+
 const { enqueueMentorAgentJob, enqueueCareerPlannerJob, getJobStatus, getQueueStats } = require('../services/queueService');
 const MentorSuggestion = require('../models/MentorSuggestion');
 const AgentJob = require('../models/AgentJob');
 const Notification = require('../models/Notification');
 
 /**
- * POST /api/agents/trigger
+ * POST /api/agents/trigger (LEGACY)
  * Trigger an agent job for a user
  */
 router.post('/trigger', async (req, res) => {
@@ -28,7 +72,7 @@ router.post('/trigger', async (req, res) => {
     }
 
     // Check rate limit unless forced
-    if (!force) {
+    if (!force && AgentJob.canEnqueueJob) {
       const canEnqueue = await AgentJob.canEnqueueJob(userId, type, 6);
       if (!canEnqueue) {
         return res.status(429).json({
@@ -41,12 +85,14 @@ router.post('/trigger', async (req, res) => {
 
     let job;
     if (type === 'mentorAgent' || type === 'adhoc') {
-      job = await enqueueMentorAgentJob(userId, {
-        force,
-        triggeredBy: 'api',
-        priority: force ? 10 : 0
-      });
-    } else if (type === 'careerPlanner') {
+      if (enqueueMentorAgentJob) {
+        job = await enqueueMentorAgentJob(userId, {
+          force,
+          triggeredBy: 'api',
+          priority: force ? 10 : 0
+        });
+      }
+    } else if (type === 'careerPlanner' && enqueueCareerPlannerJob) {
       job = await enqueueCareerPlannerJob(userId, {
         force,
         triggeredBy: 'api',

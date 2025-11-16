@@ -1,135 +1,209 @@
 const mongoose = require('mongoose');
 
-const TaskSchema = new mongoose.Schema({
-  time: { type: String, required: true }, // "09:00"
-  task: { type: String, required: true },
-  durationMinutes: { type: Number, required: true },
-  resource: { type: String, default: '' },
-  resourceUrl: { type: String, default: '' },
-  practiceProblemIds: [{ type: String }],
-  completed: { type: Boolean, default: false },
-  completedAt: { type: Date }
-}, { _id: false });
-
-const DayPlanSchema = new mongoose.Schema({
-  day: { type: Number, required: true },
-  date: { type: Date, required: true },
-  tasks: [TaskSchema]
-}, { _id: false });
-
-const InsightSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  detail: { type: String, required: true },
-  severity: { 
-    type: String, 
-    enum: ['low', 'medium', 'high'], 
-    required: true 
-  }
-}, { _id: false });
-
-const MicroSupportSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  summary: { type: String, required: true },
-  estimatedMinutes: { type: Number, required: true },
-  resourceUrl: { type: String, default: '' },
-  exampleProblem: { type: String, default: '' }
-}, { _id: false });
-
-const ResourceSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  url: { type: String, required: true },
-  type: { 
-    type: String, 
-    enum: ['video', 'article', 'course', 'notes', 'practice', 'other'],
-    default: 'other'
-  }
-}, { _id: false });
-
-const MentorSuggestionSchema = new mongoose.Schema({
-  userId: { 
-    type: String, 
-    required: true, 
-    index: true 
+const taskSchema = new mongoose.Schema({
+  time: {
+    type: String,
+    required: true,
+    match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
   },
-  agent: { 
-    type: String, 
-    enum: ['mentorAgent', 'careerPlanner', 'adhoc'],
-    default: 'mentorAgent',
-    required: true 
+  task: {
+    type: String,
+    required: true
   },
-  insights: [InsightSchema],
-  planLength: { 
-    type: Number, 
+  durationMinutes: {
+    type: Number,
+    required: true,
+    min: 15,
+    max: 180
+  },
+  resourceUrl: {
+    type: String,
+    default: ''
+  },
+  completed: {
+    type: Boolean,
+    default: false
+  },
+  completedAt: Date
+});
+
+const planDaySchema = new mongoose.Schema({
+  day: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 28
+  },
+  date: {
+    type: Date,
+    required: true
+  },
+  tasks: [taskSchema]
+});
+
+const insightSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  detail: {
+    type: String,
+    required: true
+  },
+  severity: {
+    type: String,
+    enum: ['low', 'medium', 'high'],
+    required: true
+  }
+});
+
+const resourceSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  url: {
+    type: String,
+    required: true
+  }
+});
+
+const mentorSuggestionSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    index: true
+  },
+  insights: [insightSchema],
+  planLength: {
+    type: Number,
     enum: [7, 14, 28],
-    required: true 
+    required: true
   },
-  plan: [DayPlanSchema],
-  microSupport: [MicroSupportSchema],
-  resources: [ResourceSchema],
-  suggestedMentorActions: [{ type: String }],
-  confidence: { 
-    type: Number, 
-    min: 0, 
-    max: 1,
-    default: 0.5 
+  plan: [planDaySchema],
+  resources: [resourceSchema],
+  mentorActions: [{
+    type: String
+  }],
+  riskProfile: {
+    lowAttendance: [String],
+    weakSubjects: [String],
+    cgpaDrop: Boolean,
+    overallRisk: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: 'low'
+    }
   },
-  generatedAt: { 
-    type: Date, 
-    default: Date.now,
-    index: true 
+  reviewed: {
+    type: Boolean,
+    default: false
   },
-  reviewed: { 
-    type: Boolean, 
-    default: false,
-    index: true 
+  reviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
-  reviewedAt: { type: Date },
-  reviewedBy: { type: String }, // mentor userId
-  accepted: { 
-    type: Boolean, 
-    default: false 
+  reviewedAt: Date,
+  accepted: {
+    type: Boolean,
+    default: false
   },
-  dismissed: { type: Boolean, default: false },
-  dismissReason: { type: String },
-  reviewNotes: { type: String },
-  applied: { 
-    type: Boolean, 
-    default: false 
+  acceptedAt: Date,
+  active: {
+    type: Boolean,
+    default: true
   },
-  appliedAt: { type: Date },
-  // Metadata
-  studentSnapshot: { type: mongoose.Schema.Types.Mixed }, // Snapshot of student data at generation time
-  promptHash: { type: String },
-  modelUsed: { type: String },
-  tokenCostEstimate: { type: Number },
-  outputHash: { type: String }
+  version: {
+    type: Number,
+    default: 1
+  },
+  previousVersionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'MentorSuggestion'
+  },
+  generatedBy: {
+    type: String,
+    enum: ['auto', 'manual', 'student-request'],
+    default: 'auto'
+  }
 }, {
   timestamps: true
 });
 
-// Indexes for efficient queries
-MentorSuggestionSchema.index({ userId: 1, generatedAt: -1 });
-MentorSuggestionSchema.index({ userId: 1, reviewed: 1 });
-MentorSuggestionSchema.index({ userId: 1, accepted: 1, applied: 1 });
+// Indexes for performance
+mentorSuggestionSchema.index({ userId: 1, active: 1 });
+mentorSuggestionSchema.index({ createdAt: -1 });
+mentorSuggestionSchema.index({ reviewed: 1, accepted: 1 });
 
-// Virtual for days remaining
-MentorSuggestionSchema.virtual('daysRemaining').get(function() {
-  if (!this.plan || this.plan.length === 0) return 0;
-  const lastDay = this.plan[this.plan.length - 1];
+// Methods
+mentorSuggestionSchema.methods.getProgress = function() {
+  let totalTasks = 0;
+  let completedTasks = 0;
+
+  this.plan.forEach(day => {
+    totalTasks += day.tasks.length;
+    completedTasks += day.tasks.filter(t => t.completed).length;
+  });
+
+  return {
+    totalTasks,
+    completedTasks,
+    progressPercent: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
+  };
+};
+
+mentorSuggestionSchema.methods.getTodayTasks = function() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const todayPlan = this.plan.find(day => {
+    const planDate = new Date(day.date);
+    planDate.setHours(0, 0, 0, 0);
+    return planDate.getTime() === today.getTime();
+  });
+
+  return todayPlan ? todayPlan.tasks : [];
+};
+
+mentorSuggestionSchema.methods.getNextTask = function() {
   const now = new Date();
-  const daysLeft = Math.ceil((lastDay.date - now) / (1000 * 60 * 60 * 24));
-  return Math.max(0, daysLeft);
-});
+  
+  for (const dayPlan of this.plan) {
+    const planDate = new Date(dayPlan.date);
+    if (planDate >= now) {
+      for (const task of dayPlan.tasks) {
+        if (!task.completed) {
+          return {
+            day: dayPlan.day,
+            date: dayPlan.date,
+            task: task
+          };
+        }
+      }
+    }
+  }
+  
+  return null;
+};
 
-// Method to check if suggestion is still active
-MentorSuggestionSchema.methods.isActive = function() {
-  if (this.dismissed) return false;
-  if (!this.accepted) return false;
-  return this.daysRemaining > 0;
+mentorSuggestionSchema.statics.getActivePlan = async function(userId) {
+  return this.findOne({ 
+    userId, 
+    active: true,
+    accepted: true 
+  }).sort({ createdAt: -1 });
+};
+
+mentorSuggestionSchema.statics.deactivateOldPlans = async function(userId) {
+  return this.updateMany(
+    { userId, active: true },
+    { $set: { active: false } }
+  );
 };
 
 // Static method to find pending suggestions for a user
-MentorSuggestionSchema.statics.findPendingForUser = function(userId) {
+mentorSuggestionSchema.statics.findPendingForUser = function(userId) {
   return this.find({
     userId,
     reviewed: false,
@@ -138,7 +212,7 @@ MentorSuggestionSchema.statics.findPendingForUser = function(userId) {
 };
 
 // Static method to find active plans
-MentorSuggestionSchema.statics.findActivePlans = function(userId) {
+mentorSuggestionSchema.statics.findActivePlans = function(userId) {
   return this.find({
     userId,
     accepted: true,
@@ -147,4 +221,6 @@ MentorSuggestionSchema.statics.findActivePlans = function(userId) {
   }).sort({ generatedAt: -1 });
 };
 
-module.exports = mongoose.model('MentorSuggestion', MentorSuggestionSchema);
+const MentorSuggestion = mongoose.model('MentorSuggestion', mentorSuggestionSchema);
+
+module.exports = MentorSuggestion;

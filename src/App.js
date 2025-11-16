@@ -25,6 +25,7 @@ import SemesterMarksPage from './components/pages/StudentDashboard/SemesterMarks
 import StudentMeetingNotesPage from './components/pages/StudentMeetingNotesPage';
 import MentorMeetingNotesPage from './components/pages/MentorMeetingNotesPage';
 import MeetingNotesTestPage from './components/pages/MeetingNotesTestPage';
+import StudyPlanPage from './components/pages/StudyPlanPage';
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/contact-us" element={< ContactDash />} />
           <Route path="/meeting-notes" element={<StudentMeetingNotesPage />} />
           <Route path="/test-meeting-notes" element={<MeetingNotesTestPage />} />
+          <Route path="/study-plan" element={<StudyPlanPage />} />
           <Route path="/dashboard-mentor" element={< MentorMain />} />
           <Route path="/mentor-main" element={< MentorMain />} />
           <Route path="/settings-mentor" element={<SettingsMentor />} />

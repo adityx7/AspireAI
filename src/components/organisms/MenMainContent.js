@@ -1,7 +1,8 @@
-import React from "react";
-import { Box, Typography, Divider, Card, CardContent, Grid, IconButton } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Typography, Divider, Card, CardContent, Grid, IconButton, CircularProgress, Alert } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Tick icon
 import CancelIcon from "@mui/icons-material/Cancel"; // Cross icon
+import axios from "axios";
 
 // Constants for styling - matching the login theme
 const NAVY_BLUE_MAIN = "#0A192F";
@@ -12,21 +13,40 @@ const GOLD_LIGHT = "#DAA520";
 const GOLD_DARK = "#8B6914";
 
 export default function MentorTrainingPage() {
-    // Array of student details
-    const trainingModules = [
-        {
-            title: "Student 1",
-            description: "Student Details from Database.",
-        },
-        {
-            title: "Student 2",
-            description: "Student Details from Database.",
-        },
-        {
-            title: "Student 3",
-            description: "Student Details from Database.",
-        },
-    ];
+    const [students, setStudents] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Fetch students assigned to this mentor
+    useEffect(() => {
+        fetchMentees();
+    }, []);
+
+    const fetchMentees = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const mentorID = localStorage.getItem('mentorID');
+            if (!mentorID) {
+                setError('Mentor ID not found. Please login again.');
+                setLoading(false);
+                return;
+            }
+
+            const response = await axios.get(`http://localhost:5002/api/mentor/${mentorID}/mentees`);
+            
+            if (response.data.success) {
+                setStudents(response.data.mentees || []);
+            } else {
+                setError('Failed to fetch student data');
+            }
+        } catch (err) {
+            console.error('Error fetching mentees:', err);
+            setError(err.response?.data?.message || 'Failed to load students. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleAccept = (studentName) => {
         console.log(`${studentName} accepted`);
@@ -90,9 +110,48 @@ export default function MentorTrainingPage() {
                 {/* Divider */}
                 <Divider sx={{ mb: 3, borderColor: `${GOLD_MAIN}50`, width: '50%', mx: 'auto' }} />
 
+                {/* Loading State */}
+                {loading && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                        <CircularProgress sx={{ color: GOLD_MAIN }} />
+                        <Typography sx={{ ml: 2, color: 'white' }}>Loading students...</Typography>
+                    </Box>
+                )}
+
+                {/* Error State */}
+                {error && (
+                    <Alert 
+                        severity="error" 
+                        sx={{ 
+                            mb: 3, 
+                            backgroundColor: 'rgba(211, 47, 47, 0.1)',
+                            color: 'white',
+                            border: '1px solid rgba(211, 47, 47, 0.5)'
+                        }}
+                    >
+                        {error}
+                    </Alert>
+                )}
+
+                {/* Empty State */}
+                {!loading && !error && students.length === 0 && (
+                    <Alert 
+                        severity="info" 
+                        sx={{ 
+                            mb: 3, 
+                            backgroundColor: 'rgba(41, 128, 185, 0.1)',
+                            color: 'white',
+                            border: `1px solid ${GOLD_MAIN}50`
+                        }}
+                    >
+                        No students assigned yet. Please contact the administrator.
+                    </Alert>
+                )}
+
                 {/* Cards Section */}
-                <Grid container spacing={4} justifyContent={'center'} alignItems={'stretch'}>
-                    {trainingModules.map((module, index) => (
+                {!loading && !error && students.length > 0 && (
+                    <Grid container spacing={4} justifyContent={'center'} alignItems={'stretch'}>
+                        {students.map((student, index) => (
                         <Grid 
                             item 
                             xs={12} 
@@ -128,31 +187,55 @@ export default function MentorTrainingPage() {
                                         gutterBottom
                                         sx={{ 
                                             textAlign: "center", 
-                                            fontSize: 16, 
+                                            fontSize: 18, 
                                             fontFamily: "'Inter', sans-serif",
                                             color: GOLD_LIGHT,
                                             textShadow: `0 0 5px ${GOLD_MAIN}30`
                                         }}
                                     >
-                                        {module.title}
+                                        {student.name}
+                                    </Typography>
+                                    <Divider sx={{ my: 1, borderColor: `${GOLD_MAIN}30` }} />
+                                    <Typography 
+                                        variant="body2" 
+                                        sx={{ 
+                                            fontSize: 14, 
+                                            fontFamily: "'Inter', sans-serif",
+                                            color: 'rgba(255, 255, 255, 0.9)',
+                                            mb: 1
+                                        }}
+                                    >
+                                        <strong style={{ color: GOLD_LIGHT }}>USN:</strong> {student.usn}
                                     </Typography>
                                     <Typography 
                                         variant="body2" 
                                         sx={{ 
-                                            textAlign: "justify", 
                                             fontSize: 14, 
                                             fontFamily: "'Inter', sans-serif",
-                                            color: 'rgba(255, 255, 255, 0.8)'
+                                            color: 'rgba(255, 255, 255, 0.9)',
+                                            mb: 1
                                         }}
                                     >
-                                        {module.description}
+                                        <strong style={{ color: GOLD_LIGHT }}>Email:</strong> {student.email}
                                     </Typography>
+                                    {student.academics?.overallCGPA && (
+                                        <Typography 
+                                            variant="body2" 
+                                            sx={{ 
+                                                fontSize: 14, 
+                                                fontFamily: "'Inter', sans-serif",
+                                                color: 'rgba(255, 255, 255, 0.9)'
+                                            }}
+                                        >
+                                            <strong style={{ color: GOLD_LIGHT }}>CGPA:</strong> {student.academics.overallCGPA}
+                                        </Typography>
+                                    )}
                                 </CardContent>
 
                                 {/* Action Buttons */}
                                 <Box sx={{ display: "flex", justifyContent: "space-around", p: 2 }}>
                                     <IconButton
-                                        onClick={() => handleAccept(module.title)}
+                                        onClick={() => handleAccept(student.name)}
                                         sx={{ 
                                             bgcolor: `${GOLD_MAIN}40`,
                                             color: GOLD_LIGHT,
@@ -167,7 +250,7 @@ export default function MentorTrainingPage() {
                                         <CheckCircleIcon />
                                     </IconButton>
                                     <IconButton
-                                        onClick={() => handleReject(module.title)}
+                                        onClick={() => handleReject(student.name)}
                                         sx={{ 
                                             bgcolor: "rgba(220, 50, 50, 0.3)", 
                                             color: "rgba(255, 120, 120, 1)",
@@ -186,6 +269,7 @@ export default function MentorTrainingPage() {
                         </Grid>
                     ))}
                 </Grid>
+                )}
             </Box>
         </Box>
     );

@@ -102,6 +102,9 @@ export default function Login() {
       if (response.data.success) {
         localStorage.setItem('studentToken', response.data.token);
         localStorage.setItem('userUSN', usn);
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('studentId', response.data.studentId);
+        console.log('✅ Login successful, userId stored:', response.data.userId);
         navigate('/dashboard');
       } else {
         setError('Invalid USN or Password. Please try again.');

@@ -15,6 +15,7 @@ import AutoGraphOutlinedIcon from '@mui/icons-material/AutoGraphOutlined';
 import SchoolIcon from "@mui/icons-material/School"; // ✅ Import Academics Icon
 import AssignmentIcon from "@mui/icons-material/Assignment"; // ✅ Import Internal Marks Icon
 import EditNoteIcon from "@mui/icons-material/EditNote"; // ✅ Import Semester Marks Icon
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday"; // ✅ Import Study Plan Icon
 import SettingsIcon from "@mui/icons-material/Settings";
 import ContactMailIcon from "@mui/icons-material/DraftsOutlined";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
@@ -29,6 +30,7 @@ const Sidebar = ({ onMenuClick }) => {
     const menuItems = [
         { text: "Dashboard", path: "dashboard", icon: <DashboardIcon /> },
         { text: "Academics", path: "academics", icon: <SchoolIcon /> }, // ✅ Added Academics
+        { text: "AI Study Plan", path: "study-plan", icon: <CalendarTodayIcon /> }, // ✅ Added AI Study Plan
         { text: "Semester Marks", path: "semester-marks/1", icon: <EditNoteIcon /> }, // ✅ Added Semester Marks Entry
         { text: "Internal Marks", path: "internal-marks", icon: <AssignmentIcon /> }, // ✅ Added Internal Marks
         { text: "Mentors", path: "mentors", icon: <PersonIcon /> },

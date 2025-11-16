@@ -1,9 +1,12 @@
+// Load environment variables from .env file
+require('dotenv').config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
-const PORT = 5002; // ✅ Using port 5002
+const PORT = process.env.PORT || 5002;
 
 // Middleware
 app.use(express.json());
@@ -1316,7 +1319,9 @@ app.post("/api/student/login", async (req, res) => {
             success: true, 
             message: "Login successful",
             token: token,
-            usn: usn
+            usn: usn,
+            userId: student._id.toString(),
+            studentId: student._id.toString()
         });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error });
@@ -1377,12 +1382,14 @@ app.put("/api/students/:usn", async (req, res) => {
     }
 });
 
-// ✅ Agentic AI Routes
+// ✅ Agentic AI Routes (Simplified - No Auto-Scheduler)
 try {
-    const agentRoutes = require('../../../routes/agentRoutes');
+    const agentRoutes = require('../../../routes/agentRoutesSimple');
     app.use('/api/agents', agentRoutes);
-    app.use('/api', agentRoutes); // For routes like /api/notifications
     console.log('✅ Agentic AI routes loaded');
+    console.log('   📚 Manual trigger available: POST /api/agents/run');
+    console.log('   📋 Today tasks: GET /api/agents/:userId/today');
+    console.log('   � Risk profile: GET /api/agents/:userId/risk-profile');
 } catch (err) {
     console.warn('⚠️  Agentic AI routes not available:', err.message);
 }

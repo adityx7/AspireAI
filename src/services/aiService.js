@@ -1,243 +1,391 @@
-const Ajv = require('ajv');
-const addFormats = require('ajv-formats');
 const crypto = require('crypto');
-const mentorSuggestionSchema = require('../schemas/mentorSuggestion.json');
 
-const ajv = new Ajv({ allErrors: true, strict: false });
-addFormats(ajv);
+// Configure AI provider
+const AI_PROVIDER = process.env.AI_PROVIDER || 'openai'; // 'openai', 'claude', 'google'
+const AI_API_KEY = process.env.AI_API_KEY || process.env.OPENAI_API_KEY;
+const AI_MODEL = process.env.AI_MODEL || 'gpt-4-turbo-preview';
 
-const validateMentorSuggestion = ajv.compile(mentorSuggestionSchema);
-
-// Prompt templates
-const PROMPTS = {
-  mentor_plan: `You are an empathetic academic coach. Input: {studentJson}. Output only JSON. Analyze the student's grades, IA marks, attendance, upcoming exams, and recent activity. Produce:
-1) "insights": up to 5 prioritized observations {title, detail, severity: low|medium|high}.
-2) "planLength": choose 7|14|28 days.
-3) "plan": array of days [{day:1, date, tasks:[{time:'09:00', task:'Revise topic X', durationMinutes:60, resource:'url or text', practiceProblemIds:[] }]}].
-4) "microSupport": array of short learning units {title, summary, estimatedMinutes, resourceUrl, exampleProblem}.
-5) "mentorActions": short bullet suggestions for mentor (meeting, exercise, encouragement).
-6) "confidence": numeric 0-1.
-Ensure tasks are realistic (no more than 5 hours/day) and considerate of attendance/semester load. Return only JSON.`,
-
-  strict_json: `Your previous response was not valid JSON. Please respond ONLY with valid JSON matching the exact schema required. No markdown, no code blocks, no explanations - just pure JSON.`
-};
+// Import AI SDK based on provider
+let aiClient;
+if (AI_PROVIDER === 'openai') {
+  const { OpenAI } = require('openai');
+  aiClient = new OpenAI({ apiKey: AI_API_KEY });
+} else if (AI_PROVIDER === 'claude') {
+  const { Anthropic } = require('@anthropic-ai/sdk');
+  aiClient = new Anthropic({ apiKey: AI_API_KEY });
+}
 
 /**
- * Generate AI insights using LLM (Claude or OpenAI)
- * @param {Object} studentJson - Normalized student data
- * @param {String} promptName - Name of prompt template to use
- * @param {Object} options - Additional options
- * @returns {Promise<Object>} - Validated AI response
+ * STRICT PROMPT TEMPLATE FOR STUDY PLAN GENERATION
  */
-async function generateAIInsight(studentJson, promptName = 'mentor_plan', options = {}) {
+const STUDY_PLAN_PROMPT = `You are an academic mentor AI. Given this student profile and risk report, produce a JSON response.
+
+RESPONSE FORMAT (STRICT JSON):
+
+{
+  "insights": [
+     { "title": "", "detail": "", "severity": "low|medium|high" }
+  ],
+  "planLength": 7 | 14 | 28,
+  "plan": [
+    {
+      "day": Number,
+      "date": "YYYY-MM-DD",
+      "tasks": [
+        {
+          "time": "HH:MM",
+          "task": "",
+          "durationMinutes": Number,
+          "resourceUrl": ""
+        }
+      ]
+    }
+  ],
+  "resources": [ { "title": "", "url": "" } ],
+  "mentorActions": [ "..." ]
+}
+
+Rules:
+- No more than 5 hours of work per day.
+- Include breaks.
+- If attendance is low, include class attendance reminders.
+- If IA is low, include topic-specific revision tasks.
+- Include at least 2 free online resources per subject.
+- Keep plan realistic for Indian college students.
+- Tasks should be specific and actionable.
+- Times should be in 24-hour format (HH:MM).
+- Dates should be in YYYY-MM-DD format.
+- Duration should be between 15-180 minutes.
+
+STUDENT DATA:
+{studentData}
+
+RESPOND WITH ONLY THE JSON OBJECT. NO MARKDOWN, NO CODE BLOCKS, NO EXPLANATIONS.`;
+
+/**
+ * Generate study plan using AI
+ * @param {Object} studentData - Student data with risk profile
+ * @param {Object} options - Generation options
+ * @returns {Promise<Object>} - Generated study plan
+ */
+async function generateStudyPlan(studentData, options = {}) {
   const {
-    maxRetries = 1,
-    timeout = 60000,
-    model = process.env.LLM_MODEL || 'gpt-4-turbo-preview'
+    maxRetries = 3,
+    timeout = 90000,
+    temperature = 0.7
   } = options;
 
-  const provider = process.env.LLM_PROVIDER || 'openai'; // 'openai' or 'claude'
-  
-  // Get prompt template
-  const promptTemplate = PROMPTS[promptName];
-  if (!promptTemplate) {
-    throw new Error(`Unknown prompt name: ${promptName}`);
-  }
+  console.log('🤖 Generating AI study plan for student:', studentData.basicInfo?.usn);
 
-  // Build full prompt
-  const prompt = promptTemplate.replace('{studentJson}', JSON.stringify(studentJson, null, 2));
-  const inputHash = hashString(prompt);
+  // Prepare prompt with student data
+  const prompt = STUDY_PLAN_PROMPT.replace(
+    '{studentData}',
+    JSON.stringify(studentData, null, 2)
+  );
 
   let lastError = null;
-  
-  // Retry loop
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+
+  // Retry logic
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`🤖 Generating AI insight (attempt ${attempt + 1}/${maxRetries + 1})...`);
-      
-      let response;
-      let rawOutput;
-      let tokenCost = 0;
+      console.log(`🔄 AI generation attempt ${attempt}/${maxRetries}`);
 
-      if (provider === 'claude') {
-        const result = await callClaude(prompt, model, timeout, attempt > 0);
-        rawOutput = result.output;
-        tokenCost = result.tokenCost;
-      } else {
-        const result = await callOpenAI(prompt, model, timeout, attempt > 0);
-        rawOutput = result.output;
-        tokenCost = result.tokenCost;
+      const response = await callAI(prompt, {
+        temperature,
+        timeout,
+        attempt
+      });
+
+      // Parse and validate response
+      const parsedPlan = parseAIResponse(response);
+      
+      if (!parsedPlan) {
+        throw new Error('Failed to parse AI response');
       }
 
-      // Parse JSON
-      response = parseJSON(rawOutput);
-      
-      if (!response) {
-        throw new Error('Failed to parse JSON from LLM response');
-      }
+      // Validate dates and structure
+      const validatedPlan = validateAndEnhancePlan(parsedPlan, studentData);
 
-      // Validate against schema
-      const valid = validateMentorSuggestion(response);
-      
-      if (!valid) {
-        const errors = validateMentorSuggestion.errors;
-        console.error('❌ Schema validation failed:', JSON.stringify(errors, null, 2));
-        throw new Error(`Schema validation failed: ${JSON.stringify(errors)}`);
-      }
-
-      // Success!
-      console.log('✅ AI insight generated and validated successfully');
-      
-      const outputHash = hashString(JSON.stringify(response));
-      
-      return {
-        data: response,
-        metadata: {
-          promptHash: inputHash,
-          outputHash,
-          modelUsed: model,
-          provider,
-          tokenCostEstimate: tokenCost,
-          attempt: attempt + 1
-        }
-      };
+      console.log('✅ AI study plan generated successfully');
+      return validatedPlan;
 
     } catch (error) {
+      console.error(`❌ Attempt ${attempt} failed:`, error.message);
       lastError = error;
-      console.error(`❌ Attempt ${attempt + 1} failed:`, error.message);
-      
-      // If this was our last attempt, throw
-      if (attempt >= maxRetries) {
-        break;
+
+      if (attempt < maxRetries) {
+        console.log(`⏳ Retrying in ${attempt * 2} seconds...`);
+        await sleep(attempt * 2000);
       }
-      
-      // Wait before retry (exponential backoff)
-      await sleep(Math.pow(2, attempt) * 1000);
     }
   }
 
-  // All retries failed
-  throw new Error(`Failed to generate AI insight after ${maxRetries + 1} attempts: ${lastError.message}`);
+  // If all retries failed, return fallback plan
+  console.warn('⚠️ All AI attempts failed, generating fallback plan');
+  return generateFallbackPlan(studentData);
 }
 
 /**
- * Call Claude API
+ * Call AI API based on provider
+ * @param {String} prompt - The prompt to send
+ * @param {Object} options - Call options
+ * @returns {Promise<String>} - AI response text
  */
-async function callClaude(prompt, model, timeout, isRetry) {
-  const apiKey = process.env.CLAUDE_API_KEY;
-  if (!apiKey) {
-    throw new Error('CLAUDE_API_KEY not configured');
-  }
-
-  const messages = [
-    {
-      role: 'user',
-      content: isRetry ? `${PROMPTS.strict_json}\n\n${prompt}` : prompt
-    }
-  ];
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+async function callAI(prompt, options = {}) {
+  const { temperature = 0.7, timeout = 90000 } = options;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: model || 'claude-3-5-sonnet-20241022',
-        max_tokens: 4096,
-        temperature: 0.7,
-        messages
-      }),
-      signal: controller.signal
-    });
+    if (AI_PROVIDER === 'openai' && aiClient) {
+      const completion = await Promise.race([
+        aiClient.chat.completions.create({
+          model: AI_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert academic mentor AI. You generate structured JSON study plans for students.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: temperature,
+          response_format: { type: 'json_object' }
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('AI call timeout')), timeout)
+        )
+      ]);
 
-    clearTimeout(timeoutId);
+      return completion.choices[0].message.content;
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Claude API error: ${response.status} - ${error}`);
+    } else if (AI_PROVIDER === 'claude' && aiClient) {
+      const message = await Promise.race([
+        aiClient.messages.create({
+          model: AI_MODEL,
+          max_tokens: 4096,
+          temperature: temperature,
+          messages: [{
+            role: 'user',
+            content: prompt
+          }]
+        }),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('AI call timeout')), timeout)
+        )
+      ]);
+
+      return message.content[0].text;
+
+    } else {
+      throw new Error(`Unsupported AI provider: ${AI_PROVIDER}`);
     }
-
-    const data = await response.json();
-    const output = data.content[0].text;
-    const tokenCost = (data.usage.input_tokens + data.usage.output_tokens) / 1000;
-
-    return { output, tokenCost };
 
   } catch (error) {
-    clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      throw new Error('Claude API request timeout');
-    }
+    console.error('AI API call error:', error);
     throw error;
   }
 }
 
 /**
- * Call OpenAI API
+ * Parse AI response and extract JSON
+ * @param {String} response - Raw AI response
+ * @returns {Object|null} - Parsed JSON object
  */
-async function callOpenAI(prompt, model, timeout, isRetry) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new Error('OPENAI_API_KEY not configured');
+function parseAIResponse(response) {
+  try {
+    // Remove markdown code blocks if present
+    let cleaned = response.trim();
+    
+    // Remove ```json and ``` markers
+    cleaned = cleaned.replace(/^```json\s*/i, '');
+    cleaned = cleaned.replace(/^```\s*/, '');
+    cleaned = cleaned.replace(/```\s*$/, '');
+    
+    // Parse JSON
+    const parsed = JSON.parse(cleaned);
+    
+    return parsed;
+  } catch (error) {
+    console.error('Failed to parse AI response:', error.message);
+    console.error('Raw response:', response.substring(0, 500));
+    return null;
+  }
+}
+
+/**
+ * Validate and enhance AI-generated plan
+ * @param {Object} plan - Parsed plan from AI
+ * @param {Object} studentData - Original student data
+ * @returns {Object} - Validated and enhanced plan
+ */
+function validateAndEnhancePlan(plan, studentData) {
+  // Ensure required fields exist
+  if (!plan.insights) plan.insights = [];
+  if (!plan.plan) plan.plan = [];
+  if (!plan.resources) plan.resources = [];
+  if (!plan.mentorActions) plan.mentorActions = [];
+  if (!plan.planLength) plan.planLength = 7;
+
+  // Validate and fix dates
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  plan.plan = plan.plan.map((dayPlan, index) => {
+    // Calculate correct date
+    const dayDate = new Date(today);
+    dayDate.setDate(today.getDate() + index);
+
+    return {
+      day: index + 1,
+      date: dayDate,
+      tasks: (dayPlan.tasks || []).map(task => ({
+        time: task.time || '09:00',
+        task: task.task || 'Study session',
+        durationMinutes: Math.min(Math.max(task.durationMinutes || 60, 15), 180),
+        resourceUrl: task.resourceUrl || '',
+        completed: false
+      }))
+    };
+  });
+
+  // Ensure plan length matches
+  if (plan.plan.length !== plan.planLength) {
+    console.warn(`Plan length mismatch: expected ${plan.planLength}, got ${plan.plan.length}`);
+    plan.planLength = plan.plan.length;
   }
 
-  const messages = [
+  // Add risk profile from student data
+  if (studentData.riskProfile) {
+    plan.riskProfile = studentData.riskProfile;
+  }
+
+  return plan;
+}
+
+/**
+ * Generate fallback plan when AI fails
+ * @param {Object} studentData - Student data
+ * @returns {Object} - Basic study plan
+ */
+function generateFallbackPlan(studentData) {
+  console.log('📋 Generating fallback study plan');
+
+  const { riskProfile, basicInfo } = studentData;
+  const planLength = riskProfile?.overallRisk === 'high' ? 14 : 7;
+  
+  const insights = [
     {
-      role: 'system',
-      content: 'You are a helpful academic advisor. Always respond with valid JSON only.'
+      title: 'Automated Study Plan',
+      detail: 'This is an automated study plan. For personalized recommendations, ensure all your academic data is up to date.',
+      severity: 'low'
+    }
+  ];
+
+  // Add insights based on risk profile
+  if (riskProfile?.lowAttendance?.length > 0) {
+    insights.push({
+      title: 'Attendance Alert',
+      detail: `You have low attendance in ${riskProfile.lowAttendance.length} subject(s). Focus on attending all upcoming classes.`,
+      severity: 'high'
+    });
+  }
+
+  if (riskProfile?.weakSubjects?.length > 0) {
+    insights.push({
+      title: 'Performance Improvement Needed',
+      detail: `${riskProfile.weakSubjects.length} subject(s) require additional focus and revision.`,
+      severity: 'medium'
+    });
+  }
+
+  // Generate daily plan
+  const plan = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < planLength; i++) {
+    const dayDate = new Date(today);
+    dayDate.setDate(today.getDate() + i);
+
+    const tasks = [
+      {
+        time: '09:00',
+        task: 'Morning revision - Review previous day concepts',
+        durationMinutes: 60,
+        resourceUrl: '',
+        completed: false
+      },
+      {
+        time: '14:00',
+        task: 'Practice problems and exercises',
+        durationMinutes: 90,
+        resourceUrl: '',
+        completed: false
+      },
+      {
+        time: '17:00',
+        task: 'Attend all scheduled classes',
+        durationMinutes: 60,
+        resourceUrl: '',
+        completed: false
+      },
+      {
+        time: '20:00',
+        task: 'Evening study session - Focus on weak areas',
+        durationMinutes: 90,
+        resourceUrl: '',
+        completed: false
+      }
+    ];
+
+    plan.push({
+      day: i + 1,
+      date: dayDate,
+      tasks: tasks
+    });
+  }
+
+  const resources = [
+    {
+      title: 'Khan Academy',
+      url: 'https://www.khanacademy.org/'
     },
     {
-      role: 'user',
-      content: isRetry ? `${PROMPTS.strict_json}\n\n${prompt}` : prompt
+      title: 'Coursera Free Courses',
+      url: 'https://www.coursera.org/courses?query=free'
+    },
+    {
+      title: 'GeeksforGeeks',
+      url: 'https://www.geeksforgeeks.org/'
     }
   ];
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const mentorActions = [
+    'Review student progress weekly',
+    'Discuss attendance improvement strategy',
+    'Provide additional practice materials',
+    'Schedule one-on-one mentoring session'
+  ];
 
-  try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: model || 'gpt-4-turbo-preview',
-        messages,
-        temperature: 0.7,
-        max_tokens: 4096,
-        response_format: { type: 'json_object' }
-      }),
-      signal: controller.signal
-    });
+  return {
+    insights,
+    planLength,
+    plan,
+    resources,
+    mentorActions,
+    riskProfile: riskProfile || {},
+    fallback: true
+  };
+}
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`OpenAI API error: ${response.status} - ${error}`);
-    }
-
-    const data = await response.json();
-    const output = data.choices[0].message.content;
-    const tokenCost = (data.usage.prompt_tokens + data.usage.completion_tokens) / 1000;
-
-    return { output, tokenCost };
-
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
-      throw new Error('OpenAI API request timeout');
-    }
-    throw error;
-  }
+/**
+ * Sleep utility
+ * @param {Number} ms - Milliseconds to sleep
+ * @returns {Promise<void>}
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
@@ -314,8 +462,24 @@ function checkRateLimit(key, maxPerMinute = 10) {
   return true;
 }
 
+/**
+ * Hash string using crypto
+ * @param {String} str - String to hash
+ * @returns {String} - Hash
+ */
+function hashString(str) {
+  return crypto.createHash('sha256').update(str).digest('hex');
+}
+
 module.exports = {
-  generateAIInsight,
+  generateStudyPlan,
+  callAI,
+  parseAIResponse,
+  validateAndEnhancePlan,
+  generateFallbackPlan,
+  hashString,
+  sleep,
   checkRateLimit,
-  PROMPTS
+  // Backward compatibility
+  generateAIInsight: generateStudyPlan
 };

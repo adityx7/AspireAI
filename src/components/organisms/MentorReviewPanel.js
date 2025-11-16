@@ -51,13 +51,13 @@ const MentorReviewPanel = ({ mentorId }) => {
   const fetchSuggestions = async () => {
     setLoading(true);
     try {
-      // Get all students assigned to this mentor
+      // Get all students assigned to this mentor using the correct endpoint
       const mentorResponse = await axios.get(
-        `http://localhost:5002/api/mentors/${mentorId}/students`
+        `http://localhost:5002/api/mentor/${mentorId}/mentees`
       );
       
       if (mentorResponse.data.success) {
-        const studentIds = mentorResponse.data.data.students.map(s => s.usn);
+        const studentIds = mentorResponse.data.mentees.map(s => s.usn);
         
         // Fetch suggestions for all these students
         const suggestionPromises = studentIds.map(studentId =>
