@@ -27,6 +27,8 @@ export default function Navbar() {
   const isMentorSettings = location.pathname === '/settings-mentor';
   const isMentorContact = location.pathname === '/contact-mentor'
   const isProfileMentor = location.pathname === '/profile-mentor'
+  const isMentorStudentsVerification = location.pathname === '/mentor/students-verification';
+  const isMentorVerifyStudent = location.pathname.startsWith('/mentor/verify-student/');
 
   const navigate = useNavigate();
 
@@ -51,7 +53,8 @@ export default function Navbar() {
   return (<>{!isLoginPage && !isRegisterStudent && !isRegisterMentor &&
     !isDashbaord && !isMentormain && !isMentors && !isDocuments &&
     !isContactUs && !isSettings && !isMentorLoginPage && !isMentorContact && 
-    !isMentorSettings && !isProfile && !isProfileMentor &&
+    !isMentorSettings && !isProfile && !isProfileMentor && !isMentorStudentsVerification && 
+    !isMentorVerifyStudent &&
     <AppBar position="sticky" sx={{ 
       background: 'linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(26, 43, 76, 0.98) 100%) !important',
       backgroundColor: 'rgba(10, 25, 47, 0.95) !important',

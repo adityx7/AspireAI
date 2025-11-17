@@ -56,11 +56,33 @@ export default function MentorTrainingPage() {
         navigate(`/mentor/verify-student/${student.usn}`);
     };
 
-    const handleReject = (student) => {
-        console.log(`Rejecting ${student.name}`);
-        // You can add rejection logic here if needed
-        // For now, just navigate to verification page
-        navigate(`/mentor/verify-student/${student.usn}`);
+    const handleReject = async (student) => {
+        console.log(`Removing ${student.name} from mentee list`);
+        
+        // Confirm before removing
+        if (!window.confirm(`Are you sure you want to remove ${student.name} from your mentee list?`)) {
+            return;
+        }
+
+        try {
+            const mentorID = localStorage.getItem('mentorID');
+            const response = await axios.delete(
+                `http://localhost:5002/api/mentor/${mentorID}/mentee/${student.usn}`
+            );
+
+            if (response.data.success) {
+                // Remove student from local state
+                setStudents(prevStudents => 
+                    prevStudents.filter(s => s.usn !== student.usn)
+                );
+                alert(`${student.name} has been removed from your mentee list.`);
+            } else {
+                alert('Failed to remove student. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error removing student:', error);
+            alert(error.response?.data?.message || 'Failed to remove student. Please try again.');
+        }
     };
 
     return (

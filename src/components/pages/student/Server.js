@@ -1008,6 +1008,48 @@ app.get("/api/mentor/:mentorID/mentees", async (req, res) => {
     }
 });
 
+// ✅ Remove student from mentor's mentee list
+app.delete("/api/mentor/:mentorID/mentee/:studentUSN", async (req, res) => {
+    try {
+        const { mentorID, studentUSN } = req.params;
+        
+        // Find mentor
+        const mentor = await Mentor.findOne({ mentorID });
+        if (!mentor) {
+            return res.status(404).json({ success: false, message: "Mentor not found" });
+        }
+
+        // Check if student is in mentee list
+        if (!mentor.menteeIDs.includes(studentUSN)) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student is not assigned to this mentor" 
+            });
+        }
+
+        // Remove student from menteeIDs array
+        mentor.menteeIDs = mentor.menteeIDs.filter(usn => usn !== studentUSN);
+        await mentor.save();
+
+        // Also update student's mentor field to null
+        await Student.findOneAndUpdate(
+            { usn: studentUSN },
+            { $unset: { selectedMentor: "" } }
+        );
+
+        console.log(`✅ Removed student ${studentUSN} from mentor ${mentorID}'s mentee list`);
+        
+        res.json({ 
+            success: true, 
+            message: "Student removed from mentee list successfully",
+            menteeIDs: mentor.menteeIDs 
+        });
+    } catch (error) {
+        console.error("❌ Error removing mentee:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+});
+
 // ✅ Create new meeting note (Mentor only)
 app.post("/api/meeting-notes", async (req, res) => {
     try {

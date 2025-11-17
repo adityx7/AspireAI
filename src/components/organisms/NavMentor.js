@@ -12,7 +12,7 @@ const GOLD_MAIN = "#B8860B";
 const GOLD_LIGHT = "#DAA520";
 const GOLD_DARK = "#8B6914";
 
-const NavMentor = ({ onDrawerToggle, title }) => {
+const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const navigate = useNavigate(); // To navigate programmatically
 
@@ -60,6 +60,8 @@ const NavMentor = ({ onDrawerToggle, title }) => {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
+                    minHeight: { xs: 56, sm: 64 },
+                    py: 1
                 }}
             >
                 <IconButton
@@ -79,25 +81,33 @@ const NavMentor = ({ onDrawerToggle, title }) => {
                     <MenuIcon />
                 </IconButton>
 
-                <Typography
-                    variant="h6"
-                    sx={{
-                        color: GOLD_LIGHT,
-                        fontFamily: "Courier",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        fontSize: 38,
-                        textShadow: `0 0 10px ${GOLD_MAIN}40`,
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                            color: GOLD_MAIN,
-                            textShadow: `0 0 15px ${GOLD_MAIN}60`,
-                        }
-                    }}
-                    onClick={handleTitleClick} // Make title clickable
-                >
-                    {title}
-                </Typography>
+                <Box sx={{ flexGrow: 1, ml: 2 }}>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            color: GOLD_LIGHT,
+                            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                            fontWeight: 700,
+                            fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' },
+                            textShadow: `0 0 10px ${GOLD_MAIN}40`,
+                            mb: subtitle ? 0.5 : 0
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                    {subtitle && (
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                            }}
+                        >
+                            {subtitle}
+                        </Typography>
+                    )}
+                </Box>
 
                 <Box>
                     <Avatar
@@ -150,6 +160,7 @@ const NavMentor = ({ onDrawerToggle, title }) => {
 NavMentor.propTypes = {
     onDrawerToggle: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
+    subtitle: PropTypes.string,
 };
 
 export default NavMentor;
