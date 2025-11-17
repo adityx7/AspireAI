@@ -26,6 +26,8 @@ import StudentMeetingNotesPage from './components/pages/StudentMeetingNotesPage'
 import MentorMeetingNotesPage from './components/pages/MentorMeetingNotesPage';
 import MeetingNotesTestPage from './components/pages/MeetingNotesTestPage';
 import StudyPlanPage from './components/pages/StudyPlanPage';
+import MentorStudentVerificationPage from './components/pages/mentor/MentorStudentVerificationPage';
+import MentorStudentsListPage from './components/pages/mentor/MentorStudentsListPage';
 
 export default function App() {
   return (
@@ -58,6 +60,8 @@ export default function App() {
           <Route path="/contact-mentor" element={< MentorContact title = {"Contact us"} />} />
           <Route path="/profile-mentor" element={<MentorProfile />} />
           <Route path="/mentor-meeting-notes" element={<MentorMeetingNotesPage />} />
+          <Route path="/mentor/students-verification" element={<MentorStudentsListPage />} />
+          <Route path="/mentor/verify-student/:studentId" element={<MentorStudentVerificationPage />} />
         </Routes>
       </Router>
     </AuthProvider>

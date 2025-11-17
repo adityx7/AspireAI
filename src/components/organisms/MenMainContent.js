@@ -3,6 +3,7 @@ import { Box, Typography, Divider, Card, CardContent, Grid, IconButton, Circular
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Tick icon
 import CancelIcon from "@mui/icons-material/Cancel"; // Cross icon
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // Constants for styling - matching the login theme
 const NAVY_BLUE_MAIN = "#0A192F";
@@ -13,6 +14,7 @@ const GOLD_LIGHT = "#DAA520";
 const GOLD_DARK = "#8B6914";
 
 export default function MentorTrainingPage() {
+    const navigate = useNavigate();
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -48,14 +50,17 @@ export default function MentorTrainingPage() {
         }
     };
 
-    const handleAccept = (studentName) => {
-        console.log(`${studentName} accepted`);
-        // Add logic for accepting the student
+    const handleAccept = (student) => {
+        console.log(`Navigating to verify ${student.name} (${student.usn})`);
+        // Navigate to student verification page
+        navigate(`/mentor/verify-student/${student.usn}`);
     };
 
-    const handleReject = (studentName) => {
-        console.log(`${studentName} rejected`);
-        // Add logic for rejecting the student
+    const handleReject = (student) => {
+        console.log(`Rejecting ${student.name}`);
+        // You can add rejection logic here if needed
+        // For now, just navigate to verification page
+        navigate(`/mentor/verify-student/${student.usn}`);
     };
 
     return (
@@ -235,7 +240,7 @@ export default function MentorTrainingPage() {
                                 {/* Action Buttons */}
                                 <Box sx={{ display: "flex", justifyContent: "space-around", p: 2 }}>
                                     <IconButton
-                                        onClick={() => handleAccept(student.name)}
+                                        onClick={() => handleAccept(student)}
                                         sx={{ 
                                             bgcolor: `${GOLD_MAIN}40`,
                                             color: GOLD_LIGHT,
@@ -246,11 +251,12 @@ export default function MentorTrainingPage() {
                                                 transform: 'scale(1.1)'
                                             } 
                                         }}
+                                        title="Verify Student"
                                     >
                                         <CheckCircleIcon />
                                     </IconButton>
                                     <IconButton
-                                        onClick={() => handleReject(student.name)}
+                                        onClick={() => handleReject(student)}
                                         sx={{ 
                                             bgcolor: "rgba(220, 50, 50, 0.3)", 
                                             color: "rgba(255, 120, 120, 1)",
@@ -261,6 +267,7 @@ export default function MentorTrainingPage() {
                                                 transform: 'scale(1.1)'
                                             } 
                                         }}
+                                        title="Reject Student"
                                     >
                                         <CancelIcon />
                                     </IconButton>

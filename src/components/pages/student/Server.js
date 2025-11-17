@@ -398,11 +398,75 @@ app.post("/api/mentor/details", async (req, res) => {
 
 app.get("/api/mentor/details", async (req, res) => {
     try {
-        const mentors = await MentorDetails.find({}, "fullName selectedMajors bio tech");
+        const mentors = await MentorDetails.find({}, "mentorID fullName selectedMajors bio tech");
         res.json(mentors);
     } catch (error) {
         console.error("❌ Error fetching mentors:", error);
         res.status(500).json({ message: "Server error", error });
+    }
+});
+
+// ✅ Student chooses a mentor
+app.post("/api/students/choose-mentor", async (req, res) => {
+    try {
+        const { usn, mentorID } = req.body;
+        console.log("📩 Student choosing mentor:", { usn, mentorID });
+
+        if (!usn || !mentorID) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "USN and mentorID are required" 
+            });
+        }
+
+        // Find the student
+        const student = await Student.findOne({ usn });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        // Find the mentor
+        const mentor = await Mentor.findOne({ mentorID });
+        if (!mentor) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Mentor not found" 
+            });
+        }
+
+        // Check if mentor already has this student
+        if (!mentor.menteeIDs.includes(usn)) {
+            mentor.menteeIDs.push(usn);
+            await mentor.save();
+        }
+
+        // Update student's assigned mentor (if student schema has this field)
+        if (student.academics) {
+            student.academics.assignedMentor = mentorID;
+            await student.save();
+        }
+
+        const mentorDetails = await MentorDetails.findOne({ mentorID });
+        
+        res.json({ 
+            success: true, 
+            message: `${mentorDetails?.fullName || mentorID} is now your mentor!`,
+            mentor: {
+                mentorID,
+                fullName: mentorDetails?.fullName,
+                tech: mentorDetails?.tech
+            }
+        });
+    } catch (error) {
+        console.error("❌ Error choosing mentor:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
     }
 });
 
@@ -1410,6 +1474,15 @@ try {
     console.log('✅ Internal Marks routes loaded');
 } catch (err) {
     console.warn('⚠️  Internal Marks routes not available:', err.message);
+}
+
+// ✅ Mentor Verification Routes
+try {
+    const mentorVerificationRoutes = require('../../../routes/mentorVerificationRoutes');
+    app.use('/api', mentorVerificationRoutes);
+    console.log('✅ Mentor Verification routes loaded');
+} catch (err) {
+    console.warn('⚠️  Mentor Verification routes not available:', err.message);
 }
 
 // ✅ Start Server on PORT 5002

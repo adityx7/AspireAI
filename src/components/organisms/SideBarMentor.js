@@ -14,6 +14,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ContactMailIcon from "@mui/icons-material/DraftsOutlined";
 import StarIcon from "@mui/icons-material/Star";
 import AccountCircleIcon from "@mui/icons-material/AccountCircleOutlined";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 
 // Constants for styling - matching the login theme
 const NAVY_BLUE_MAIN = "#0A192F";
@@ -30,6 +31,7 @@ const SidebarMentor = () => {
 
     const menuItems = [
         { text: "Dashboard", path: "/dashboard-mentor", icon: <DashboardIcon /> },
+        { text: "Student Verification", path: "/mentor/students-verification", icon: <VerifiedUserIcon /> },
     ];
 
     const secondaryMenuItems = [

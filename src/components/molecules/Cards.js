@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Typography, Divider, Button, Box } from "@mui/material";
 import { toast } from "react-toastify";
 
 const MentorCard = ({ mentor }) => {
   const [isSelected, setIsSelected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Check if this mentor is already selected
+  useEffect(() => {
+    const selectedMentorID = localStorage.getItem("selectedMentorID");
+    const selectedMentorName = localStorage.getItem("selectedMentor");
+    
+    if (mentor.mentorID && selectedMentorID === mentor.mentorID) {
+      setIsSelected(true);
+    } else if (mentor.fullName && selectedMentorName === mentor.fullName) {
+      setIsSelected(true);
+    }
+  }, [mentor]);
 
   const handleChooseMentor = async () => {
     const userUSN = localStorage.getItem("userUSN");
@@ -13,21 +26,45 @@ const MentorCard = ({ mentor }) => {
       return;
     }
 
-    try {
-      // You can add your API call here to save the mentor selection
-      // Example:
-      // const response = await fetch("http://localhost:5002/api/students/choose-mentor", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ usn: userUSN, mentorName: mentor.fullName })
-      // });
+    if (isLoading) return; // Prevent double clicks
 
-      setIsSelected(true);
-      localStorage.setItem("selectedMentor", mentor.fullName);
-      toast.success(`${mentor.fullName} is now your mentor!`);
+    console.log("🎯 Choosing mentor:", { userUSN, mentor });
+
+    setIsLoading(true);
+
+    try {
+      const payload = { 
+        usn: userUSN, 
+        mentorID: mentor.mentorID || mentor.fullName 
+      };
+      
+      console.log("📤 Sending request:", payload);
+
+      const response = await fetch("http://localhost:5002/api/students/choose-mentor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      console.log("📥 Response status:", response.status, response.ok);
+
+      const data = await response.json();
+      console.log("📥 Response data:", data);
+
+      if (response.ok && data.success) {
+        setIsSelected(true);
+        localStorage.setItem("selectedMentor", mentor.fullName);
+        localStorage.setItem("selectedMentorID", data.mentor?.mentorID || mentor.mentorID);
+        toast.success(data.message || `${mentor.fullName} is now your mentor!`);
+      } else {
+        console.error("❌ API returned error:", data);
+        toast.error(data.message || "Failed to choose mentor");
+      }
     } catch (error) {
-      console.error("Error choosing mentor:", error);
-      toast.error("Failed to choose mentor. Please try again.");
+      console.error("❌ Error choosing mentor:", error);
+      toast.error(`Failed to choose mentor: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -148,11 +185,13 @@ const MentorCard = ({ mentor }) => {
         <Button
           fullWidth
           onClick={handleChooseMentor}
-          disabled={isSelected}
+          disabled={isSelected || isLoading}
           sx={{
             background: isSelected 
               ? "linear-gradient(135deg, #28a745 0%, #20c997 100%)" 
-              : "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+              : isLoading 
+                ? "linear-gradient(135deg, #888 0%, #999 100%)"
+                : "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
             color: "#ffffff",
             fontWeight: "600",
             padding: "12px 20px",
@@ -175,7 +214,7 @@ const MentorCard = ({ mentor }) => {
             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
           }}
         >
-          {isSelected ? "✓ Selected as Mentor" : "Choose as Mentor"}
+          {isSelected ? "✓ Selected as Mentor" : isLoading ? "Selecting..." : "Choose as Mentor"}
         </Button>
       </Box>
     </Card>

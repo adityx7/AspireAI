@@ -21,6 +21,7 @@ const MentorPage = () => {
 
         // Extract only necessary fields
         const formattedMentors = data.map(mentor => ({
+          mentorID: mentor.mentorID,
           fullName: mentor.fullName,
           selectedMajors: mentor.selectedMajors,
           bio: mentor.bio,
