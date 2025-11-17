@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Alert, Paper, InputAdornment, IconButton } from '@mui/material';
+import { Box, TextField, Button, Typography, Alert, Paper, InputAdornment, IconButton, Fade, Grow, Slide, Zoom } from '@mui/material';
 import { Visibility, VisibilityOff, AdminPanelSettings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -120,243 +120,283 @@ const AdminLogin = () => {
                 }}
             />
 
-            <Paper
-                elevation={24}
-                sx={{
-                    maxWidth: 480,
-                    width: '90%',
-                    p: 5,
-                    borderRadius: 4,
-                    background: 'linear-gradient(135deg, rgba(26, 43, 76, 0.98) 0%, rgba(10, 25, 47, 0.99) 100%)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(184, 134, 11, 0.2)',
-                    boxShadow: `
-                        0 20px 60px rgba(0, 0, 0, 0.4),
-                        inset 0 1px 0 rgba(184, 134, 11, 0.1),
-                        0 0 40px rgba(184, 134, 11, 0.1)
-                    `,
-                    position: 'relative',
-                    zIndex: 2
-                }}
-            >
-                {/* Admin Icon */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                    <Box
-                        sx={{
-                            width: 80,
-                            height: 80,
-                            borderRadius: '50%',
-                            background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: `0 8px 25px rgba(184, 134, 11, 0.3)`,
-                            animation: 'pulse 3s ease-in-out infinite'
-                        }}
-                    >
-                        <AdminPanelSettings sx={{ fontSize: 48, color: 'white' }} />
-                    </Box>
-                </Box>
+            <Grow in={true} timeout={800}>
+                <Paper
+                    elevation={24}
+                    sx={{
+                        maxWidth: 480,
+                        width: '90%',
+                        p: 5,
+                        borderRadius: 4,
+                        background: 'linear-gradient(135deg, rgba(26, 43, 76, 0.98) 0%, rgba(10, 25, 47, 0.99) 100%)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(184, 134, 11, 0.2)',
+                        boxShadow: `
+                            0 20px 60px rgba(0, 0, 0, 0.4),
+                            inset 0 1px 0 rgba(184, 134, 11, 0.1),
+                            0 0 40px rgba(184, 134, 11, 0.1)
+                        `,
+                        position: 'relative',
+                        zIndex: 2
+                    }}
+                >
+                    {/* Admin Icon */}
+                    <Zoom in={true} timeout={1000} style={{ transitionDelay: '200ms' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+                            <Box
+                                sx={{
+                                    width: 80,
+                                    height: 80,
+                                    borderRadius: '50%',
+                                    background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    boxShadow: `0 8px 25px rgba(184, 134, 11, 0.3)`,
+                                    animation: 'pulse 3s ease-in-out infinite',
+                                    transition: 'all 0.3s ease',
+                                    '&:hover': {
+                                        transform: 'rotate(360deg) scale(1.1)',
+                                        boxShadow: `0 12px 35px rgba(184, 134, 11, 0.5)`,
+                                    }
+                                }}
+                            >
+                                <AdminPanelSettings sx={{ fontSize: 48, color: 'white' }} />
+                            </Box>
+                        </Box>
+                    </Zoom>
 
                 {/* Title */}
-                <Typography
-                    variant="h4"
-                    sx={{
-                        textAlign: 'center',
-                        mb: 1,
-                        fontWeight: 700,
-                        background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        fontSize: '2rem'
-                    }}
-                >
-                    Admin Access
-                </Typography>
+                <Fade in={true} timeout={1000} style={{ transitionDelay: '400ms' }}>
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            textAlign: 'center',
+                            mb: 1,
+                            fontWeight: 700,
+                            background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            fontSize: '2rem'
+                        }}
+                    >
+                        Admin Access
+                    </Typography>
+                </Fade>
 
-                <Typography
-                    variant="body2"
-                    sx={{
-                        textAlign: 'center',
-                        mb: 4,
-                        color: '#94A3B8',
-                        fontSize: '0.95rem'
-                    }}
-                >
-                    Secure portal for administrative functions
-                </Typography>
+                <Fade in={true} timeout={1000} style={{ transitionDelay: '600ms' }}>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            textAlign: 'center',
+                            mb: 4,
+                            color: '#94A3B8',
+                            fontSize: '0.95rem'
+                        }}
+                    >
+                        Secure portal for administrative functions
+                    </Typography>
+                </Fade>
 
                 {/* Error Alert */}
                 {error && (
-                    <Alert 
-                        severity="error" 
-                        sx={{ 
-                            mb: 3,
-                            background: 'rgba(211, 47, 47, 0.1)',
-                            color: '#EF5350',
-                            border: '1px solid rgba(211, 47, 47, 0.3)',
-                            '& .MuiAlert-icon': {
-                                color: '#EF5350'
-                            }
-                        }}
-                    >
-                        {error}
-                    </Alert>
+                    <Slide direction="down" in={true} timeout={500}>
+                        <Alert 
+                            severity="error" 
+                            sx={{ 
+                                mb: 3,
+                                background: 'rgba(211, 47, 47, 0.1)',
+                                color: '#EF5350',
+                                border: '1px solid rgba(211, 47, 47, 0.3)',
+                                '& .MuiAlert-icon': {
+                                    color: '#EF5350'
+                                }
+                            }}
+                        >
+                            {error}
+                        </Alert>
+                    </Slide>
                 )}
 
                 {/* Login Form */}
                 <form onSubmit={handleSubmit}>
                     {/* Employee ID Field */}
-                    <TextField
-                        fullWidth
-                        label="Employee ID"
-                        variant="outlined"
-                        value={employeeId}
-                        onChange={(e) => setEmployeeId(e.target.value)}
-                        disabled={loading}
-                        sx={{
-                            mb: 3,
-                            '& .MuiOutlinedInput-root': {
-                                color: 'white',
-                                background: 'rgba(26, 43, 76, 0.6)',
-                                '& fieldset': {
-                                    borderColor: 'rgba(184, 134, 11, 0.3)',
+                    <Slide direction="right" in={true} timeout={800} style={{ transitionDelay: '800ms' }}>
+                        <TextField
+                            fullWidth
+                            label="Employee ID"
+                            variant="outlined"
+                            value={employeeId}
+                            onChange={(e) => setEmployeeId(e.target.value)}
+                            disabled={loading}
+                            sx={{
+                                mb: 3,
+                                '& .MuiOutlinedInput-root': {
+                                    color: 'white',
+                                    background: 'rgba(26, 43, 76, 0.6)',
+                                    transition: 'all 0.3s ease',
+                                    '& fieldset': {
+                                        borderColor: 'rgba(184, 134, 11, 0.3)',
+                                        transition: 'all 0.3s ease',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: GOLD_LIGHT,
+                                        boxShadow: `0 0 8px rgba(184, 134, 11, 0.2)`,
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: GOLD_MAIN,
+                                        boxShadow: `0 0 10px rgba(184, 134, 11, 0.3)`
+                                    },
                                 },
-                                '&:hover fieldset': {
-                                    borderColor: GOLD_LIGHT,
+                                '& .MuiInputLabel-root': {
+                                    color: '#94A3B8',
                                 },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: GOLD_MAIN,
-                                    boxShadow: `0 0 10px rgba(184, 134, 11, 0.3)`
+                                '& .MuiInputLabel-root.Mui-focused': {
+                                    color: GOLD_LIGHT,
                                 },
-                            },
-                            '& .MuiInputLabel-root': {
-                                color: '#94A3B8',
-                            },
-                            '& .MuiInputLabel-root.Mui-focused': {
-                                color: GOLD_LIGHT,
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                    </Slide>
 
                     {/* Password Field */}
-                    <TextField
-                        fullWidth
-                        label="Password"
-                        type={showPassword ? 'text' : 'password'}
-                        variant="outlined"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        edge="end"
-                                        sx={{ color: '#94A3B8' }}
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{
-                            mb: 4,
-                            '& .MuiOutlinedInput-root': {
-                                color: 'white',
-                                background: 'rgba(26, 43, 76, 0.6)',
-                                '& fieldset': {
-                                    borderColor: 'rgba(184, 134, 11, 0.3)',
+                    <Slide direction="left" in={true} timeout={800} style={{ transitionDelay: '1000ms' }}>
+                        <TextField
+                            fullWidth
+                            label="Password"
+                            type={showPassword ? 'text' : 'password'}
+                            variant="outlined"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            disabled={loading}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            edge="end"
+                                            sx={{ 
+                                                color: '#94A3B8',
+                                                transition: 'all 0.3s ease',
+                                                '&:hover': {
+                                                    color: GOLD_LIGHT,
+                                                    transform: 'scale(1.1)',
+                                                }
+                                            }}
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                mb: 4,
+                                '& .MuiOutlinedInput-root': {
+                                    color: 'white',
+                                    background: 'rgba(26, 43, 76, 0.6)',
+                                    transition: 'all 0.3s ease',
+                                    '& fieldset': {
+                                        borderColor: 'rgba(184, 134, 11, 0.3)',
+                                        transition: 'all 0.3s ease',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: GOLD_LIGHT,
+                                        boxShadow: `0 0 8px rgba(184, 134, 11, 0.2)`,
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: GOLD_MAIN,
+                                        boxShadow: `0 0 10px rgba(184, 134, 11, 0.3)`
+                                    },
                                 },
-                                '&:hover fieldset': {
-                                    borderColor: GOLD_LIGHT,
+                                '& .MuiInputLabel-root': {
+                                    color: '#94A3B8',
                                 },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: GOLD_MAIN,
-                                    boxShadow: `0 0 10px rgba(184, 134, 11, 0.3)`
+                                '& .MuiInputLabel-root.Mui-focused': {
+                                    color: GOLD_LIGHT,
                                 },
-                            },
-                            '& .MuiInputLabel-root': {
-                                color: '#94A3B8',
-                            },
-                            '& .MuiInputLabel-root.Mui-focused': {
-                                color: GOLD_LIGHT,
-                            },
-                        }}
-                    />
+                            }}
+                        />
+                    </Slide>
 
                     {/* Login Button */}
-                    <Button
-                        fullWidth
-                        type="submit"
-                        variant="contained"
-                        disabled={loading}
-                        sx={{
-                            py: 1.5,
-                            fontSize: '1.1rem',
-                            fontWeight: 600,
-                            textTransform: 'none',
-                            background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
-                            color: 'white',
-                            borderRadius: 2,
-                            boxShadow: `0 8px 20px rgba(184, 134, 11, 0.3)`,
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD_MAIN})`,
-                                boxShadow: `0 12px 30px rgba(184, 134, 11, 0.4)`,
-                                transform: 'translateY(-2px)',
-                            },
-                            '&:active': {
-                                transform: 'translateY(0px)',
-                            },
-                            '&:disabled': {
-                                background: 'rgba(184, 134, 11, 0.3)',
-                                color: 'rgba(255, 255, 255, 0.5)',
-                            }
-                        }}
-                    >
-                        {loading ? 'Logging in...' : 'Login'}
-                    </Button>
+                    <Zoom in={true} timeout={800} style={{ transitionDelay: '1200ms' }}>
+                        <Button
+                            fullWidth
+                            type="submit"
+                            variant="contained"
+                            disabled={loading}
+                            sx={{
+                                py: 1.5,
+                                fontSize: '1.1rem',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
+                                color: 'white',
+                                borderRadius: 2,
+                                boxShadow: `0 8px 20px rgba(184, 134, 11, 0.3)`,
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    background: `linear-gradient(135deg, ${GOLD_LIGHT}, ${GOLD_MAIN})`,
+                                    boxShadow: `0 12px 30px rgba(184, 134, 11, 0.4)`,
+                                    transform: 'translateY(-2px) scale(1.02)',
+                                },
+                                '&:active': {
+                                    transform: 'translateY(0px) scale(0.98)',
+                                },
+                                '&:disabled': {
+                                    background: 'rgba(184, 134, 11, 0.3)',
+                                    color: 'rgba(255, 255, 255, 0.5)',
+                                }
+                            }}
+                        >
+                            {loading ? 'Logging in...' : 'Login'}
+                        </Button>
+                    </Zoom>
                 </form>
 
                 {/* Sign Up and Home Links */}
-                <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Button
-                        fullWidth
-                        variant="text"
-                        onClick={() => navigate('/admin/signup')}
-                        sx={{
-                            color: GOLD_LIGHT,
-                            textTransform: 'none',
-                            fontWeight: 500,
-                            '&:hover': {
-                                color: GOLD_MAIN,
-                                background: 'rgba(184, 134, 11, 0.1)',
-                            }
-                        }}
-                    >
-                        Don't have an account? Sign Up
-                    </Button>
-                    
-                    <Button
-                        fullWidth
-                        variant="text"
-                        onClick={() => navigate('/')}
-                        sx={{
-                            color: '#94A3B8',
-                            textTransform: 'none',
-                            '&:hover': {
+                <Fade in={true} timeout={1000} style={{ transitionDelay: '1400ms' }}>
+                    <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Button
+                            fullWidth
+                            variant="text"
+                            onClick={() => navigate('/admin/signup')}
+                            sx={{
                                 color: GOLD_LIGHT,
-                                background: 'rgba(184, 134, 11, 0.1)',
-                            }
-                        }}
-                    >
-                        ← Back to Home
-                    </Button>
-                </Box>
+                                textTransform: 'none',
+                                fontWeight: 500,
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    color: GOLD_MAIN,
+                                    background: 'rgba(184, 134, 11, 0.1)',
+                                    transform: 'translateX(5px)',
+                                }
+                            }}
+                        >
+                            Don't have an account? Sign Up
+                        </Button>
+                        
+                        <Button
+                            fullWidth
+                            variant="text"
+                            onClick={() => navigate('/')}
+                            sx={{
+                                color: '#94A3B8',
+                                textTransform: 'none',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    color: GOLD_LIGHT,
+                                    background: 'rgba(184, 134, 11, 0.1)',
+                                    transform: 'translateX(-5px)',
+                                }
+                            }}
+                        >
+                            ← Back to Home
+                        </Button>
+                    </Box>
+                </Fade>
             </Paper>
+            </Grow>
 
             {/* Animation keyframes */}
             <style>
