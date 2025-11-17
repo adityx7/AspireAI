@@ -15,7 +15,18 @@ const NotificationSchema = new mongoose.Schema({
       'mentor_review',
       'plan_applied',
       'agent_alert',
-      'system'
+      'system',
+      'attendance',
+      'internal_marks',
+      'semester_performance',
+      'assignment',
+      'exam_reminder',
+      'aicte_points',
+      'inactivity',
+      'wellbeing',
+      'career_development',
+      'mentor_alert',
+      'deadline'
     ],
     required: true,
     index: true 

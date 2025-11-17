@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import NotificationBell from "./NotificationBell";
 
 // Constants for styling - matching the login theme
 const NAVY_BLUE_MAIN = "#0A192F";
@@ -14,7 +15,40 @@ const GOLD_DARK = "#8B6914";
 
 const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const [userInitial, setUserInitial] = useState("M");
     const navigate = useNavigate(); // To navigate programmatically
+
+    // Get mentor's first initial - check localStorage first, then fetch from API
+    useEffect(() => {
+        const fetchMentorName = async () => {
+            // First, try localStorage
+            let mentorName = localStorage.getItem('fullName') || localStorage.getItem('name');
+            
+            // If not in localStorage, fetch from API
+            if (!mentorName || mentorName === "Mentor") {
+                try {
+                    const mentorID = localStorage.getItem('mentorID') || localStorage.getItem('mentorId');
+                    if (mentorID) {
+                        const response = await fetch(`http://localhost:5002/api/mentors/${mentorID}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            mentorName = data.fullName;
+                            // Store it for future use
+                            localStorage.setItem('name', mentorName);
+                            localStorage.setItem('fullName', mentorName);
+                        }
+                    }
+                } catch (error) {
+                    console.log('Could not fetch mentor name:', error);
+                }
+            }
+            
+            const initial = (mentorName || "Mentor").charAt(0).toUpperCase();
+            setUserInitial(initial);
+        };
+        
+        fetchMentorName();
+    }, []);
 
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget); // Set the anchor element for the menu
@@ -109,13 +143,17 @@ const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
                     )}
                 </Box>
 
-                <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {/* Notification Bell */}
+                    <NotificationBell userId={localStorage.getItem('mentorID') || localStorage.getItem('mentorId')} />
+                    
                     <Avatar
                         sx={{ 
                             cursor: "pointer",
                             background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
                             color: 'white',
                             fontWeight: 'bold',
+                            fontSize: '1.2rem',
                             boxShadow: `0 0 10px ${GOLD_MAIN}40`,
                             transition: 'all 0.3s ease',
                             '&:hover': {
@@ -125,7 +163,7 @@ const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
                         }}
                         onClick={handleAvatarClick} // Open dropdown menu on click
                     >
-                        S
+                        {userInitial}
                     </Avatar>
                     <Menu
                         anchorEl={anchorEl}

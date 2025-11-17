@@ -102,9 +102,13 @@ export default function Login() {
       if (response.data.success) {
         localStorage.setItem('studentToken', response.data.token);
         localStorage.setItem('userUSN', usn);
+        localStorage.setItem('usn', usn);
         localStorage.setItem('userId', response.data.userId);
         localStorage.setItem('studentId', response.data.studentId);
+        localStorage.setItem('name', response.data.name || 'Student');
+        localStorage.setItem('fullName', response.data.name || 'Student');
         console.log('✅ Login successful, userId stored:', response.data.userId);
+        console.log('✅ Name stored:', response.data.name);
         navigate('/dashboard');
       } else {
         setError('Invalid USN or Password. Please try again.');

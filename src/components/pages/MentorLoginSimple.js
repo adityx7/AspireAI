@@ -57,6 +57,14 @@ export default function MentorSignInPage() {
             if (response.data && response.data.token) {
                 localStorage.setItem("mentorToken", response.data.token);
                 localStorage.setItem("mentorID", mentorID);
+                localStorage.setItem("mentorId", mentorID);
+                
+                // Store mentor name if available
+                if (response.data.mentor && response.data.mentor.fullName) {
+                    localStorage.setItem("name", response.data.mentor.fullName);
+                    localStorage.setItem("fullName", response.data.mentor.fullName);
+                    console.log('✅ Mentor name stored:', response.data.mentor.fullName);
+                }
                 
                 // Navigate to mentor dashboard
                 navigate("/dashboard-mentor");

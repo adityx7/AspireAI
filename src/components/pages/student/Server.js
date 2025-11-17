@@ -60,117 +60,8 @@ const mentorSchema = new mongoose.Schema({
 });
 const Mentor = mongoose.model("Mentor", mentorSchema);
 
-// ✅ Student Schema (Updated for Phase 1)
-const studentSchema = new mongoose.Schema({
-    name: String,   // ✅ Name should match ProfilePage
-    usn: String,
-    mobileNumber: String,
-    alternateMobileNumber: String,
-    email: String,
-    collegeEmail: String,
-    gender: String,
-    dob: String,
-    graduationYear: String,
-    employeeId: String, // ✅ Match frontend `employeeId`
-    selectedMajors: [],
-    shortBio: String,
-    
-    // ✅ Phase 1: New fields for advanced features
-    academics: {
-        semesters: [{
-            semesterNumber: { type: Number, required: true },
-            cgpa: { type: Number, min: 0, max: 10 },
-            semesterCourses: [{
-                name: { type: String, required: true },
-                grade: { type: String },
-                credits: { type: Number, min: 0 },
-                performanceGraphData: [{
-                    assessment: String, // e.g., "Quiz 1", "Midterm", "Final"
-                    marks: Number,
-                    maxMarks: Number,
-                    date: Date
-                }]
-            }],
-            reflectionJournal: {
-                whatDidWell: String,
-                whatToImprove: String,
-                goals: String,
-                challenges: String,
-                reflectionDate: { type: Date, default: Date.now }
-            }
-        }],
-        overallCGPA: { type: Number, min: 0, max: 10 },
-        totalCredits: { type: Number, default: 0 }
-    },
-    
-    certifications: [{
-        name: { type: String, required: true },
-        issuer: { type: String, required: true },
-        date: { type: Date, required: true },
-        domainTags: [String], // e.g., ["Web Development", "Cloud Computing"]
-        verificationLink: String,
-        certificateImage: String // Optional: base64 or file path
-    }],
-    
-    aictActivityPoints: {
-        currentPoints: { type: Number, default: 0 },
-        targetPoints: { type: Number, default: 100 },
-        activities: [{
-            name: { type: String, required: true },
-            type: { 
-                type: String, 
-                enum: ['Academic', 'Extracurricular', 'Project', 'Certification', 'Event'], 
-                required: true 
-            },
-            points: { type: Number, required: true },
-            status: { 
-                type: String, 
-                enum: ['Completed', 'In Progress', 'Planned'], 
-                default: 'Planned' 
-            },
-            dateCompleted: Date,
-            description: String
-        }]
-    },
-    
-    attendance: [{
-        subjectName: { type: String, required: true },
-        attendedClasses: { type: Number, default: 0 },
-        totalClasses: { type: Number, default: 0 },
-        semester: Number,
-        attendancePercentage: { type: Number, min: 0, max: 100 }
-    }],
-    
-    // ✅ SWOT Analysis and Career Planning
-    swotAnalysis: {
-        strengths: [String],
-        weaknesses: [String],
-        opportunities: [String],
-        threats: [String],
-        lastUpdated: { type: Date, default: Date.now }
-    },
-    
-    careerInterests: [{
-        field: String, // e.g., "Software Development", "Data Science"
-        interestLevel: { type: Number, min: 1, max: 10 },
-        skills: [String],
-        experience: String
-    }],
-    
-    careerRoadmap: [{
-        milestone: { type: String, required: true },
-        targetDate: Date,
-        status: { 
-            type: String, 
-            enum: ['Not Started', 'In Progress', 'Completed'], 
-            default: 'Not Started' 
-        },
-        description: String,
-        requiredSkills: [String]
-    }]
-}, { strict: false });
-
-const Student = mongoose.model("Student", studentSchema);
+// ✅ Student Model - Imported from models folder
+const Student = require('../../../models/Student');
 
 // ✅ Mentor Meeting Notes Schema
 const meetingNotesSchema = new mongoose.Schema({
@@ -1418,6 +1309,9 @@ app.post("/api/student/login", async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid USN or Password" });
         }
 
+        // Get student profile data to return name
+        const studentProfile = await Student.findOne({ usn });
+
         // Generate a simple token (in production you would use JWT)
         const token = Buffer.from(`${usn}-${Date.now()}`).toString('base64');
         
@@ -1427,7 +1321,8 @@ app.post("/api/student/login", async (req, res) => {
             token: token,
             usn: usn,
             userId: student._id.toString(),
-            studentId: student._id.toString()
+            studentId: student._id.toString(),
+            name: studentProfile?.name || student.fullName || "Student"
         });
     } catch (error) {
         res.status(500).json({ success: false, message: "Server error", error });
@@ -1525,6 +1420,23 @@ try {
     console.log('✅ Mentor Verification routes loaded');
 } catch (err) {
     console.warn('⚠️  Mentor Verification routes not available:', err.message);
+}
+
+// ✅ Notification Routes
+try {
+    const notificationRoutes = require('../../../routes/notificationRoutes');
+    app.use('/api/notifications', notificationRoutes);
+    console.log('✅ Notification routes loaded');
+} catch (err) {
+    console.warn('⚠️  Notification routes not available:', err.message);
+}
+
+// ✅ Start Notification Scheduler
+try {
+    const notificationScheduler = require('../../../services/notificationScheduler');
+    notificationScheduler.startAll();
+} catch (err) {
+    console.warn('⚠️  Notification scheduler not available:', err.message);
 }
 
 // ✅ Start Server on PORT 5002

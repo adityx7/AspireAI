@@ -168,10 +168,12 @@ const NotificationBell = ({ userId, onNotificationClick }) => {
       <IconButton
         onClick={handleClick}
         sx={{
-          color: NAVY_BLUE_MAIN,
+          color: GOLD_MAIN,
           '&:hover': {
             bgcolor: GOLD_MAIN + '20',
+            transform: 'scale(1.1)',
           },
+          transition: 'all 0.3s ease',
         }}
       >
         <Badge badgeContent={unreadCount} color="error">

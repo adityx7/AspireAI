@@ -28,6 +28,7 @@ import MeetingNotesTestPage from './components/pages/MeetingNotesTestPage';
 import StudyPlanPage from './components/pages/StudyPlanPage';
 import MentorStudentVerificationPage from './components/pages/mentor/MentorStudentVerificationPage';
 import MentorStudentsListPage from './components/pages/mentor/MentorStudentsListPage';
+import NotificationCenterPage from './components/pages/NotificationCenterPage';
 
 export default function App() {
   return (
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="/mentor-meeting-notes" element={<MentorMeetingNotesPage />} />
           <Route path="/mentor/students-verification" element={<MentorStudentsListPage />} />
           <Route path="/mentor/verify-student/:studentId" element={<MentorStudentVerificationPage />} />
+          <Route path="/notifications" element={<NotificationCenterPage />} />
         </Routes>
       </Router>
     </AuthProvider>

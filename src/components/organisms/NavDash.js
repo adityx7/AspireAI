@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Menu, MenuItem } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PropTypes from "prop-types";
+import NotificationBell from "./NotificationBell";
 
 // Constants for styling - matching the login theme
 const NAVY_BLUE_MAIN = "#0A192F";
@@ -14,7 +15,40 @@ const GOLD_DARK = "#8B6914";
 
 const Navbar = ({ onDrawerToggle, title }) => {
     const [anchorEl, setAnchorEl] = useState(null);
+    const [userInitial, setUserInitial] = useState("S");
     const navigate = useNavigate(); // Initialize navigate function
+
+    // Get user's first initial - check localStorage first, then fetch from API
+    useEffect(() => {
+        const fetchUserName = async () => {
+            // First, try localStorage
+            let userName = localStorage.getItem('fullName') || localStorage.getItem('name');
+            
+            // If not in localStorage, fetch from API
+            if (!userName || userName === "Student") {
+                try {
+                    const usn = localStorage.getItem('userUSN') || localStorage.getItem('usn');
+                    if (usn) {
+                        const response = await fetch(`http://localhost:5002/api/students/${usn}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            userName = data.name;
+                            // Store it for future use
+                            localStorage.setItem('name', userName);
+                            localStorage.setItem('fullName', userName);
+                        }
+                    }
+                } catch (error) {
+                    console.log('Could not fetch user name:', error);
+                }
+            }
+            
+            const initial = (userName || "Student").charAt(0).toUpperCase();
+            setUserInitial(initial);
+        };
+        
+        fetchUserName();
+    }, []);
 
     const handleAvatarClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -98,13 +132,17 @@ const Navbar = ({ onDrawerToggle, title }) => {
                     {title}
                 </Typography>
 
-                <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {/* Notification Bell */}
+                    <NotificationBell userId={localStorage.getItem('usn') || localStorage.getItem('studentId')} />
+                    
                     <Avatar
                         sx={{ 
                             cursor: "pointer",
                             background: `linear-gradient(135deg, ${GOLD_MAIN}, ${GOLD_LIGHT})`,
                             color: 'white',
                             fontWeight: 'bold',
+                            fontSize: '1.2rem',
                             boxShadow: `0 0 10px ${GOLD_MAIN}40`,
                             transition: 'all 0.3s ease',
                             '&:hover': {
@@ -114,7 +152,7 @@ const Navbar = ({ onDrawerToggle, title }) => {
                         }}
                         onClick={handleAvatarClick}
                     >
-                        S
+                        {userInitial}
                     </Avatar>
                     <Menu
                         anchorEl={anchorEl}
