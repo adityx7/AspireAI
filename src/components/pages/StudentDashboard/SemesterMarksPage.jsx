@@ -133,15 +133,15 @@ const SemesterMarksPage = () => {
     if (field === 'courseCode' || field === 'courseName') {
       course[field] = value;
     } else if (field === 'attendancePercentage') {
-      course[field] = validateNumber(value, 0, 100);
+      course[field] = value === '' ? 0 : validateNumber(value, 0, 100);
     } else if (['ia1', 'ia2', 'ia3'].includes(field)) {
-      course[field] = validateNumber(value, 0, 15);
+      course[field] = value === '' ? 0 : validateNumber(value, 0, 15);
     } else if (['lab', 'other'].includes(field)) {
-      course[field] = validateNumber(value, 0, 25);
+      course[field] = value === '' ? 0 : validateNumber(value, 0, 25);
     } else if (field === 'external') {
-      course[field] = validateNumber(value, 0, 50);
+      course[field] = value === '' ? 0 : validateNumber(value, 0, 50);
     } else if (field === 'credits') {
-      course[field] = validateNumber(value, 0, 10);
+      course[field] = value === '' ? 0 : validateNumber(value, 0, 10);
     }
     
     // Auto-calculate internal marks (best 2 IAs)
@@ -747,7 +747,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.attendancePercentage || 0}
+                          value={course.attendancePercentage || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'attendancePercentage', e.target.value)}
                           inputProps={{ min: 0, max: 100, step: 0.1 }}
                           sx={{ width: 70 }}
@@ -757,7 +757,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.ia1 || 0}
+                          value={course.ia1 || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'ia1', e.target.value)}
                           inputProps={{ min: 0, max: 15, step: 0.5 }}
                           sx={{ width: 60 }}
@@ -767,7 +767,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.ia2 || 0}
+                          value={course.ia2 || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'ia2', e.target.value)}
                           inputProps={{ min: 0, max: 15, step: 0.5 }}
                           sx={{ width: 60 }}
@@ -777,7 +777,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.ia3 || 0}
+                          value={course.ia3 || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'ia3', e.target.value)}
                           inputProps={{ min: 0, max: 15, step: 0.5 }}
                           sx={{ width: 60 }}
@@ -787,7 +787,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.lab || 0}
+                          value={course.lab || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'lab', e.target.value)}
                           inputProps={{ min: 0, max: 25, step: 0.5 }}
                           sx={{ width: 60 }}
@@ -797,7 +797,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.other || 0}
+                          value={course.other || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'other', e.target.value)}
                           inputProps={{ min: 0, max: 25, step: 0.5 }}
                           sx={{ width: 60 }}
@@ -822,7 +822,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.external || 0}
+                          value={course.external || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'external', e.target.value)}
                           inputProps={{ min: 0, max: 50, step: 0.5 }}
                           sx={{ width: 60 }}
@@ -877,7 +877,7 @@ const SemesterMarksPage = () => {
                         <TextField
                           size="small"
                           type="number"
-                          value={course.credits || 0}
+                          value={course.credits || ''}
                           onChange={(e) => handleCourseFieldChange(index, 'credits', e.target.value)}
                           inputProps={{ min: 0, max: 10, step: 1 }}
                           sx={{ width: 60 }}
