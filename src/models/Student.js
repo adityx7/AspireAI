@@ -111,6 +111,7 @@ const studentSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true }
 }, { strict: false, timestamps: true });
 
-const Student = mongoose.model("Student", studentSchema);
+// Check if model already exists to avoid OverwriteModelError
+const Student = mongoose.models.Student || mongoose.model("Student", studentSchema);
 
 module.exports = Student;

@@ -29,6 +29,18 @@ import StudyPlanPage from './components/pages/StudyPlanPage';
 import MentorStudentVerificationPage from './components/pages/mentor/MentorStudentVerificationPage';
 import MentorStudentsListPage from './components/pages/mentor/MentorStudentsListPage';
 import NotificationCenterPage from './components/pages/NotificationCenterPage';
+import AdminLogin from './components/pages/AdminLogin';
+import AdminSignup from './components/pages/AdminSignup';
+import AdminDashboard from './components/pages/AdminDashboard';
+import AdminStudentsList from './components/pages/AdminStudentsList';
+import AdminStudentDetails from './components/pages/AdminStudentDetails';
+import AdminEditStudent from './components/pages/AdminEditStudent';
+import AdminProfile from './components/pages/AdminProfile';
+import AdminPreferences from './components/pages/AdminPreferences';
+import AdminPermissions from './components/pages/AdminPermissions';
+import AdminAddStudent from './components/pages/AdminAddStudent';
+import AdminBulkUpload from './components/pages/AdminBulkUpload';
+import AdminReports from './components/pages/AdminReports';
 
 export default function App() {
   return (
@@ -64,6 +76,18 @@ export default function App() {
           <Route path="/mentor/students-verification" element={<MentorStudentsListPage />} />
           <Route path="/mentor/verify-student/:studentId" element={<MentorStudentVerificationPage />} />
           <Route path="/notifications" element={<NotificationCenterPage />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/signup" element={<AdminSignup />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/students" element={<AdminStudentsList />} />
+          <Route path="/admin/students/:studentId" element={<AdminStudentDetails />} />
+          <Route path="/admin/students/:studentId/edit" element={<AdminEditStudent />} />
+          <Route path="/admin/profile" element={<AdminProfile />} />
+          <Route path="/admin/preferences" element={<AdminPreferences />} />
+          <Route path="/admin/permissions" element={<AdminPermissions />} />
+          <Route path="/admin/add-student" element={<AdminAddStudent />} />
+          <Route path="/admin/bulk-upload" element={<AdminBulkUpload />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
         </Routes>
       </Router>
     </AuthProvider>

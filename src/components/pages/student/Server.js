@@ -236,6 +236,167 @@ app.post("/api/mentors/login", async (req, res) => {
     }
 });
 
+// ✅ Admin Login (Added for Admin Panel)
+app.post("/api/admin/login", async (req, res) => {
+    try {
+        const bcrypt = require('bcryptjs');
+        const jwt = require('jsonwebtoken');
+        const Admin = require('../../../models/Admin');
+        const JWT_SECRET = process.env.JWT_SECRET || 'aspirai-secret-key-2024';
+        
+        console.log("📩 Admin Login Request Received:", req.body);
+        const { employeeId, password } = req.body;
+
+        if (!employeeId || !password) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing employeeId or password" 
+            });
+        }
+
+        // Find admin by employeeId
+        const admin = await Admin.findOne({ employeeId: String(employeeId) });
+
+        if (!admin) {
+            console.log("❌ Admin not found");
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid credentials" 
+            });
+        }
+
+        if (!admin.isActive) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "Account is inactive. Contact system administrator." 
+            });
+        }
+
+        // Compare password
+        const isMatch = await bcrypt.compare(password, admin.password);
+        if (!isMatch) {
+            console.log("❌ Invalid password");
+            return res.status(401).json({ 
+                success: false, 
+                message: "Invalid credentials" 
+            });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            {
+                userId: admin.employeeId,
+                role: admin.role,
+                email: admin.email,
+                name: admin.fullName
+            },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        // Update last login
+        admin.lastLogin = new Date();
+        await admin.save();
+
+        console.log("✅ Admin login successful:", employeeId);
+        
+        res.json({ 
+            success: true, 
+            message: "Login successful",
+            token,
+            admin: {
+                employeeId: admin.employeeId,
+                fullName: admin.fullName,
+                email: admin.email,
+                role: admin.role,
+                department: admin.department,
+                permissions: admin.permissions
+            }
+        });
+    } catch (error) {
+        console.error("❌ Admin login error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
+// ✅ Admin Registration (Added for Admin Panel)
+app.post("/api/admin/register", async (req, res) => {
+    try {
+        const bcrypt = require('bcryptjs');
+        const Admin = require('../../../models/Admin');
+        
+        console.log("📩 Admin Registration Request Received:", req.body);
+        const { employeeId, fullName, email, password, department, role, permissions } = req.body;
+
+        // Validation
+        if (!employeeId || !fullName || !email || !password || !department) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing required fields" 
+            });
+        }
+
+        // Check if admin already exists
+        const existingAdmin = await Admin.findOne({ 
+            $or: [
+                { employeeId: String(employeeId) },
+                { email: email.toLowerCase() }
+            ]
+        });
+
+        if (existingAdmin) {
+            return res.status(409).json({ 
+                success: false, 
+                message: "Admin with this Employee ID or Email already exists" 
+            });
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Create new admin
+        const newAdmin = new Admin({
+            employeeId: String(employeeId),
+            fullName,
+            email: email.toLowerCase(),
+            password: hashedPassword,
+            department,
+            role: role || 'admin',
+            permissions: permissions || ['view_students', 'manage_marks'],
+            isActive: true
+        });
+
+        await newAdmin.save();
+
+        console.log("✅ Admin registration successful:", employeeId);
+        
+        res.status(201).json({ 
+            success: true, 
+            message: "Admin account created successfully",
+            admin: {
+                employeeId: newAdmin.employeeId,
+                fullName: newAdmin.fullName,
+                email: newAdmin.email,
+                role: newAdmin.role,
+                department: newAdmin.department,
+                permissions: newAdmin.permissions
+            }
+        });
+    } catch (error) {
+        console.error("❌ Admin registration error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
+    }
+});
+
 app.post("/api/mentor/details", async (req, res) => {
     try {
         console.log("📩 Received Mentor Details:", req.body);
@@ -1437,6 +1598,17 @@ try {
     notificationScheduler.startAll();
 } catch (err) {
     console.warn('⚠️  Notification scheduler not available:', err.message);
+}
+
+// ✅ Admin Routes (RBAC Protected)
+try {
+    const adminRoutes = require('../../../routes/adminRoutes');
+    app.use('/api/admin', adminRoutes);
+    console.log('✅ Admin routes loaded');
+    console.log('   📊 Admin panel endpoints available');
+    console.log('   🔐 RBAC protection enabled');
+} catch (err) {
+    console.warn('⚠️  Admin routes not available:', err.message);
 }
 
 // ✅ Start Server on PORT 5002

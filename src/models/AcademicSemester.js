@@ -208,6 +208,7 @@ academicSemesterSchema.statics.getOrCreate = async function(userId, semester, ac
   return semesterDoc;
 };
 
-const AcademicSemester = mongoose.model('AcademicSemester', academicSemesterSchema);
+// Check if model already exists to avoid OverwriteModelError
+const AcademicSemester = mongoose.models.AcademicSemester || mongoose.model('AcademicSemester', academicSemesterSchema);
 
 module.exports = AcademicSemester;

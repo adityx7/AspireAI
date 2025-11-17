@@ -644,6 +644,54 @@ function Home() {
               Click here
             </Link>
           </Typography>
+          
+          {/* Admin Login Button */}
+          <Button
+            className="bounce-in pulse-glow stagger-child"
+            variant="outlined"
+            onClick={() => navigate("/admin/login")}
+            sx={{
+              mt: 3,
+              background: "linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(184, 134, 11, 0.05) 100%)",
+              color: "#B8860B",
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              px: 3,
+              py: 1.2,
+              borderRadius: 10,
+              border: "2px solid rgba(184, 134, 11, 0.3)",
+              textTransform: "none",
+              position: "relative",
+              overflow: "hidden",
+              transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              animationDelay: '1.4s',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.15), transparent)',
+                transition: 'left 0.6s'
+              },
+              "&:hover": {
+                background: "linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(139, 0, 0, 0.15) 100%)",
+                boxShadow: "0 8px 20px rgba(184, 134, 11, 0.25), inset 0 1px 0 rgba(184, 134, 11, 0.1)",
+                transform: "translateY(-2px) scale(1.03)",
+                border: "2px solid rgba(184, 134, 11, 0.5)",
+                color: "#DAA520",
+                '&::before': {
+                  left: '100%'
+                }
+              },
+              "&:active": {
+                transform: "translateY(0px) scale(0.98)"
+              }
+            }}
+          >
+            🔐 Admin Access
+          </Button>
         </Box>
         {/* Right Content - Professional Images */}
         <Box 
