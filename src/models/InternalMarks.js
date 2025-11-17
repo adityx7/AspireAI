@@ -59,9 +59,9 @@ const courseInternalSchema = new mongoose.Schema({
 // Main schema for semester internal marks
 const internalMarksSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Student',
-    required: true
+    type: String,
+    required: true,
+    trim: true
   },
   semester: {
     type: Number,

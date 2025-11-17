@@ -125,14 +125,17 @@ const InternalMarksOverview = () => {
                 <Card 
                   sx={{ 
                     height: '100%',
-                    border: semData ? `3px solid ${cardColor}` : '3px solid #e0e0e0',
-                    boxShadow: semData ? '0 4px 20px rgba(63, 81, 181, 0.2)' : 3,
+                    border: semData ? '3px solid rgba(255, 193, 7, 0.6)' : '3px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: semData ? '0 4px 20px rgba(255, 193, 7, 0.3)' : '0 4px 20px rgba(0, 0, 0, 0.2)',
                     borderRadius: 3,
-                    background: semData ? 'rgba(44, 62, 87, 0.6)' : 'rgba(44, 62, 87, 0.3)',
+                    background: semData 
+                      ? 'linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(44, 62, 87, 0.9) 100%)'
+                      : 'linear-gradient(135deg, rgba(44, 62, 87, 0.5) 0%, rgba(26, 35, 50, 0.6) 100%)',
                     '&:hover': {
-                      boxShadow: '0 8px 30px rgba(63, 81, 181, 0.3)',
+                      boxShadow: semData ? '0 8px 30px rgba(255, 193, 7, 0.4)' : '0 8px 30px rgba(63, 81, 181, 0.3)',
                       transform: 'translateY(-4px)',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.3s ease',
+                      border: semData ? '3px solid rgba(255, 193, 7, 0.8)' : '3px solid rgba(255, 255, 255, 0.3)'
                     }
                   }}
                 >
@@ -142,8 +145,8 @@ const InternalMarksOverview = () => {
                   >
                     <CardContent>
                       <Box display="flex" alignItems="center" mb={2}>
-                        <AssignmentIcon sx={{ fontSize: 40, color: cardColor, mr: 1 }} />
-                        <Typography variant="h5" fontWeight="bold">
+                        <AssignmentIcon sx={{ fontSize: 40, color: semData ? cardColor : '#e0e0e0', mr: 1 }} />
+                        <Typography variant="h5" fontWeight="bold" sx={{ color: 'white' }}>
                           Semester {semNum}
                         </Typography>
                       </Box>
@@ -151,39 +154,39 @@ const InternalMarksOverview = () => {
                       {semData ? (
                         <>
                           <Box mb={2}>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} gutterBottom>
                               Academic Year
                             </Typography>
-                            <Typography variant="body1" fontWeight="medium">
+                            <Typography variant="body1" fontWeight="medium" sx={{ color: 'white' }}>
                               {semData.academicYear || 'N/A'}
                             </Typography>
                           </Box>
 
                           <Box mb={2}>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} gutterBottom>
                               Number of Courses
                             </Typography>
                             <Chip 
                               label={`${courseCount} Courses`} 
                               size="small"
                               sx={{ 
-                                bgcolor: 'rgba(26, 43, 76, 0.85)',
-                                color: 'white',
+                                bgcolor: 'rgba(255, 193, 7, 0.9)',
+                                color: 'rgba(10, 25, 47, 0.9)',
                                 fontWeight: 'bold'
                               }}
                             />
                           </Box>
 
                           <Box mb={2}>
-                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} gutterBottom>
                               Avg Attendance
                             </Typography>
                             <Chip 
                               label={`${avgAttendance}%`}
                               size="small"
                               sx={{ 
-                                bgcolor: cardColor,
-                                color: cardColor === '#B8860B' ? 'rgba(10, 25, 47, 0.9)' : 'white',
+                                bgcolor: parseFloat(avgAttendance) >= 85 ? '#4caf50' : parseFloat(avgAttendance) >= 75 ? '#ff9800' : '#f44336',
+                                color: 'white',
                                 fontWeight: 'bold'
                               }}
                             />
@@ -191,10 +194,10 @@ const InternalMarksOverview = () => {
 
                           {semData.mentorName && (
                             <Box>
-                              <Typography variant="body2" color="text.secondary" gutterBottom>
+                              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }} gutterBottom>
                                 Mentor
                               </Typography>
-                              <Typography variant="body2" fontWeight="medium">
+                              <Typography variant="body2" fontWeight="medium" sx={{ color: 'white' }}>
                                 {semData.mentorName}
                               </Typography>
                             </Box>
@@ -202,10 +205,10 @@ const InternalMarksOverview = () => {
                         </>
                       ) : (
                         <Box>
-                          <Typography variant="body2" color="text.secondary" align="center">
+                          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }} align="center">
                             No data available
                           </Typography>
-                          <Typography variant="caption" color="text.secondary" align="center" display="block" mt={1}>
+                          <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }} align="center" display="block" mt={1}>
                             Click to add internal marks
                           </Typography>
                         </Box>

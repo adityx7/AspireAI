@@ -65,6 +65,16 @@ router.post('/students/:userId/internal-marks/:semester', checkAuth, async (req,
     const { userId, semester } = req.params;
     const updateData = req.body;
     
+    console.log('📝 Saving internal marks:', { userId, semester, dataKeys: Object.keys(updateData) });
+    
+    // Validate required fields
+    if (!updateData.academicYear) {
+      return res.status(400).json({
+        success: false,
+        message: 'Academic year is required'
+      });
+    }
+    
     let semesterDoc = await InternalMarks.findOne({ 
       userId, 
       semester: parseInt(semester) 
@@ -72,16 +82,30 @@ router.post('/students/:userId/internal-marks/:semester', checkAuth, async (req,
     
     if (semesterDoc) {
       // Update existing document
-      Object.assign(semesterDoc, updateData);
+      console.log('✅ Updating existing document');
+      semesterDoc.academicYear = updateData.academicYear;
+      semesterDoc.mentorName = updateData.mentorName || '';
+      semesterDoc.feesToBePaid = updateData.feesToBePaid || 0;
+      semesterDoc.feesPaid = updateData.feesPaid || 0;
+      semesterDoc.receiptNo = updateData.receiptNo || '';
+      semesterDoc.courses = updateData.courses || [];
       await semesterDoc.save();
     } else {
       // Create new document
+      console.log('✅ Creating new document');
       semesterDoc = await InternalMarks.create({
         userId,
         semester: parseInt(semester),
-        ...updateData
+        academicYear: updateData.academicYear,
+        mentorName: updateData.mentorName || '',
+        feesToBePaid: updateData.feesToBePaid || 0,
+        feesPaid: updateData.feesPaid || 0,
+        receiptNo: updateData.receiptNo || '',
+        courses: updateData.courses || []
       });
     }
+    
+    console.log('✅ Saved successfully:', semesterDoc._id);
     
     res.json({
       success: true,
@@ -89,7 +113,9 @@ router.post('/students/:userId/internal-marks/:semester', checkAuth, async (req,
       data: semesterDoc
     });
   } catch (error) {
-    console.error('Error saving internal marks:', error);
+    console.error('❌ Error saving internal marks:', error);
+    console.error('Error details:', error.message);
+    console.error('Stack:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Failed to save internal marks',
