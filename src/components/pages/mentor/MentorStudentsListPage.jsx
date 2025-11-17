@@ -65,13 +65,78 @@ const MentorStudentsListPage = () => {
         navigate(`/mentor/verify-student/${studentUSN}`);
     };
 
+    // Add animation effects when component mounts
+    useEffect(() => {
+        // Trigger animations for elements with these classes
+        const elements = document.querySelectorAll('.fade-in-up, .scale-in, .slide-in-right');
+        elements.forEach((el, index) => {
+            setTimeout(() => {
+                el.style.animationPlayState = 'running';
+            }, index * 100);
+        });
+    }, []);
+
     return (
         <Box sx={{ 
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100vh',
-            bgcolor: NAVY_BLUE_MAIN,
-            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+            position: 'relative',
+            background: `linear-gradient(135deg, 
+                ${NAVY_BLUE_MAIN} 0%, 
+                ${NAVY_BLUE_LIGHT} 35%, 
+                ${NAVY_BLUE_MAIN} 100%)`,
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+            '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: `
+                    radial-gradient(ellipse at 25% 25%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
+                    radial-gradient(ellipse at 75% 75%, rgba(184, 134, 11, 0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 50%, rgba(218, 165, 32, 0.03) 0%, transparent 50%)
+                `,
+                zIndex: 0
+            },
+            // Animation classes
+            '& .fade-in-up': {
+                animation: 'fadeInUp 0.6s ease-out forwards',
+                opacity: 0,
+                transform: 'translateY(30px)',
+            },
+            '& .scale-in': {
+                animation: 'scaleIn 0.7s ease-out forwards',
+                opacity: 0,
+                transform: 'scale(0.9)',
+                animationDelay: '0.2s'
+            },
+            '& .slide-in-right': {
+                animation: 'slideInRight 0.8s ease-out forwards',
+                opacity: 0,
+                transform: 'translateX(30px)',
+                animationDelay: '0.4s'
+            },
+            '@keyframes fadeInUp': {
+                'to': {
+                    opacity: 1,
+                    transform: 'translateY(0)',
+                }
+            },
+            '@keyframes scaleIn': {
+                'to': {
+                    opacity: 1,
+                    transform: 'scale(1)',
+                }
+            },
+            '@keyframes slideInRight': {
+                'to': {
+                    opacity: 1,
+                    transform: 'translateX(0)',
+                }
+            }
         }}>
             {/* Navbar */}
             <NavMentor 
@@ -90,6 +155,7 @@ const MentorStudentsListPage = () => {
                         display: { xs: "none", sm: "block" },
                         borderRight: `1px solid ${GOLD_MAIN}20`,
                     }}
+                    className="scale-in"
                 >
                     <SidebarMentor />
                 </Box>
@@ -161,7 +227,7 @@ const MentorStudentsListPage = () => {
                                 <Box sx={{ pt: 2, pr: 2, pb: 2, pl: 2, width: '100%' }}>
                                 <Grid container spacing={2} justifyContent="center">
                                 {students.map((student) => (
-                                    <Grid item xs={12} sm={10} md={8} lg={6} key={student.usn}>
+                                    <Grid item xs={12} sm={10} md={8} lg={6} key={student.usn} className="fade-in-up">
                                             <Card
                                                 sx={{
                                                     background: 'linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)',
@@ -251,6 +317,42 @@ const MentorStudentsListPage = () => {
                             </Box>
                         )}
                         </Box>
+
+                        {/* Animated floating elements */}
+                        <Box 
+                            sx={{ 
+                                position: 'absolute', 
+                                top: '10%', 
+                                left: '5%', 
+                                width: '80px', 
+                                height: '80px', 
+                                borderRadius: '50%',
+                                background: `${GOLD_MAIN}20`,
+                                animation: 'floating 6s infinite ease-in-out',
+                                zIndex: 0,
+                                '@keyframes floating': {
+                                    '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                                    '25%': { transform: 'translateY(-10px) rotate(1deg)' },
+                                    '50%': { transform: 'translateY(-5px) rotate(-1deg)' },
+                                    '75%': { transform: 'translateY(-15px) rotate(0.5deg)' }
+                                }
+                            }}
+                        />
+                        
+                        <Box 
+                            sx={{ 
+                                position: 'absolute', 
+                                bottom: '20%', 
+                                right: '15%', 
+                                width: '60px', 
+                                height: '60px', 
+                                transform: 'rotate(45deg)',
+                                background: `${GOLD_LIGHT}20`,
+                                animation: 'floating 8s infinite ease-in-out',
+                                animationDelay: '1s',
+                                zIndex: 0
+                            }}
+                        />
                     </Box>
                 )}
             </Box>
