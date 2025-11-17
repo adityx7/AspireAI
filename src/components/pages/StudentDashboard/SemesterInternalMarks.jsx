@@ -85,7 +85,8 @@ const SemesterInternalMarks = () => {
     
     // Validate numeric fields
     if (['ia1', 'ia2', 'ia3', 'lab', 'other', 'attendancePercentage'].includes(field)) {
-      const numValue = parseFloat(value) || 0;
+      // Handle empty string - store as 0
+      const numValue = value === '' ? 0 : parseFloat(value);
       
       // Apply max limits
       if (field === 'attendancePercentage') {
@@ -292,8 +293,8 @@ const SemesterInternalMarks = () => {
               fullWidth
               label="Fees to be Paid"
               type="number"
-              value={semesterData.feesToBePaid}
-              onChange={(e) => handleMetadataChange('feesToBePaid', parseFloat(e.target.value) || 0)}
+              value={semesterData.feesToBePaid || ''}
+              onChange={(e) => handleMetadataChange('feesToBePaid', e.target.value === '' ? 0 : parseFloat(e.target.value))}
             />
           </Grid>
           <Grid item xs={12} md={2}>
@@ -301,8 +302,8 @@ const SemesterInternalMarks = () => {
               fullWidth
               label="Fees Paid"
               type="number"
-              value={semesterData.feesPaid}
-              onChange={(e) => handleMetadataChange('feesPaid', parseFloat(e.target.value) || 0)}
+              value={semesterData.feesPaid || ''}
+              onChange={(e) => handleMetadataChange('feesPaid', e.target.value === '' ? 0 : parseFloat(e.target.value))}
             />
           </Grid>
           <Grid item xs={12} md={2}>
@@ -437,7 +438,7 @@ const SemesterInternalMarks = () => {
                       <TextField
                         size="small"
                         type="number"
-                        value={course.attendancePercentage}
+                        value={course.attendancePercentage || ''}
                         onChange={(e) => handleCourseFieldChange(index, 'attendancePercentage', e.target.value)}
                         inputProps={{ min: 0, max: 100, step: 0.1 }}
                         sx={{ width: 80 }}
@@ -447,7 +448,7 @@ const SemesterInternalMarks = () => {
                       <TextField
                         size="small"
                         type="number"
-                        value={course.ia1}
+                        value={course.ia1 || ''}
                         onChange={(e) => handleCourseFieldChange(index, 'ia1', e.target.value)}
                         inputProps={{ min: 0, max: 15, step: 0.5 }}
                         sx={{ width: 70 }}
@@ -457,7 +458,7 @@ const SemesterInternalMarks = () => {
                       <TextField
                         size="small"
                         type="number"
-                        value={course.ia2}
+                        value={course.ia2 || ''}
                         onChange={(e) => handleCourseFieldChange(index, 'ia2', e.target.value)}
                         inputProps={{ min: 0, max: 15, step: 0.5 }}
                         sx={{ width: 70 }}
@@ -467,7 +468,7 @@ const SemesterInternalMarks = () => {
                       <TextField
                         size="small"
                         type="number"
-                        value={course.ia3}
+                        value={course.ia3 || ''}
                         onChange={(e) => handleCourseFieldChange(index, 'ia3', e.target.value)}
                         inputProps={{ min: 0, max: 15, step: 0.5 }}
                         sx={{ width: 70 }}
@@ -477,7 +478,7 @@ const SemesterInternalMarks = () => {
                       <TextField
                         size="small"
                         type="number"
-                        value={course.lab}
+                        value={course.lab || ''}
                         onChange={(e) => handleCourseFieldChange(index, 'lab', e.target.value)}
                         inputProps={{ min: 0, max: 25, step: 0.5 }}
                         sx={{ width: 70 }}
@@ -487,7 +488,7 @@ const SemesterInternalMarks = () => {
                       <TextField
                         size="small"
                         type="number"
-                        value={course.other}
+                        value={course.other || ''}
                         onChange={(e) => handleCourseFieldChange(index, 'other', e.target.value)}
                         inputProps={{ min: 0, max: 25, step: 0.5 }}
                         sx={{ width: 70 }}
