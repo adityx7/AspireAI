@@ -101,8 +101,8 @@ const Navbar = ({ onDrawerToggle, title }) => {
                     edge="start"
                     onClick={onDrawerToggle}
                     sx={{
-                        display: { sm: "none" },
                         color: GOLD_LIGHT,
+                        mr: 2,
                         '&:hover': {
                             color: GOLD_MAIN,
                             background: 'rgba(184, 134, 11, 0.1)'

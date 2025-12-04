@@ -906,6 +906,10 @@ function Home() {
               sx={{ 
                 p: { xs: 3, md: 4 }, 
                 minWidth: { xs: 250, md: 280 }, 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 textAlign: 'center', 
                 background: 'linear-gradient(135deg, rgba(26, 43, 76, 0.4) 0%, rgba(10, 25, 47, 0.6) 100%)', 
                 backdropFilter: "blur(20px)",
@@ -954,11 +958,12 @@ function Home() {
                 variant="h6" 
                 sx={{ 
                   fontWeight: 600, 
-                  mb: 2, 
+                  mb: 1.5, 
                   color: '#F1F5F9', 
                   fontSize: '1.2rem',
                   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  width: '100%'
                 }}
               >
                 Sign Up
@@ -973,8 +978,8 @@ function Home() {
                   opacity: 0.9,
                   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
                   textAlign: 'center',
-                  mx: 'auto',
-                  maxWidth: '200px'
+                  width: '100%',
+                  px: 2
                 }}
               >
                 Create your profile and begin your mentorship journey.
@@ -987,6 +992,10 @@ function Home() {
               sx={{ 
                 p: { xs: 3, md: 4 }, 
                 minWidth: { xs: 250, md: 280 }, 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 textAlign: 'center', 
                 background: 'linear-gradient(135deg, rgba(26, 43, 76, 0.4) 0%, rgba(10, 25, 47, 0.6) 100%)', 
                 backdropFilter: "blur(20px)",
@@ -1035,11 +1044,12 @@ function Home() {
                 variant="h6" 
                 sx={{ 
                   fontWeight: 600, 
-                  mb: 2, 
+                  mb: 1.5, 
                   color: '#F1F5F9', 
                   fontSize: '1.2rem',
                   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  width: '100%'
                 }}
               >
                 Personalize Experience
@@ -1054,8 +1064,8 @@ function Home() {
                   opacity: 0.9,
                   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
                   textAlign: 'center',
-                  mx: 'auto',
-                  maxWidth: '200px'
+                  width: '100%',
+                  px: 2
                 }}
               >
                 Share your goals and interests to find the best mentor match.
@@ -1068,6 +1078,10 @@ function Home() {
               sx={{ 
                 p: { xs: 3, md: 4 }, 
                 minWidth: { xs: 250, md: 280 }, 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 textAlign: 'center', 
                 background: 'linear-gradient(135deg, rgba(26, 43, 76, 0.4) 0%, rgba(10, 25, 47, 0.6) 100%)', 
                 backdropFilter: "blur(20px)",
@@ -1116,11 +1130,12 @@ function Home() {
                 variant="h6" 
                 sx={{ 
                   fontWeight: 600, 
-                  mb: 2, 
+                  mb: 1.5, 
                   color: '#F1F5F9', 
                   fontSize: '1.2rem',
                   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  width: '100%'
                 }}
               >
                 Connect & Grow
@@ -1135,8 +1150,8 @@ function Home() {
                   opacity: 0.9,
                   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
                   textAlign: 'center',
-                  mx: 'auto',
-                  maxWidth: '200px'
+                  width: '100%',
+                  px: 2
                 }}
               >
                 Engage with your mentor through secure chat and calls—grow together!

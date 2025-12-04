@@ -41,6 +41,8 @@ import AdminPermissions from './components/pages/AdminPermissions';
 import AdminAddStudent from './components/pages/AdminAddStudent';
 import AdminBulkUpload from './components/pages/AdminBulkUpload';
 import AdminReports from './components/pages/AdminReports';
+import VideoCallRoom from './components/pages/VideoCallRoom';
+import VideoCallDashboard from './components/pages/VideoCallDashboard';
 
 export default function App() {
   return (
@@ -88,6 +90,8 @@ export default function App() {
           <Route path="/admin/add-student" element={<AdminAddStudent />} />
           <Route path="/admin/bulk-upload" element={<AdminBulkUpload />} />
           <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/video-calls" element={<VideoCallDashboard />} />
+          <Route path="/video-call/:roomId" element={<VideoCallRoom />} />
         </Routes>
       </Router>
     </AuthProvider>

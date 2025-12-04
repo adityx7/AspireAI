@@ -104,8 +104,8 @@ const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
                     edge="start"
                     onClick={onDrawerToggle}
                     sx={{
-                        display: { sm: "none" },
                         color: GOLD_LIGHT, // Gold menu icon to match theme
+                        mr: 2,
                         '&:hover': {
                             color: GOLD_MAIN,
                             background: 'rgba(184, 134, 11, 0.1)'
@@ -115,7 +115,7 @@ const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
                     <MenuIcon />
                 </IconButton>
 
-                <Box sx={{ flexGrow: 1, ml: 2 }}>
+                <Box sx={{ flexGrow: 1 }}>
                     <Typography
                         variant="h6"
                         sx={{

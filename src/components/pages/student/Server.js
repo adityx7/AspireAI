@@ -4,8 +4,18 @@ require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const socketIO = require("socket.io");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
 const PORT = process.env.PORT || 5002;
 
 // Middleware
@@ -1611,7 +1621,29 @@ try {
     console.warn('⚠️  Admin routes not available:', err.message);
 }
 
-// ✅ Start Server on PORT 5002
-app.listen(PORT, () => {
+// ✅ Video Call Routes
+try {
+    const videoCallRoutes = require('../../../routes/videoCallRoutes');
+    app.use('/api/video-calls', videoCallRoutes);
+    console.log('✅ Video call routes loaded');
+    console.log('   📹 Video call endpoints available');
+} catch (err) {
+    console.warn('⚠️  Video call routes not available:', err.message);
+}
+
+// ✅ Initialize Video Call Service with Socket.IO
+try {
+    const VideoCallService = require('../../../services/videoCallService');
+    const videoCallService = new VideoCallService(io);
+    console.log('✅ Video call service initialized');
+    console.log('   🔌 WebRTC signaling ready');
+    console.log('   💬 Real-time communication enabled');
+} catch (err) {
+    console.warn('⚠️  Video call service not available:', err.message);
+}
+
+// ✅ Start Server on PORT 5002 with Socket.IO
+server.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📹 Video call server ready on ws://localhost:${PORT}`);
 });
