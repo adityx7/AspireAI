@@ -1,9 +1,9 @@
 /* Video Call Dashboard Styles */
 
 .video-call-dashboard {
-  padding: 30px;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 30px 0;
+  width: 100%;
+  margin: 0;
   min-height: 100vh;
   background: linear-gradient(135deg, #0A192F 0%, #172A45 100%);
 }
@@ -13,7 +13,7 @@
   margin-bottom: 40px;
   padding: 30px;
   background: rgba(184, 134, 11, 0.1);
-  border: 2px solid #B8860B;
+  border: none;
   border-radius: 15px;
 }
 
@@ -88,7 +88,7 @@
 
 .call-option-card {
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid #B8860B;
+  border: none;
   border-radius: 15px;
   padding: 30px;
   display: flex;
@@ -100,7 +100,6 @@
 .call-option-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(184, 134, 11, 0.3);
-  border-color: #DAA520;
 }
 
 .call-option-card h3 {
@@ -119,7 +118,7 @@
 .date-input,
 .time-input {
   padding: 12px 15px;
-  border: 2px solid #B8860B;
+  border: none;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
   color: #fff;
@@ -131,7 +130,6 @@
 .user-select:focus,
 .date-input:focus,
 .time-input:focus {
-  border-color: #DAA520;
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -194,7 +192,7 @@
 
 .call-card {
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid #B8860B;
+  border: none;
   border-radius: 12px;
   padding: 20px;
   transition: all 0.3s ease;
@@ -270,7 +268,7 @@
 .cancel-btn {
   background: rgba(255, 0, 0, 0.2);
   color: #FF6B6B;
-  border: 2px solid #FF6B6B;
+  border: none;
 }
 
 .cancel-btn:hover {
@@ -290,14 +288,13 @@
 
 .history-card {
   background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(184, 134, 11, 0.3);
+  border: none;
   border-radius: 12px;
   padding: 20px;
   transition: all 0.3s ease;
 }
 
 .history-card:hover {
-  border-color: #B8860B;
   box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2);
 }
 
@@ -409,7 +406,7 @@
 .modal-content {
   position: relative;
   background: linear-gradient(135deg, #0A192F 0%, #172A45 100%);
-  border: 3px solid #B8860B;
+  border: none;
   border-radius: 20px;
   padding: 40px;
   text-align: center;

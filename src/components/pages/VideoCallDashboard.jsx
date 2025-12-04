@@ -17,8 +17,30 @@ import './VideoCallDashboard.css';
 
 const SOCKET_URL = 'http://localhost:5002';
 
-const VideoCallDashboard = ({ userType, userId, userName }) => {
+const VideoCallDashboard = () => {
   const navigate = useNavigate();
+  
+  // Get user info from localStorage
+  const [currentUser] = useState(() => {
+    const userType = localStorage.getItem('userType');
+    if (userType === 'student') {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return {
+        userId: user.usn || user._id,
+        userName: user.fullName || user.name || 'Student',
+        userType: 'student'
+      };
+    } else if (userType === 'mentor') {
+      const mentor = JSON.parse(localStorage.getItem('mentorData') || '{}');
+      return {
+        userId: mentor.mentorID || mentor._id,
+        userName: mentor.fullName || mentor.name || 'Mentor',
+        userType: 'mentor'
+      };
+    }
+    return { userId: '', userName: '', userType: 'student' };
+  });
+
   const [activeTab, setActiveTab] = useState('start');
   const [callHistory, setCallHistory] = useState([]);
   const [upcomingCalls, setUpcomingCalls] = useState([]);
@@ -47,7 +69,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
   const initializeSocket = () => {
     const newSocket = io(SOCKET_URL);
     
-    newSocket.emit('register', userId);
+    newSocket.emit('register', currentUser.userId);
     
     newSocket.on('incoming-call', (data) => {
       console.log('Incoming call:', data);
@@ -76,8 +98,8 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
 
   const fetchCallHistory = async () => {
     try {
-      const response = await axios.get(`/api/video-calls/history/${userId}`, {
-        params: { userType, limit: 20 }
+      const response = await axios.get(`/api/video-calls/history/${currentUser.userId}`, {
+        params: { userType: currentUser.userType, limit: 20 }
       });
       if (response.data.success) {
         setCallHistory(response.data.data);
@@ -89,7 +111,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
 
   const fetchUpcomingCalls = async () => {
     try {
-      const response = await axios.get(`/api/video-calls/upcoming/${userId}`);
+      const response = await axios.get(`/api/video-calls/upcoming/${currentUser.userId}`);
       if (response.data.success) {
         setUpcomingCalls(response.data.data);
       }
@@ -101,9 +123,9 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
   const fetchAvailableUsers = async () => {
     try {
       // Fetch mentors if student, students if mentor
-      const endpoint = userType === 'student' 
+      const endpoint = currentUser.userType === 'student' 
         ? '/api/mentor/list' 
-        : `/api/mentor/${userId}/mentees`;
+        : `/api/mentor/${currentUser.userId}/mentees`;
       
       const response = await axios.get(endpoint);
       setAvailableUsers(response.data || []);
@@ -128,11 +150,11 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
     setLoading(true);
     try {
       const response = await axios.post('/api/video-calls/initiate', {
-        initiatorId: userId,
-        initiatorType: userType,
-        initiatorName: userName,
+        initiatorId: currentUser.userId,
+        initiatorType: currentUser.userType,
+        initiatorName: currentUser.userName,
         receiverId,
-        receiverType: userType === 'student' ? 'mentor' : 'student',
+        receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
         receiverName
       });
 
@@ -141,8 +163,8 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
         
         // Notify the other user via socket
         socket.emit('call-user', {
-          callerId: userId,
-          callerName: userName,
+          callerId: currentUser.userId,
+          callerName: currentUser.userName,
           receiverId,
           receiverName,
           roomId
@@ -183,11 +205,11 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
       );
 
       const response = await axios.post('/api/video-calls/initiate', {
-        initiatorId: userId,
-        initiatorType: userType,
-        initiatorName: userName,
+        initiatorId: currentUser.userId,
+        initiatorType: currentUser.userType,
+        initiatorName: currentUser.userName,
         receiverId: selectedUser,
-        receiverType: userType === 'student' ? 'mentor' : 'student',
+        receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
         receiverName: user?.fullName || user?.name || 'User',
         scheduledTime: scheduledDateTime.toISOString()
       });
@@ -252,7 +274,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
   const cancelScheduledCall = async (roomId) => {
     try {
       await axios.put(`/api/video-calls/${roomId}/cancel`, {
-        cancelledBy: userId,
+        cancelledBy: currentUser.userId,
         cancelReason: 'Cancelled by user'
       });
       
@@ -303,7 +325,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
 
       <div className="dashboard-header">
         <h1><VideoCallIcon /> Video Calls</h1>
-        <p>Connect with your {userType === 'student' ? 'mentors' : 'mentees'} via video</p>
+        <p>Connect with your {currentUser.userType === 'student' ? 'mentors' : 'mentees'} via video</p>
       </div>
 
       {/* Tabs */}
@@ -344,7 +366,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
                   onChange={(e) => setSelectedUser(e.target.value)}
                   className="user-select"
                 >
-                  <option value="">Select {userType === 'student' ? 'mentor' : 'student'}</option>
+                  <option value="">Select {currentUser.userType === 'student' ? 'mentor' : 'student'}</option>
                   {availableUsers.map((user) => {
                     const id = user.mentorID || user.usn || user._id;
                     const name = user.fullName || user.name;
@@ -381,7 +403,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
                   onChange={(e) => setSelectedUser(e.target.value)}
                   className="user-select"
                 >
-                  <option value="">Select {userType === 'student' ? 'mentor' : 'student'}</option>
+                  <option value="">Select {currentUser.userType === 'student' ? 'mentor' : 'student'}</option>
                   {availableUsers.map((user) => {
                     const id = user.mentorID || user.usn || user._id;
                     const name = user.fullName || user.name;
@@ -435,7 +457,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
                   <div key={call._id} className="call-card scheduled">
                     <div className="call-header">
                       <h4>
-                        {call.initiator.userId === userId 
+                        {call.initiator.userId === currentUser.userId 
                           ? call.receiver.name 
                           : call.initiator.name}
                       </h4>
@@ -481,7 +503,7 @@ const VideoCallDashboard = ({ userType, userId, userName }) => {
                   <div key={call._id} className="history-card">
                     <div className="call-info">
                       <h4>
-                        {call.initiator.userId === userId 
+                        {call.initiator.userId === currentUser.userId 
                           ? call.receiver.name 
                           : call.initiator.name}
                       </h4>
