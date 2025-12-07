@@ -1,11 +1,74 @@
 /* Video Call Dashboard Styles */
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
 .video-call-dashboard {
   padding: 30px 0;
   width: 100%;
   margin: 0;
   min-height: 100vh;
   background: linear-gradient(135deg, #0A192F 0%, #172A45 100%);
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .dashboard-header {
@@ -15,6 +78,25 @@
   background: rgba(184, 134, 11, 0.1);
   border: none;
   border-radius: 15px;
+  animation: scaleIn 0.8s ease-out 0.2s both;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(184, 134, 11, 0.1),
+    transparent
+  );
+  animation: shimmer 3s infinite;
 }
 
 .dashboard-header h1 {
@@ -25,6 +107,15 @@
   align-items: center;
   justify-content: center;
   gap: 15px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 20px rgba(184, 134, 11, 0.5);
+  transition: all 0.3s ease;
+}
+
+.dashboard-header h1:hover {
+  text-shadow: 0 0 30px rgba(184, 134, 11, 0.8);
+  transform: scale(1.05);
 }
 
 .dashboard-header p {
@@ -40,6 +131,7 @@
   margin-bottom: 30px;
   border-bottom: 2px solid #B8860B;
   padding-bottom: 0;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
 }
 
 .dashboard-tabs button {
@@ -62,17 +154,22 @@
 .dashboard-tabs button:hover {
   background: rgba(184, 134, 11, 0.2);
   color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(184, 134, 11, 0.3);
 }
 
 .dashboard-tabs button.active {
   background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
   color: #fff;
   border-bottom: 3px solid #DAA520;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 5px 20px rgba(184, 134, 11, 0.5);
 }
 
 /* Tab Content */
 .tab-content {
   min-height: 400px;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 /* Start Call Section */
@@ -86,6 +183,14 @@
   gap: 30px;
 }
 
+.call-options .call-option-card:nth-child(1) {
+  animation: slideInFromLeft 0.8s ease-out 0.2s both;
+}
+
+.call-options .call-option-card:nth-child(2) {
+  animation: slideInFromRight 0.8s ease-out 0.2s both;
+}
+
 .call-option-card {
   background: rgba(255, 255, 255, 0.05);
   border: none;
@@ -94,18 +199,50 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.call-option-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(184, 134, 11, 0.05),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
 }
 
 .call-option-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(184, 134, 11, 0.3);
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(184, 134, 11, 0.4), 0 0 30px rgba(184, 134, 11, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.call-option-card:hover::before {
+  left: 100%;
 }
 
 .call-option-card h3 {
   color: #B8860B;
   font-size: 1.8rem;
   margin: 0;
+  text-shadow: 0 0 10px rgba(184, 134, 11, 0.3);
+  transition: all 0.3s ease;
+}
+
+.call-option-card:hover h3 {
+  text-shadow: 0 0 20px rgba(184, 134, 11, 0.6);
+  transform: scale(1.05);
 }
 
 .call-option-card p {
@@ -124,13 +261,24 @@
   color: #fff;
   font-size: 1rem;
   outline: none;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.user-select:hover,
+.date-input:hover,
+.time-input:hover {
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2);
 }
 
 .user-select:focus,
 .date-input:focus,
 .time-input:focus {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(184, 134, 11, 0.4), 0 0 0 2px rgba(184, 134, 11, 0.3);
 }
 
 .user-select option {
@@ -150,27 +298,59 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.instant-call-btn::before,
+.schedule-call-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.instant-call-btn:hover::before,
+.schedule-call-btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .instant-call-btn {
   background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
   color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
 }
 
 .instant-call-btn:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(0, 200, 83, 0.4);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(0, 200, 83, 0.5);
+}
+
+.instant-call-btn:active:not(:disabled) {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .schedule-call-btn {
   background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
   color: #fff;
+  box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
 }
 
 .schedule-call-btn:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(184, 134, 11, 0.5);
+}
+
+.schedule-call-btn:active:not(:disabled) {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .instant-call-btn:disabled,
@@ -190,17 +370,47 @@
   gap: 20px;
 }
 
+.calls-grid .call-card:nth-child(1) { animation: fadeInUp 0.6s ease-out 0.1s both; }
+.calls-grid .call-card:nth-child(2) { animation: fadeInUp 0.6s ease-out 0.2s both; }
+.calls-grid .call-card:nth-child(3) { animation: fadeInUp 0.6s ease-out 0.3s both; }
+.calls-grid .call-card:nth-child(4) { animation: fadeInUp 0.6s ease-out 0.4s both; }
+.calls-grid .call-card:nth-child(n+5) { animation: fadeInUp 0.6s ease-out 0.5s both; }
+
 .call-card {
   background: rgba(255, 255, 255, 0.05);
   border: none;
   border-radius: 12px;
   padding: 20px;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.call-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(184, 134, 11, 0.1),
+    transparent
+  );
+  transition: left 0.6s ease;
 }
 
 .call-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(184, 134, 11, 0.3);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(184, 134, 11, 0.4), 0 0 20px rgba(184, 134, 11, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.call-card:hover::before {
+  left: 100%;
 }
 
 .call-header {
@@ -252,17 +462,44 @@
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.join-btn::before,
+.cancel-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.5s, height 0.5s;
+}
+
+.join-btn:hover::before,
+.cancel-btn:hover::before {
+  width: 200px;
+  height: 200px;
 }
 
 .join-btn {
   background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
   color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 200, 83, 0.3);
 }
 
 .join-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 15px rgba(0, 200, 83, 0.4);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 200, 83, 0.5);
+}
+
+.join-btn:active {
+  transform: translateY(0) scale(1.02);
 }
 
 .cancel-btn {
@@ -285,6 +522,12 @@
   flex-direction: column;
   gap: 15px;
 }
+
+.history-list .history-card:nth-child(1) { animation: slideInFromLeft 0.6s ease-out 0.1s both; }
+.history-list .history-card:nth-child(2) { animation: slideInFromLeft 0.6s ease-out 0.2s both; }
+.history-list .history-card:nth-child(3) { animation: slideInFromLeft 0.6s ease-out 0.3s both; }
+.history-list .history-card:nth-child(4) { animation: slideInFromLeft 0.6s ease-out 0.4s both; }
+.history-list .history-card:nth-child(n+5) { animation: slideInFromLeft 0.6s ease-out 0.5s both; }
 
 .history-card {
   background: rgba(255, 255, 255, 0.05);
@@ -363,16 +606,28 @@
 }
 
 /* Empty State */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
 .empty-state {
   text-align: center;
   padding: 60px 20px;
   color: rgba(255, 255, 255, 0.5);
+  animation: fadeInUp 0.8s ease-out;
 }
 
 .empty-state svg {
   font-size: 4rem;
   margin-bottom: 20px;
   opacity: 0.3;
+  animation: float 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(184, 134, 11, 0.2));
 }
 
 .empty-state p {

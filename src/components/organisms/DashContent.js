@@ -3,6 +3,7 @@ import { Box, Typography, Button } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import Dashboard from "../../assets/Dashboard.png";
 import HeadsetMicIcon from "@mui/icons-material/HeadsetMic";
+import VideoCallIcon from "@mui/icons-material/VideoCall";
 import { useNavigate } from "react-router-dom";
 import Chatbox from "./Chatbox";
 
@@ -222,6 +223,94 @@ const DashboardContent = ({ selectedMenu }) => {
                     AI Assistant
                 </Button>
             </Box>
+
+            {/* Video Call Section */}
+            <Box
+                className="content-fade-in-up"
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+                    backdropFilter: "blur(25px)",
+                    p: 4,
+                    borderRadius: 4,
+                    textAlign: "center",
+                    width: { xs: "90%", sm: "80%", md: "60%" },
+                    boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                    border: "1px solid rgba(184, 134, 11, 0.15)",
+                    marginBottom: 3,
+                    position: "relative",
+                    overflow: "hidden",
+                    transition: "all 0.6s ease",
+                    '&:hover': {
+                        transform: 'translateY(-8px) scale(1.02)',
+                        boxShadow: "0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(184, 134, 11, 0.12)",
+                    }
+                }}
+            >
+                <VideoCallIcon sx={{ 
+                    fontSize: '4rem',
+                    color: '#B8860B',
+                    filter: "drop-shadow(0 4px 8px rgba(184, 134, 11, 0.4))",
+                    mb: 2
+                }} />
+                <Typography 
+                    variant="h5" 
+                    sx={{ 
+                        mt: 2, 
+                        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", 
+                        fontWeight: 700,
+                        background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        filter: "drop-shadow(0 2px 8px rgba(184, 134, 11, 0.3))",
+                        fontSize: { xs: "1.5rem", md: "1.8rem" }
+                    }}
+                >
+                    Video Calls
+                </Typography>
+                <Typography 
+                    variant="body1" 
+                    sx={{ 
+                        mt: 2, 
+                        width: "80%", 
+                        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                        color: "#F8FAFC",
+                        opacity: 0.9,
+                        lineHeight: 1.6
+                    }}
+                >
+                    Connect with your mentors via video calls. Schedule meetings or start instant calls.
+                </Typography>
+                <Button 
+                    variant="contained" 
+                    onClick={() => navigate('/video-calls')} 
+                    startIcon={<VideoCallIcon />}
+                    sx={{ 
+                        mt: 3,
+                        background: 'linear-gradient(135deg, #B8860B 0%, #DAA520 100%)',
+                        color: 'white',
+                        py: 1.5,
+                        px: 4,
+                        fontSize: '1rem',
+                        fontWeight: 'bold',
+                        borderRadius: 2,
+                        boxShadow: '0 4px 15px rgba(184, 134, 11, 0.3)',
+                        transition: 'all 0.3s ease',
+                        textTransform: 'none',
+                        '&:hover': {
+                            background: 'linear-gradient(135deg, #8B6914 0%, #B8860B 100%)',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 8px 25px rgba(184, 134, 11, 0.4)',
+                        }
+                    }}
+                >
+                    Start Video Call
+                </Button>
+            </Box>
+
             {/* Chat Modal */}
             <Chatbox open={chatOpen} onClose={() => setChatOpen(false)} />
         </Box>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Divider, Card, CardContent, Grid, IconButton, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, Divider, Card, CardContent, Grid, IconButton, CircularProgress, Alert, Button } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Tick icon
 import CancelIcon from "@mui/icons-material/Cancel"; // Cross icon
+import VideoCallIcon from "@mui/icons-material/VideoCall";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -299,6 +300,84 @@ export default function MentorTrainingPage() {
                     ))}
                 </Grid>
                 )}
+
+                {/* Video Call Section */}
+                <Box
+                    sx={{
+                        width: "100%",
+                        mt: 4,
+                        p: 4,
+                        background: `linear-gradient(135deg, ${NAVY_BLUE_LIGHT} 0%, ${NAVY_BLUE_MAIN} 100%)`,
+                        backdropFilter: 'blur(25px)',
+                        borderRadius: 4,
+                        textAlign: "center",
+                        boxShadow: `0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 ${GOLD_MAIN}14`,
+                        border: `1px solid ${GOLD_MAIN}30`,
+                        transition: 'all 0.4s ease',
+                        '&:hover': {
+                            transform: 'translateY(-5px)',
+                            boxShadow: `0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 0 ${GOLD_MAIN}20`,
+                        }
+                    }}
+                >
+                    <VideoCallIcon sx={{ 
+                        fontSize: '4rem',
+                        color: GOLD_MAIN,
+                        filter: `drop-shadow(0 4px 8px ${GOLD_MAIN}66)`,
+                        mb: 2
+                    }} />
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            mt: 2, 
+                            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", 
+                            fontWeight: 700,
+                            color: GOLD_LIGHT,
+                            textShadow: `0 2px 8px ${GOLD_MAIN}50`,
+                            fontSize: { xs: "1.5rem", md: "1.8rem" }
+                        }}
+                    >
+                        Video Calls
+                    </Typography>
+                    <Typography 
+                        variant="body1" 
+                        sx={{ 
+                            mt: 2, 
+                            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                            color: "rgba(255, 255, 255, 0.9)",
+                            lineHeight: 1.6,
+                            maxWidth: "600px",
+                            margin: "16px auto"
+                        }}
+                    >
+                        Connect with your students via video calls. Schedule meetings or start instant calls to provide guidance and support.
+                    </Typography>
+                    <Button 
+                        variant="contained" 
+                        onClick={() => navigate('/video-calls')} 
+                        startIcon={<VideoCallIcon />}
+                        sx={{ 
+                            mt: 3,
+                            background: `linear-gradient(135deg, ${GOLD_MAIN} 0%, ${GOLD_LIGHT} 100%)`,
+                            color: 'white',
+                            py: 1.5,
+                            px: 4,
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            borderRadius: 2,
+                            boxShadow: `0 4px 15px ${GOLD_MAIN}50`,
+                            transition: 'all 0.3s ease',
+                            textTransform: 'none',
+                            '&:hover': {
+                                background: `linear-gradient(135deg, ${GOLD_DARK} 0%, ${GOLD_MAIN} 100%)`,
+                                transform: 'translateY(-2px)',
+                                boxShadow: `0 8px 25px ${GOLD_MAIN}66`,
+                            }
+                        }}
+                    >
+                        Start Video Call
+                    </Button>
+                </Box>
             </Box>
         </Box>
     );

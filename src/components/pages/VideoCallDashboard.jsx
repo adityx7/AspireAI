@@ -23,13 +23,20 @@ const VideoCallDashboard = () => {
   // Get user info from localStorage
   const [currentUser] = useState(() => {
     const userType = localStorage.getItem('userType');
+    console.log('🔍 UserType from localStorage:', userType);
+    
     if (userType === 'student') {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      return {
+      const userString = localStorage.getItem('user');
+      console.log('📦 Raw user data:', userString);
+      const user = JSON.parse(userString || '{}');
+      console.log('👤 Parsed user:', user);
+      const currentUserData = {
         userId: user.usn || user._id,
         userName: user.fullName || user.name || 'Student',
         userType: 'student'
       };
+      console.log('✅ Final currentUser:', currentUserData);
+      return currentUserData;
     } else if (userType === 'mentor') {
       const mentor = JSON.parse(localStorage.getItem('mentorData') || '{}');
       return {
@@ -38,6 +45,7 @@ const VideoCallDashboard = () => {
         userType: 'mentor'
       };
     }
+    console.log('⚠️ No valid userType, using default');
     return { userId: '', userName: '', userType: 'student' };
   });
 
@@ -98,7 +106,7 @@ const VideoCallDashboard = () => {
 
   const fetchCallHistory = async () => {
     try {
-      const response = await axios.get(`/api/video-calls/history/${currentUser.userId}`, {
+      const response = await axios.get(`http://localhost:5002/api/video-calls/history/${currentUser.userId}`, {
         params: { userType: currentUser.userType, limit: 20 }
       });
       if (response.data.success) {
@@ -110,13 +118,19 @@ const VideoCallDashboard = () => {
   };
 
   const fetchUpcomingCalls = async () => {
+    console.log('📅 Fetching upcoming calls for user:', currentUser.userId);
     try {
-      const response = await axios.get(`/api/video-calls/upcoming/${currentUser.userId}`);
+      const response = await axios.get(`http://localhost:5002/api/video-calls/upcoming/${currentUser.userId}`);
+      console.log('📋 Upcoming calls response:', response.data);
       if (response.data.success) {
         setUpcomingCalls(response.data.data);
+        console.log('✅ Set upcoming calls:', response.data.data);
+      } else {
+        console.warn('⚠️ No upcoming calls or unsuccessful response');
       }
     } catch (error) {
-      console.error('Error fetching upcoming calls:', error);
+      console.error('❌ Error fetching upcoming calls:', error);
+      console.error('Error details:', error.response?.data);
     }
   };
 
@@ -124,11 +138,25 @@ const VideoCallDashboard = () => {
     try {
       // Fetch mentors if student, students if mentor
       const endpoint = currentUser.userType === 'student' 
-        ? '/api/mentor/list' 
-        : `/api/mentor/${currentUser.userId}/mentees`;
+        ? 'http://localhost:5002/api/mentor/details' 
+        : `http://localhost:5002/api/mentor/${currentUser.userId}/mentees`;
       
       const response = await axios.get(endpoint);
-      setAvailableUsers(response.data || []);
+      
+      // Format the response data
+      if (currentUser.userType === 'student') {
+        // For students fetching mentors - response is array of mentor objects
+        const formattedMentors = (response.data || []).map(mentor => ({
+          id: mentor.mentorID || mentor._id,
+          mentorID: mentor.mentorID,
+          fullName: mentor.fullName || mentor.name,
+          name: mentor.fullName || mentor.name
+        }));
+        setAvailableUsers(formattedMentors);
+      } else {
+        // For mentors fetching students - response.data.mentees
+        setAvailableUsers(response.data.mentees || response.data || []);
+      }
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error('Failed to load available users');
@@ -138,60 +166,89 @@ const VideoCallDashboard = () => {
   useEffect(() => {
     if (activeTab === 'start') {
       fetchAvailableUsers();
+    } else if (activeTab === 'scheduled') {
+      fetchUpcomingCalls();
+    } else if (activeTab === 'history') {
+      fetchCallHistory();
     }
-  }, [activeTab]);
+  }, [activeTab, currentUser.userType]);
 
   const startInstantCall = async (receiverId, receiverName) => {
+    console.log('🎥 startInstantCall called', { receiverId, receiverName });
+    console.log('👤 currentUser:', currentUser);
+    
     if (!receiverId || !receiverName) {
       toast.error('Please select a user to call');
       return;
     }
 
     setLoading(true);
+    
+    const callData = {
+      initiatorId: currentUser.userId,
+      initiatorType: currentUser.userType,
+      initiatorName: currentUser.userName,
+      receiverId,
+      receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
+      receiverName
+    };
+    
+    console.log('📤 Sending call data:', callData);
+    
     try {
-      const response = await axios.post('/api/video-calls/initiate', {
-        initiatorId: currentUser.userId,
-        initiatorType: currentUser.userType,
-        initiatorName: currentUser.userName,
-        receiverId,
-        receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
-        receiverName
-      });
+      const response = await axios.post('http://localhost:5002/api/video-calls/initiate', callData);
 
+      console.log('✅ Response received:', response.data);
+      
       if (response.data.success) {
         const { roomId } = response.data.data;
         
+        console.log('🚪 Room ID:', roomId);
+        
         // Notify the other user via socket
-        socket.emit('call-user', {
-          callerId: currentUser.userId,
-          callerName: currentUser.userName,
-          receiverId,
-          receiverName,
-          roomId
-        });
+        if (socket) {
+          socket.emit('call-user', {
+            callerId: currentUser.userId,
+            callerName: currentUser.userName,
+            receiverId,
+            receiverName,
+            roomId
+          });
+          console.log('📡 Socket notification sent');
+        } else {
+          console.warn('⚠️ Socket not connected');
+        }
 
         toast.success('Calling...');
         
         // Navigate to call room after a brief delay
         setTimeout(() => {
+          console.log('🎯 Navigating to:', `/video-call/${roomId}`);
           navigate(`/video-call/${roomId}`);
         }, 1000);
+      } else {
+        console.error('❌ Call initiation failed:', response.data);
+        toast.error(response.data.message || 'Failed to start call');
       }
     } catch (error) {
-      console.error('Error starting call:', error);
-      toast.error('Failed to start call');
+      console.error('❌ Error starting call:', error);
+      console.error('Error details:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Failed to start call');
     } finally {
       setLoading(false);
     }
   };
 
   const scheduleCall = async () => {
+    console.log('📅 scheduleCall called', { selectedUser, scheduleDate, scheduleTime });
+    
     if (!selectedUser || !scheduleDate || !scheduleTime) {
       toast.error('Please fill all fields');
       return;
     }
 
     const scheduledDateTime = new Date(`${scheduleDate}T${scheduleTime}`);
+    console.log('⏰ Scheduled DateTime:', scheduledDateTime);
     
     if (scheduledDateTime <= new Date()) {
       toast.error('Please select a future date and time');
@@ -203,8 +260,10 @@ const VideoCallDashboard = () => {
       const user = availableUsers.find(u => 
         (u.mentorID || u.usn || u._id) === selectedUser
       );
+      
+      console.log('👤 Found user for scheduling:', user);
 
-      const response = await axios.post('/api/video-calls/initiate', {
+      const scheduleData = {
         initiatorId: currentUser.userId,
         initiatorType: currentUser.userType,
         initiatorName: currentUser.userName,
@@ -212,7 +271,13 @@ const VideoCallDashboard = () => {
         receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
         receiverName: user?.fullName || user?.name || 'User',
         scheduledTime: scheduledDateTime.toISOString()
-      });
+      };
+      
+      console.log('📤 Sending schedule data:', scheduleData);
+
+      const response = await axios.post('http://localhost:5002/api/video-calls/initiate', scheduleData);
+      
+      console.log('✅ Schedule response:', response.data);
 
       if (response.data.success) {
         toast.success('Call scheduled successfully!');
@@ -221,10 +286,14 @@ const VideoCallDashboard = () => {
         setSelectedUser('');
         fetchUpcomingCalls();
         setActiveTab('scheduled');
+      } else {
+        console.error('❌ Schedule failed:', response.data);
+        toast.error(response.data.message || 'Failed to schedule call');
       }
     } catch (error) {
-      console.error('Error scheduling call:', error);
-      toast.error('Failed to schedule call');
+      console.error('❌ Error scheduling call:', error);
+      console.error('Error details:', error.response?.data);
+      toast.error(error.response?.data?.message || 'Failed to schedule call');
     } finally {
       setLoading(false);
     }
@@ -273,7 +342,7 @@ const VideoCallDashboard = () => {
 
   const cancelScheduledCall = async (roomId) => {
     try {
-      await axios.put(`/api/video-calls/${roomId}/cancel`, {
+      await axios.put(`http://localhost:5002/api/video-calls/${roomId}/cancel`, {
         cancelledBy: currentUser.userId,
         cancelReason: 'Cancelled by user'
       });
@@ -381,9 +450,12 @@ const VideoCallDashboard = () => {
                 <button
                   className="instant-call-btn"
                   onClick={() => {
+                    console.log('🔘 Button clicked! selectedUser:', selectedUser);
+                    console.log('👥 availableUsers:', availableUsers);
                     const user = availableUsers.find(u => 
                       (u.mentorID || u.usn || u._id) === selectedUser
                     );
+                    console.log('👤 Found user:', user);
                     startInstantCall(selectedUser, user?.fullName || user?.name);
                   }}
                   disabled={!selectedUser || loading}
@@ -432,7 +504,10 @@ const VideoCallDashboard = () => {
 
                 <button
                   className="schedule-call-btn"
-                  onClick={scheduleCall}
+                  onClick={() => {
+                    console.log('🔘 Schedule button clicked!');
+                    scheduleCall();
+                  }}
                   disabled={!selectedUser || !scheduleDate || !scheduleTime || loading}
                 >
                   <Schedule />

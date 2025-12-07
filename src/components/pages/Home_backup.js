@@ -1,13 +1,8 @@
-import React, { useEffect, useRef } from "react";
-import { Box, Grid, Typography, Button, Link } from "@mui/material";
-import PhoneIphoneOutlinedIcon from "@mui/icons-material/PhoneIphoneOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
-import TextsmsRoundedIcon from "@mui/icons-material/TextsmsRounded";
-import manImage from "../../assets/man.png";
-import girlImage from "../../assets/girl.png";
-import dotImage from "../../assets/Dot.png";
-import chatImage from "../../assets/Chat.png";
-import pplImage from "../../assets/pplImage.png";
+import React from "react";
+import { Box, Typography, Button } from "@mui/material";
+import SchoolIcon from "@mui/icons-material/School";
+import PersonIcon from "@mui/icons-material/Person";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import { useNavigate } from "react-router-dom";
 
 function Home() {
@@ -551,88 +546,147 @@ function Home() {
           >
             Unlock your potential with guidance from experienced mentors—empowering your journey to success!
           </Typography>
-          {/* Three Section Buttons */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: '400px' }}>
-            {/* Student Section */}
-            <Button
-              className="bounce-in pulse-glow stagger-child"
-              variant="contained"
-              onClick={() => navigate("/login")}
+          <Button
+            className="bounce-in pulse-glow stagger-child"
+            variant="contained"
+            sx={{
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.9) 0%, rgba(10, 25, 47, 0.95) 100%)",
+              color: "#F8FAFC",
+              fontWeight: 600,
+              fontSize: "1rem",
+              px: 4,
+              py: 1.8,
+              borderRadius: 12,
+              boxShadow: "0 8px 25px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(184, 134, 11, 0.1)",
+              textTransform: "none",
+              mb: 2,
+              border: "1px solid rgba(184, 134, 11, 0.2)",
+              position: "relative",
+              overflow: "hidden",
+              transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              transform: "perspective(500px) rotateX(0deg)",
+              animationDelay: '1s',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.1), transparent)',
+                transition: 'left 0.6s'
+              },
+              "&:hover": {
+                background: "linear-gradient(135deg, rgba(184, 134, 11, 0.15) 0%, rgba(26, 43, 76, 0.9) 100%)",
+                boxShadow: "0 12px 35px rgba(0, 0, 0, 0.3), 0 0 20px rgba(184, 134, 11, 0.2), inset 0 1px 0 rgba(184, 134, 11, 0.2)",
+                transform: "perspective(500px) rotateX(-2deg) translateY(-2px) scale(1.05)",
+                border: "1px solid rgba(184, 134, 11, 0.4)",
+                animation: 'none',
+                '&::before': {
+                  left: '100%'
+                }
+              },
+              "&:active": {
+                transform: "perspective(500px) rotateX(2deg) translateY(1px)",
+                boxShadow: "0 4px 15px rgba(0, 0, 0, 0.3)"
+              }
+            }}
+            onClick={() => navigate("/student/register")}
+          >
+            Find a Mentor
+          </Button>
+          <Typography
+            className="slide-in-bottom stagger-child"
+            variant="body2"
+            sx={{
+              mt: 2,
+              fontSize: "0.95rem",
+              color: "#94A3B8",
+              opacity: 0.9,
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+              animationDelay: '1.2s'
+            }}
+          >
+            Looking to mentor?{" "}
+            <Link
+              href="/mentor/register"
               sx={{
-                background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
-                color: "#FFF",
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                py: 2,
-                borderRadius: 3,
-                textTransform: "none",
-                boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
-                transition: "all 0.3s ease",
-                animationDelay: '1s',
-                "&:hover": {
-                  background: "linear-gradient(135deg, #8B6914 0%, #B8860B 100%)",
-                  boxShadow: "0 12px 35px rgba(184, 134, 11, 0.5)",
-                  transform: "translateY(-3px)",
-                },
-              }}
-            >
-              Student Login / Sign Up
-            </Button>
-
-            {/* Mentor Section */}
-            <Button
-              className="bounce-in pulse-glow stagger-child"
-              variant="contained"
-              onClick={() => navigate("/mentor/login")}
-              sx={{
-                background: "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)",
-                color: "#FFF",
-                fontWeight: 600,
-                fontSize: "1.1rem",
-                py: 2,
-                borderRadius: 3,
-                textTransform: "none",
-                boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
-                transition: "all 0.3s ease",
-                animationDelay: '1.2s',
-                "&:hover": {
-                  background: "linear-gradient(135deg, #8B6914 0%, #B8860B 100%)",
-                  boxShadow: "0 12px 35px rgba(184, 134, 11, 0.5)",
-                  transform: "translateY(-3px)",
-                },
-              }}
-            >
-              Mentor Login / Sign Up
-            </Button>
-
-            {/* Admin Section */}
-            <Button
-              className="bounce-in pulse-glow stagger-child"
-              variant="outlined"
-              onClick={() => navigate("/admin/login")}
-              sx={{
-                background: "transparent",
                 color: "#B8860B",
-                fontWeight: 600,
-                fontSize: "1.05rem",
-                py: 1.8,
-                borderRadius: 3,
-                border: "2px solid #B8860B",
-                textTransform: "none",
+                textDecoration: "none",
+                fontWeight: 500,
+                position: "relative",
                 transition: "all 0.3s ease",
-                animationDelay: '1.4s',
-                "&:hover": {
-                  background: "rgba(184, 134, 11, 0.1)",
-                  boxShadow: "0 5px 15px rgba(184, 134, 11, 0.3)",
-                  transform: "translateY(-2px)",
-                  borderColor: "#DAA520",
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: -2,
+                  left: 0,
+                  width: 0,
+                  height: 1,
+                  background: 'linear-gradient(90deg, #B8860B, #DAA520)',
+                  transition: 'width 0.3s ease'
+                },
+                "&:hover": { 
                   color: "#DAA520",
+                  filter: "drop-shadow(0 0 8px rgba(184, 134, 11, 0.3))",
+                  transform: 'scale(1.05)',
+                  '&::after': {
+                    width: '100%'
+                  }
                 },
               }}
             >
-              🔐 Admin Access
-            </Button>
-          </Box>
+              Click here
+            </Link>
+          </Typography>
+          
+          {/* Admin Login Button */}
+          <Button
+            className="bounce-in pulse-glow stagger-child"
+            variant="outlined"
+            onClick={() => navigate("/admin/login")}
+            sx={{
+              mt: 3,
+              background: "linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(184, 134, 11, 0.05) 100%)",
+              color: "#B8860B",
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              px: 3,
+              py: 1.2,
+              borderRadius: 10,
+              border: "2px solid rgba(184, 134, 11, 0.3)",
+              textTransform: "none",
+              position: "relative",
+              overflow: "hidden",
+              transition: "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+              animationDelay: '1.4s',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.15), transparent)',
+                transition: 'left 0.6s'
+              },
+              "&:hover": {
+                background: "linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(139, 0, 0, 0.15) 100%)",
+                boxShadow: "0 8px 20px rgba(184, 134, 11, 0.25), inset 0 1px 0 rgba(184, 134, 11, 0.1)",
+                transform: "translateY(-2px) scale(1.03)",
+                border: "2px solid rgba(184, 134, 11, 0.5)",
+                color: "#DAA520",
+                '&::before': {
+                  left: '100%'
+                }
+              },
+              "&:active": {
+                transform: "translateY(0px) scale(0.98)"
+              }
+            }}
+          >
+            🔐 Admin Access
+          </Button>
         </Box>
         {/* Right Content - Professional Images */}
         <Box 
