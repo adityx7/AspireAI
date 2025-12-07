@@ -5,7 +5,6 @@ function ButtonComponent({ onClick = () => {} }) {
   const navItems = [
     { label: 'Home', id: 1 },
     { label: 'Contact', id: 2 },
-    { label: 'Login', id: 3 },
   ];
 
   return (
