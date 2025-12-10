@@ -54,26 +54,32 @@ const DocumentsPage = () => {
 
     return (
         <Box sx={{ 
-            mt: { xs: "40px", md: "180px" }, 
+            mt: { xs: "60px", md: "80px" }, 
+            mb: { xs: "40px", md: "80px" },
+            px: { xs: 2, sm: 3 },
             display: "flex", 
             flexDirection: "column", 
-            alignItems: "center" 
+            alignItems: "center",
+            minHeight: "70vh",
+            justifyContent: "center",
+            position: "relative",
+            zIndex: 100
         }}>
             {/* Top Section */}
             <Box 
-                className="fade-in-up"
                 sx={{ 
                 textAlign: "center", 
-                padding: "32px",
-                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
+                padding: "40px",
+                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
                 backdropFilter: "blur(25px)",
-                border: "1px solid rgba(184, 134, 11, 0.15)",
+                border: "1px solid rgba(184, 134, 11, 0.3)",
                 borderRadius: "24px",
-                maxWidth: "500px", 
+                maxWidth: "550px", 
                 width: "100%",
-                boxShadow: "0 25px 80px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                boxShadow: "0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(184, 134, 11, 0.1)",
                 position: "relative",
                 overflow: "hidden",
+                opacity: 1,
                 '&::before': {
                     content: '""',
                     position: 'absolute',

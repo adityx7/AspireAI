@@ -11,19 +11,35 @@ import {
   CardActionArea,
   Chip,
   CircularProgress,
-  Alert
+  Alert,
+  Drawer
 } from '@mui/material';
+import SideBar from '../../organisms/SideBar';
+import NavDash from '../../organisms/NavDash';
 import { motion } from 'framer-motion';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const InternalMarksOverview = () => {
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [semestersData, setSemestersData] = useState([]);
   
   // Get user ID from your auth context or local storage
   const userId = localStorage.getItem('userId') || ''; // Adjust based on your auth setup
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleMenuClick = (path) => {
+    navigate(`/${path}`);
+    if (mobileOpen) setMobileOpen(false);
+    setSidebarOpen(false);
+  };
 
   useEffect(() => {
     fetchInternalMarksData();
@@ -67,23 +83,74 @@ const InternalMarksOverview = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress />
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)' }}>
+        <NavDash onDrawerToggle={handleDrawerToggle} title="Internal Marks" />
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <CircularProgress />
+        </Box>
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Container>
-        <Alert severity="error" sx={{ mt: 3 }}>{error}</Alert>
-      </Container>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)' }}>
+        <NavDash onDrawerToggle={handleDrawerToggle} title="Internal Marks" />
+        <Container>
+          <Alert severity="error" sx={{ mt: 3 }}>{error}</Alert>
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)', py: 4 }}>
-    <Container maxWidth="lg">
+    <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)', display: 'flex', flexDirection: 'column' }}>
+      {/* Navbar */}
+      <NavDash onDrawerToggle={handleDrawerToggle} title="Internal Marks" />
+
+      <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+        {/* Sliding Sidebar */}
+        <Drawer
+          variant="temporary"
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          sx={{
+            display: { xs: "none", sm: "block" },
+            '& .MuiDrawer-paper': {
+              width: 280,
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+              backdropFilter: "blur(25px)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid rgba(184, 134, 11, 0.15)",
+              borderLeft: "none",
+            }
+          }}
+        >
+          <SideBar onMenuClick={handleMenuClick} />
+        </Drawer>
+
+        {/* Mobile Sidebar */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{ 
+            display: { xs: "block", sm: "none" },
+            '& .MuiDrawer-paper': {
+              width: 280,
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+              backdropFilter: "blur(25px)",
+              border: "1px solid rgba(184, 134, 11, 0.15)",
+            }
+          }}
+        >
+          <SideBar onMenuClick={handleMenuClick} />
+        </Drawer>
+
+        {/* Main Content */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", width: "100%", py: 4 }}>
+          <Container maxWidth="lg">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -221,7 +288,9 @@ const InternalMarksOverview = () => {
           );
         })}
       </Grid>
-    </Container>
+          </Container>
+        </Box>
+      </Box>
     </Box>
   );
 };

@@ -59,11 +59,7 @@ const Sidebar = ({ onMenuClick }) => {
                 height: "100vh",
                 boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
                 border: "1px solid rgba(184, 134, 11, 0.15)",
-                position: "fixed", // Changed from relative to fixed
-                left: 0,
-                top: 0,
                 overflow: "hidden",
-                zIndex: 1200, // Ensure sidebar is above other content
                 '&::before': {
                     content: '""',
                     position: 'absolute',
@@ -161,9 +157,11 @@ const Sidebar = ({ onMenuClick }) => {
                             primary={text}
                             sx={{
                                 '& .MuiListItemText-primary': {
-                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                    fontFamily: "'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
                                     fontWeight: currentPath === path ? "600" : "500",
-                                    fontSize: "14px"
+                                    fontSize: "15px",
+                                    letterSpacing: "0.3px",
+                                    lineHeight: 1.5
                                 }
                             }}
                         />
@@ -188,23 +186,19 @@ const Sidebar = ({ onMenuClick }) => {
                             mx: "12px",
                             borderRadius: "12px",
                             background: currentPath === path 
-                                ? "linear-gradient(135deg, #B8860B 0%, #DAA520 100%)"
+                                ? "linear-gradient(135deg, #1A2B4C 0%, #0A192F 100%)"
                                 : "transparent",
-                            color: currentPath === path ? "#ffffff" : "#ffffff",
+                            color: currentPath === path ? "#B8860B" : "#ffffff",
                             transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                            borderLeft: currentPath === path ? "3px solid #FFFFFF" : "3px solid transparent",
+                            borderLeft: currentPath === path ? "3px solid #B8860B" : "3px solid transparent",
+                            position: 'relative',
                             '&:hover': {
                                 background: currentPath === path
-                                    ? "linear-gradient(135deg, #DAA520 0%, #B8860B 100%)"
-                                    : "rgba(184, 134, 11, 0.1)",
-                                // Removed transform property to prevent movement
-                                boxShadow: currentPath === path
-                                    ? "0 8px 25px rgba(184, 134, 11, 0.3)"
-                                    : "0 4px 15px rgba(184, 134, 11, 0.1)",
+                                    ? "linear-gradient(135deg, #1A2B4C 0%, #0A192F 100%)"
+                                    : "rgba(26, 43, 76, 0.3)",
                                 borderLeft: "3px solid #B8860B"
                             },
                             ...(currentPath === path && {
-                                boxShadow: "0 8px 25px rgba(184, 134, 11, 0.3)",
                                 '&::before': {
                                     content: '""',
                                     position: 'absolute',
@@ -212,7 +206,7 @@ const Sidebar = ({ onMenuClick }) => {
                                     top: 0,
                                     bottom: 0,
                                     width: '3px',
-                                    background: '#ffffff',
+                                    background: '#B8860B',
                                     borderRadius: '0 2px 2px 0'
                                 }
                             })
@@ -231,9 +225,11 @@ const Sidebar = ({ onMenuClick }) => {
                             primary={text}
                             sx={{
                                 '& .MuiListItemText-primary': {
-                                    fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+                                    fontFamily: "'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
                                     fontWeight: currentPath === path ? "600" : "500",
-                                    fontSize: "14px"
+                                    fontSize: "15px",
+                                    letterSpacing: "0.3px",
+                                    lineHeight: 1.5
                                 }
                             }}
                         />

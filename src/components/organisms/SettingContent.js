@@ -155,7 +155,7 @@ const SettingsPage = () => {
                 position="top-right" 
                 autoClose={3000}
                 toastStyle={{
-                    background: "rgba(44, 62, 87, 0.95)",
+                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
                     backdropFilter: "blur(15px)",
                     border: "1px solid rgba(184, 134, 11, 0.2)",
                     borderRadius: "12px",
@@ -210,7 +210,7 @@ const SettingsPage = () => {
             {/* Step Content */}
             <Box
                 sx={{
-                    background: "rgba(44, 62, 87, 0.5)",
+                    background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
                     backdropFilter: "blur(25px)",
                     border: "1px solid rgba(184, 134, 11, 0.2)",
                     width: "60%",

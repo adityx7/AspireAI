@@ -8,6 +8,7 @@ import ContactPage from "../organisms/ContactDashContent";
 
 const ContactDash = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const [title, setTitle] = useState("Dashboard");
@@ -15,39 +16,14 @@ const ContactDash = () => {
     // Shimmer background styling
     const shimmerBackground = {
         minHeight: "100vh",
-        background: `
-            linear-gradient(135deg, 
-                rgba(10, 25, 47, 0.9) 0%, 
-                rgba(26, 43, 76, 0.85) 35%, 
-                rgba(50, 73, 94, 0.8) 100%
-            ),
-            radial-gradient(circle at 30% 70%, rgba(184, 134, 11, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 70% 30%, rgba(218, 165, 32, 0.1) 0%, transparent 50%)
-        `,
-        animation: 'shimmer 4s ease-in-out infinite',
+        background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
         position: 'relative',
         overflow: 'hidden',
-        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+        color: "#F8FAFC"
     };
 
-    const shimmerOverlay = {
-        position: 'absolute',
-        top: 0,
-        left: '-100%',
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.05), transparent)',
-        animation: 'shimmerSlide 3s ease-in-out infinite',
-        zIndex: 1
-    };
 
-    // Add animation keyframes to document head
-    useEffect(() => {
-        // Animation styles removed for immediate page load
-        return () => {
-            // Cleanup function (empty since no styles to remove)
-        };
-    }, []);
 
     // Define the sidebar options and map them to their paths
     const sidebarOptions = useMemo(() => [
@@ -70,10 +46,13 @@ const ContactDash = () => {
         if (location.pathname !== `/${path}`) {
             navigate(`/${path}`);
         }
+        if (mobileOpen) setMobileOpen(false);
+        setSidebarOpen(false);
     };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     return (
@@ -97,6 +76,10 @@ const ContactDash = () => {
                 transform: 'translateX(30px)',
                 animationDelay: '0.4s'
             },
+            '& .floating-element': {
+                animation: 'floating 6s ease-in-out infinite',
+                transition: 'transform 0.3s ease-out'
+            },
             '@keyframes fadeInUp': {
                 'to': {
                     opacity: 1,
@@ -114,6 +97,12 @@ const ContactDash = () => {
                     opacity: 1,
                     transform: 'translateX(0)',
                 }
+            },
+            '@keyframes floating': {
+                '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                '25%': { transform: 'translateY(-10px) rotate(1deg)' },
+                '50%': { transform: 'translateY(-20px) rotate(0deg)' },
+                '75%': { transform: 'translateY(-10px) rotate(-1deg)' }
             }
         }}>
             {/* Animated Background Elements */}
@@ -126,6 +115,34 @@ const ContactDash = () => {
                 background: 'radial-gradient(circle at 20% 80%, rgba(184, 134, 11, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(26, 43, 76, 0.2) 0%, transparent 50%)',
                 zIndex: 0,
                 pointerEvents: 'none'
+            }} />
+            
+            {/* Floating Decorative Elements */}
+            <Box className="floating-element" sx={{
+                position: 'fixed',
+                top: '15%',
+                left: '3%',
+                width: '50px',
+                height: '50px',
+                background: 'linear-gradient(45deg, rgba(184, 134, 11, 0.1), rgba(184, 134, 11, 0.2))',
+                borderRadius: '50%',
+                zIndex: 1,
+                pointerEvents: 'none',
+                filter: 'blur(1px)'
+            }} />
+            
+            <Box className="floating-element" sx={{
+                position: 'fixed',
+                top: '70%',
+                right: '5%',
+                width: '35px',
+                height: '35px',
+                background: 'linear-gradient(45deg, rgba(26, 43, 76, 0.2), rgba(26, 43, 76, 0.3))',
+                borderRadius: '50%',
+                zIndex: 1,
+                pointerEvents: 'none',
+                filter: 'blur(1px)',
+                animationDelay: '3s'
             }} />
             
             {/* Floating Decorative Elements */}
@@ -155,8 +172,6 @@ const ContactDash = () => {
                 filter: 'blur(1px)',
                 animationDelay: '2s'
             }} />
-
-            <Box sx={{ ...shimmerOverlay }} />
             
             <Box sx={{ 
                 display: "flex", 
@@ -175,46 +190,33 @@ const ContactDash = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                    {/* Sidebar */}
-                    <Box
+                    {/* Sliding Sidebar for Desktop */}
+                    <Drawer
+                        variant="temporary"
+                        open={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
                         sx={{
-                            width: 250,
-                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
-                            backdropFilter: "blur(25px)",
-                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
-                            border: "1px solid rgba(184, 134, 11, 0.15)",
                             display: { xs: "none", sm: "block" },
-                            position: "relative",
-                            overflow: "hidden",
-                            transition: "all 0.6s ease",
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: '-100%',
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.08), transparent)',
-                                transition: 'left 1.2s ease',
-                            },
-                            '&:hover': {
-                                transform: 'translateX(2px)',
-                                boxShadow: "0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(184, 134, 11, 0.12)",
-                                '&::before': {
-                                    left: '100%'
-                                }
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                                borderLeft: "none",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                             }
                         }}
                     >
                         <Sidebar onMenuClick={handleMenuClick} />
-                    </Box>
+                    </Drawer>
 
                     {/* Main Content */}
                     <Box sx={{ 
                         flexGrow: 1, 
                         overflowY: "auto",
                         background: "transparent",
-                        marginLeft: "250px" // Add margin equal to sidebar width
+                        width: "100%"
                     }}>
                         <Container sx={{ mt: 2 }}>
                             <ContactPage />

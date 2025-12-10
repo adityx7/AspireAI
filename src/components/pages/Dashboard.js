@@ -64,6 +64,7 @@ const shimmerOverlay = {
 
 const Dashboard = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Desktop sidebar toggle
     const [title, setTitle] = useState("Dashboard"); // Default title
     const navigate = useNavigate();
 
@@ -90,6 +91,7 @@ const Dashboard = () => {
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     const handleMenuClick = (path) => {
@@ -98,6 +100,11 @@ const Dashboard = () => {
             setTitle(selectedOption.label); // Update title
             navigate(`/${path}`); // Navigate to the selected path
         }
+        // Close sidebar after navigation on mobile
+        if (mobileOpen) {
+            setMobileOpen(false);
+        }
+        setSidebarOpen(false); // Close desktop sidebar after selection
     };
 
     return (
@@ -157,47 +164,33 @@ const Dashboard = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                    {/* Sidebar */}
-                    <Box
-                        className="scale-in"
+                    {/* Desktop Sidebar (Hidden by default - opens on hamburger click) */}
+                    <Drawer
+                        variant="temporary"
+                        open={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
                         sx={{
-                            width: 250,
-                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
-                            backdropFilter: "blur(25px)",
-                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
-                            border: "1px solid rgba(184, 134, 11, 0.15)",
                             display: { xs: "none", sm: "block" },
-                            position: "relative",
-                            overflow: "hidden",
-                            transition: "all 0.6s ease",
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: '-100%',
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.08), transparent)',
-                                transition: 'left 1.2s ease',
-                            },
-                            '&:hover': {
-                                transform: 'translateX(2px)',
-                                boxShadow: "0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(184, 134, 11, 0.12)",
-                                '&::before': {
-                                    left: '100%'
-                                }
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                                borderLeft: "none",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                             }
                         }}
                     >
                         <SideBar onMenuClick={handleMenuClick} />
-                    </Box>
+                    </Drawer>
 
                     {/* Main Content */}
                     <Box className="fade-in-up" sx={{ 
                         flexGrow: 1, 
                         overflowY: "auto",
                         background: "transparent",
-                        marginLeft: "250px" // Add margin equal to sidebar width
+                        width: "100%"
                     }}>
                         <Container sx={{ mt: 2 }}>
                             <DashboardContent />

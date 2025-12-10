@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { Box, Drawer } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TodayTasks from '../../components/AI/TodayTasks';
 import StudyPlanCard from '../../components/AI/StudyPlanCard';
+import SideBar from '../organisms/SideBar';
+import NavDash from '../organisms/NavDash';
 import './StudyPlanPage.css';
 
 const StudyPlanPage = ({ userId: propUserId }) => {
   // Get userId from props or localStorage
   const userId = propUserId || localStorage.getItem('userId') || localStorage.getItem('studentId');
   
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
   const [activePlan, setActivePlan] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [stats, setStats] = useState(null);
@@ -143,33 +150,96 @@ const StudyPlanPage = ({ userId: propUserId }) => {
     }, 5000);
   };
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleMenuClick = (path) => {
+    navigate(`/${path}`);
+    if (mobileOpen) setMobileOpen(false);
+    setSidebarOpen(false);
+  };
+
   if (loading) {
     return (
-      <div className="study-plan-page">
-        <div className="loading-container">
-          <div className="spinner-large"></div>
-          <p>Loading your study plan...</p>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)' }}>
+        <NavDash onDrawerToggle={handleDrawerToggle} title="AI Study Plan" />
+        <div className="study-plan-page">
+          <div className="loading-container">
+            <div className="spinner-large"></div>
+            <p>Loading your study plan...</p>
+          </div>
         </div>
-      </div>
+      </Box>
     );
   }
 
   if (error && !userId) {
     return (
-      <div className="study-plan-page">
-        <div className="error-container">
-          <h2>⚠️ Authentication Required</h2>
-          <p>{error}</p>
-          <button onClick={() => window.location.href = '/login'} className="btn-generate">
-            Go to Login
-          </button>
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)' }}>
+        <NavDash onDrawerToggle={handleDrawerToggle} title="AI Study Plan" />
+        <div className="study-plan-page">
+          <div className="error-container">
+            <h2>⚠️ Authentication Required</h2>
+            <p>{error}</p>
+            <button onClick={() => window.location.href = '/login'} className="btn-generate">
+              Go to Login
+            </button>
+          </div>
         </div>
-      </div>
+      </Box>
     );
   }
 
   return (
-    <div className="study-plan-page">
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)' }}>
+      {/* Navbar */}
+      <NavDash onDrawerToggle={handleDrawerToggle} title="AI Study Plan" />
+
+      <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+        {/* Sliding Sidebar */}
+        <Drawer
+          variant="temporary"
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          sx={{
+            display: { xs: "none", sm: "block" },
+            '& .MuiDrawer-paper': {
+              width: 280,
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+              backdropFilter: "blur(25px)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid rgba(184, 134, 11, 0.15)",
+              borderLeft: "none",
+            }
+          }}
+        >
+          <SideBar onMenuClick={handleMenuClick} />
+        </Drawer>
+
+        {/* Mobile Sidebar */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{ 
+            display: { xs: "block", sm: "none" },
+            '& .MuiDrawer-paper': {
+              width: 280,
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+              backdropFilter: "blur(25px)",
+              border: "1px solid rgba(184, 134, 11, 0.15)",
+            }
+          }}
+        >
+          <SideBar onMenuClick={handleMenuClick} />
+        </Drawer>
+
+        {/* Main Content */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", width: "100%" }}>
+          <div className="study-plan-page">
       <div className="page-header">
         <div className="header-content">
           <h1>📚 My Study Plan</h1>
@@ -327,7 +397,10 @@ const StudyPlanPage = ({ userId: propUserId }) => {
           </div>
         </div>
       )}
-    </div>
+          </div>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

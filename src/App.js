@@ -53,7 +53,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<SimpleLogin />} />
-          <Route path="/mentor-login" element={<MentorSignInPage />} />
+          <Route path="/mentor/login" element={<MentorSignInPage />} />
           <Route path="/mentor/register" element={<MentorRegister />} />
           <Route path="/student/register" element={<SimpleStudentRegister />} />
           <Route path="/dashboard" element={<Dashboard />} />

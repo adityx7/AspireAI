@@ -92,6 +92,77 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
+// Get student profile by USN
+app.get("/api/students/:usn", (req, res) => {
+    try {
+        const { usn } = req.params;
+        const students = readData();
+        
+        const student = students.find(s => s.usn === usn.toUpperCase());
+        
+        if (!student) {
+            return res.status(404).json({ message: "Student profile not found" });
+        }
+        
+        // Remove sensitive data before sending
+        const { password, decryptedPassword, ...studentData } = student;
+        
+        res.status(200).json(studentData);
+    } catch (error) {
+        console.error("Error fetching student profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// Update student profile by USN
+app.put("/api/students/:usn", (req, res) => {
+    try {
+        const { usn } = req.params;
+        const updates = req.body;
+        const students = readData();
+        
+        const studentIndex = students.findIndex(s => s.usn === usn.toUpperCase());
+        
+        if (studentIndex === -1) {
+            return res.status(404).json({ message: "Student not found" });
+        }
+        
+        // Merge updates with existing data, but don't allow password changes through this endpoint
+        const { password, decryptedPassword, ...allowedUpdates } = updates;
+        students[studentIndex] = { ...students[studentIndex], ...allowedUpdates };
+        
+        writeData(students);
+        
+        // Remove sensitive data before sending
+        const { password: pwd, decryptedPassword: dpwd, ...studentData } = students[studentIndex];
+        
+        res.status(200).json({ message: "Profile updated successfully", student: studentData });
+    } catch (error) {
+        console.error("Error updating student profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// Create/Add new student profile
+app.post("/api/students", (req, res) => {
+    try {
+        const newStudent = req.body;
+        const students = readData();
+        
+        // Check if student already exists
+        if (students.some(s => s.usn === newStudent.usn.toUpperCase())) {
+            return res.status(400).json({ message: "Student profile already exists" });
+        }
+        
+        students.push({ ...newStudent, usn: newStudent.usn.toUpperCase() });
+        writeData(students);
+        
+        res.status(201).json({ message: "Profile created successfully" });
+    } catch (error) {
+        console.error("Error creating student profile:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
 
 // Start server
 app.listen(PORT, () => {

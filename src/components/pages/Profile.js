@@ -7,6 +7,7 @@ import NavDash from "../organisms/NavDash";
 
 const ProfilePage = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [title, setTitle] = useState("Profile");
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -16,39 +17,12 @@ const ProfilePage = () => {
     // Shimmer background styling
     const shimmerBackground = {
         minHeight: "100vh",
-        background: `
-            linear-gradient(135deg, 
-                rgba(10, 25, 47, 0.9) 0%, 
-                rgba(26, 43, 76, 0.85) 35%, 
-                rgba(50, 73, 94, 0.8) 100%
-            ),
-            radial-gradient(circle at 30% 70%, rgba(184, 134, 11, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 70% 30%, rgba(218, 165, 32, 0.1) 0%, transparent 50%)
-        `,
-        animation: 'shimmer 4s ease-in-out infinite',
+        background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
         position: 'relative',
         overflow: 'hidden',
-        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif"
+        fontFamily: "'Inter', 'Segoe UI', 'Roboto', sans-serif",
+        color: "#F8FAFC"
     };
-
-    const shimmerOverlay = {
-        position: 'absolute',
-        top: 0,
-        left: '-100%',
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.05), transparent)',
-        animation: 'shimmerSlide 3s ease-in-out infinite',
-        zIndex: 1
-    };
-
-    // Add animation keyframes to document head
-    useEffect(() => {
-        // Animation styles removed for immediate page load
-        return () => {
-            // Cleanup function (empty since no styles to remove)
-        };
-    }, []);
 
     // ✅ Retrieve USN safely
     
@@ -61,22 +35,34 @@ const ProfilePage = () => {
     ];
     
     const fetchUserProfile = async () => {
-        const usn = localStorage.getItem("userUSN") || localStorage.getItem("usn"); // Check both keys
-        console.log("USN found:", usn)
+        // Try multiple possible keys for USN
+        const usn = localStorage.getItem("userUSN") || 
+                    localStorage.getItem("usn") || 
+                    localStorage.getItem("studentUSN") ||
+                    sessionStorage.getItem("userUSN") ||
+                    sessionStorage.getItem("usn");
+        
+        console.log("USN found:", usn);
+        console.log("All localStorage keys:", Object.keys(localStorage));
+        
         if (!usn) {
-            setError("User USN not found. Please log in.");
+            setError("Please complete your profile in Settings first, or log in again.");
             setLoading(false);
             return;
         }
 
         try {
             const response = await axios.get(`http://localhost:5002/api/students/${usn}`);
-            console.log(response.data);
-            
+            console.log("Profile data:", response.data);
             setUserData(response.data);
+            setError(null);
         } catch (error) {
             console.error("Error fetching profile data:", error);
-            setError("Could not fetch profile. Please try again later.");
+            if (error.response?.status === 404) {
+                setError("Profile not found. Please update your profile in Settings.");
+            } else {
+                setError("Could not fetch profile. Please try again later.");
+            }
         } finally {
             setLoading(false);
         }
@@ -87,6 +73,7 @@ const ProfilePage = () => {
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     const handleMenuClick = (path) => {
@@ -95,12 +82,13 @@ const ProfilePage = () => {
             setTitle(selectedOption.label);
             navigate(`/${path}`);
         }
+        if (mobileOpen) setMobileOpen(false);
+        setSidebarOpen(false);
     };
 
     if (loading) {
         return (
             <Box sx={shimmerBackground}>
-                <Box sx={shimmerOverlay} />
                 <Box sx={{ 
                     display: "flex", 
                     justifyContent: "center", 
@@ -131,7 +119,6 @@ const ProfilePage = () => {
     if (error || !userData) {
         return (
             <Box sx={shimmerBackground}>
-                <Box sx={shimmerOverlay} />
                 <Box sx={{ 
                     display: "flex", 
                     justifyContent: "center", 
@@ -152,21 +139,40 @@ const ProfilePage = () => {
                         <Typography variant="h6" sx={{ color: "#dc3545", fontWeight: "600", mb: 3 }}>
                             {error || "User profile not found!"}
                         </Typography>
-                        <Button
-                            variant="contained"
-                            onClick={() => navigate("/login")}
-                            sx={{
-                                background: "linear-gradient(135deg, #B8860B, #DAA520)",
-                                color: "white",
-                                fontWeight: "bold",
-                                padding: "10px 30px",
-                                '&:hover': {
-                                    background: "linear-gradient(135deg, #DAA520, #B8860B)",
-                                }
-                            }}
-                        >
-                            Go to Login
-                        </Button>
+                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                            <Button
+                                variant="contained"
+                                onClick={() => navigate("/settings")}
+                                sx={{
+                                    background: "linear-gradient(135deg, #B8860B, #DAA520)",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    padding: "10px 30px",
+                                    '&:hover': {
+                                        background: "linear-gradient(135deg, #DAA520, #B8860B)",
+                                    }
+                                }}
+                            >
+                                Go to Settings
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                onClick={() => navigate("/login")}
+                                sx={{
+                                    borderColor: "#B8860B",
+                                    color: "#B8860B",
+                                    fontWeight: "bold",
+                                    padding: "10px 30px",
+                                    '&:hover': {
+                                        borderColor: "#DAA520",
+                                        color: "#DAA520",
+                                        background: "rgba(184, 134, 11, 0.1)"
+                                    }
+                                }}
+                            >
+                                Go to Login
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             </Box>
@@ -194,6 +200,10 @@ const ProfilePage = () => {
                 transform: 'translateX(30px)',
                 animationDelay: '0.4s'
             },
+            '& .floating-element': {
+                animation: 'floating 6s ease-in-out infinite',
+                transition: 'transform 0.3s ease-out'
+            },
             '@keyframes fadeInUp': {
                 'to': {
                     opacity: 1,
@@ -211,6 +221,12 @@ const ProfilePage = () => {
                     opacity: 1,
                     transform: 'translateX(0)',
                 }
+            },
+            '@keyframes floating': {
+                '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                '25%': { transform: 'translateY(-10px) rotate(1deg)' },
+                '50%': { transform: 'translateY(-20px) rotate(0deg)' },
+                '75%': { transform: 'translateY(-10px) rotate(-1deg)' }
             }
         }}>
             {/* Animated Background Elements */}
@@ -252,8 +268,6 @@ const ProfilePage = () => {
                 filter: 'blur(1px)',
                 animationDelay: '2s'
             }} />
-
-            <Box sx={{ ...shimmerOverlay }} />
             
             <Box sx={{ 
                 display: "flex", 
@@ -268,40 +282,26 @@ const ProfilePage = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                    {/* Sidebar */}
-                    <Box
-                        className="scale-in"
+                    {/* Sliding Sidebar for Desktop */}
+                    <Drawer
+                        variant="temporary"
+                        open={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
                         sx={{
-                            width: 250,
-                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
-                            backdropFilter: "blur(25px)",
-                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
-                            border: "1px solid rgba(184, 134, 11, 0.15)",
                             display: { xs: "none", sm: "block" },
-                            position: "relative",
-                            overflow: "hidden",
-                            transition: "all 0.6s ease",
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: '-100%',
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.08), transparent)',
-                                transition: 'left 1.2s ease',
-                            },
-                            '&:hover': {
-                                transform: 'translateX(2px)',
-                                boxShadow: "0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(184, 134, 11, 0.12)",
-                                '&::before': {
-                                    left: '100%'
-                                }
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                                borderLeft: "none",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                             }
                         }}
                     >
                         <SideBar onMenuClick={handleMenuClick} />
-                    </Box>
+                    </Drawer>
 
                     {/* Main Content */}
                     <Box sx={{ 
@@ -311,7 +311,7 @@ const ProfilePage = () => {
                         alignItems: "center", 
                         minHeight: "80vh",
                         background: "transparent",
-                        marginLeft: "250px" // Add margin equal to sidebar width
+                        width: "100%"
                     }}>
                         <Container maxWidth="md" className="fade-in-up">
                             <Paper 
@@ -361,7 +361,7 @@ const ProfilePage = () => {
                                         textAlign: "center",
                                         fontWeight: "500"
                                     }}>
-                                        {userData.collegeName || "N/A"} - {userData.selectedMajors?.join(", ") || "N/A"}
+                                        {userData.collegeName || "N/A"} - {Array.isArray(userData.selectedMajors) ? userData.selectedMajors.join(", ") : (userData.selectedMajors || "N/A")}
                                     </Typography>
                                 </Box>
 

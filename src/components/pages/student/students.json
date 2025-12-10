@@ -33,5 +33,19 @@
     "email": "21cse004@bnmit.in",
     "password": "$2b$10$qNEemSqTM8zWbihN8hlPAeExlt8iRFk5SQb./m21HD384mKQDhoMC",
     "decryptedPassword": "Shaggy@2Scooby"
+  },
+  {
+    "name": "Aditya",
+    "usn": "1BG21CS091",
+    "mobileNumber": "8431971763",
+    "alternateMobileNumber": "8431971763",
+    "email": "adityachkumar97@gmail.com",
+    "collegeEmail": "adityachkumar97@gmail.com",
+    "gender": "Male",
+    "dob": "2002-10-06",
+    "selectedMajors": "Computer Science & Engineering",
+    "employeeIn": "",
+    "shortBio": "hiii\n",
+    "collegeName": "BNM"
   }
 ]

@@ -16,14 +16,18 @@ import {
     TextField,
     Alert,
     CircularProgress,
-    Paper
+    Paper,
+    Drawer
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SchoolIcon from '@mui/icons-material/School';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AddIcon from '@mui/icons-material/Add';
+import SideBar from '../../organisms/SideBar';
+import NavDash from '../../organisms/NavDash';
 
 const shimmerBackground = {
     minHeight: "100vh",
@@ -89,6 +93,9 @@ const shimmerOverlay = {
 };
 
 const Academics = () => {
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const navigate = useNavigate();
     const [academicData, setAcademicData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -181,6 +188,17 @@ const Academics = () => {
             setCreditsData({ credits: academicData.academics.totalCredits.toString() });
         }
     }, [openCreditsDialog, academicData]);
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
+    };
+
+    const handleMenuClick = (path) => {
+        navigate(`/${path}`);
+        if (mobileOpen) setMobileOpen(false);
+        setSidebarOpen(false);
+    };
 
     const handleAddSemester = async () => {
         // Validate CGPA
@@ -503,13 +521,70 @@ const Academics = () => {
 
             <Box sx={{ ...shimmerOverlay }} />
 
-            <Container maxWidth="lg" sx={{ 
-                mt: 4, 
-                mb: 4, 
-                position: "relative", 
-                zIndex: 2,
-                minHeight: "100vh"
+            {/* Layout Container */}
+            <Box sx={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                height: "100vh",
+                position: "relative",
+                zIndex: 2
             }}>
+                {/* Navbar */}
+                <Box>
+                    <NavDash onDrawerToggle={handleDrawerToggle} title="Academics" />
+                </Box>
+
+                <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+                    {/* Sliding Sidebar */}
+                    <Drawer
+                        variant="temporary"
+                        open={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
+                        sx={{
+                            display: { xs: "none", sm: "block" },
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                                borderLeft: "none",
+                            }
+                        }}
+                    >
+                        <SideBar onMenuClick={handleMenuClick} />
+                    </Drawer>
+
+                    {/* Mobile Sidebar */}
+                    <Drawer
+                        variant="temporary"
+                        open={mobileOpen}
+                        onClose={handleDrawerToggle}
+                        ModalProps={{ keepMounted: true }}
+                        sx={{ 
+                            display: { xs: "block", sm: "none" },
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                            }
+                        }}
+                    >
+                        <SideBar onMenuClick={handleMenuClick} />
+                    </Drawer>
+
+                    {/* Main Content */}
+                    <Box sx={{ 
+                        flexGrow: 1, 
+                        overflowY: "auto",
+                        width: "100%"
+                    }}>
+                        <Container maxWidth="lg" sx={{ 
+                            mt: 4, 
+                            mb: 4,
+                            minHeight: "100vh"
+                        }}>
                 {/* Header */}
                 <Paper 
                     elevation={3} 
@@ -2064,7 +2139,10 @@ const Academics = () => {
                         </Button>
                     </DialogActions>
                 </Dialog>
-            </Container>
+                        </Container>
+                    </Box>
+                </Box>
+            </Box>
         </Box>
     );
 };

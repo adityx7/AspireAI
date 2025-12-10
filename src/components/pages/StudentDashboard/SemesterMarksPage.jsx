@@ -23,8 +23,11 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  Drawer
 } from '@mui/material';
+import SideBar from '../../organisms/SideBar';
+import NavDash from '../../organisms/NavDash';
 import { motion, AnimatePresence } from 'framer-motion';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -65,6 +68,8 @@ const computeSemesterSGPA = (courses) => {
 const SemesterMarksPage = () => {
   const { semester: paramSemester } = useParams();
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [semester, setSemester] = useState(parseInt(paramSemester) || 1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -77,6 +82,17 @@ const SemesterMarksPage = () => {
   });
 
   const userId = localStorage.getItem('userId') || localStorage.getItem('studentId') || '';
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleMenuClick = (path) => {
+    navigate(`/${path}`);
+    if (mobileOpen) setMobileOpen(false);
+    setSidebarOpen(false);
+  };
 
   useEffect(() => {
     if (semester >= 1 && semester <= 8) {
@@ -387,9 +403,55 @@ const SemesterMarksPage = () => {
     <Box sx={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)',
-      py: 4
+      display: 'flex',
+      flexDirection: 'column'
     }}>
-    <Container maxWidth="xl">
+      {/* Navbar */}
+      <NavDash onDrawerToggle={handleDrawerToggle} title="Semester Marks" />
+
+      <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+        {/* Sliding Sidebar */}
+        <Drawer
+          variant="temporary"
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          sx={{
+            display: { xs: "none", sm: "block" },
+            '& .MuiDrawer-paper': {
+              width: 280,
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+              backdropFilter: "blur(25px)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
+              border: "1px solid rgba(184, 134, 11, 0.15)",
+              borderLeft: "none",
+            }
+          }}
+        >
+          <SideBar onMenuClick={handleMenuClick} />
+        </Drawer>
+
+        {/* Mobile Sidebar */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }}
+          sx={{ 
+            display: { xs: "block", sm: "none" },
+            '& .MuiDrawer-paper': {
+              width: 280,
+              background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+              backdropFilter: "blur(25px)",
+              border: "1px solid rgba(184, 134, 11, 0.15)",
+            }
+          }}
+        >
+          <SideBar onMenuClick={handleMenuClick} />
+        </Drawer>
+
+        {/* Main Content */}
+        <Box sx={{ flexGrow: 1, overflowY: "auto", width: "100%", py: 4 }}>
+          <Container maxWidth="xl">
       <ToastContainer 
         position="top-right" 
         autoClose={3000}
@@ -957,7 +1019,9 @@ const SemesterMarksPage = () => {
         </Box>
       </Paper>
       </motion.div>
-    </Container>
+          </Container>
+        </Box>
+      </Box>
     </Box>
   );
 };

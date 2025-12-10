@@ -9,7 +9,7 @@ import SettingsPage from "../organisms/SettingContent";
 const shimmerBackground = {
     minHeight: "100vh",
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    background: "linear-gradient(135deg, #2c3e57 0%, #1a2332 100%)",
+    background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
     position: "relative",
     overflow: "hidden",
     color: "#F8FAFC",
@@ -62,6 +62,7 @@ const shimmerOverlay = {
 
 const Settings = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -85,10 +86,13 @@ const Settings = () => {
 
     const handleMenuClick = (menu) => {
         navigate(`/${menu.toLowerCase()}`);
+        if (mobileOpen) setMobileOpen(false);
+        setSidebarOpen(false);
     };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     return (
@@ -108,10 +112,10 @@ const Settings = () => {
             {/* Floating Decorative Elements */}
             <Box className="floating-element" sx={{
                 position: 'fixed',
-                top: '10%',
-                left: '5%',
-                width: '60px',
-                height: '60px',
+                top: '15%',
+                left: '3%',
+                width: '50px',
+                height: '50px',
                 background: 'linear-gradient(45deg, rgba(184, 134, 11, 0.1), rgba(184, 134, 11, 0.2))',
                 borderRadius: '50%',
                 zIndex: 1,
@@ -121,16 +125,16 @@ const Settings = () => {
             
             <Box className="floating-element" sx={{
                 position: 'fixed',
-                top: '60%',
-                right: '8%',
-                width: '40px',
-                height: '40px',
+                top: '70%',
+                right: '5%',
+                width: '35px',
+                height: '35px',
                 background: 'linear-gradient(45deg, rgba(26, 43, 76, 0.2), rgba(26, 43, 76, 0.3))',
                 borderRadius: '50%',
                 zIndex: 1,
                 pointerEvents: 'none',
                 filter: 'blur(1px)',
-                animationDelay: '2s'
+                animationDelay: '3s'
             }} />
 
             <Box sx={{ ...shimmerOverlay }} />
@@ -152,47 +156,33 @@ const Settings = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                    {/* Sidebar */}
-                    <Box
-                        className="scale-in"
+                    {/* Sliding Sidebar for Desktop */}
+                    <Drawer
+                        variant="temporary"
+                        open={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
                         sx={{
-                            width: 250,
-                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.85) 0%, rgba(10, 25, 47, 0.9) 100%)",
-                            backdropFilter: "blur(25px)",
-                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
-                            border: "1px solid rgba(184, 134, 11, 0.15)",
                             display: { xs: "none", sm: "block" },
-                            position: "relative",
-                            overflow: "hidden",
-                            transition: "all 0.6s ease",
-                            '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: '-100%',
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(90deg, transparent, rgba(184, 134, 11, 0.08), transparent)',
-                                transition: 'left 1.2s ease',
-                            },
-                            '&:hover': {
-                                transform: 'translateX(2px)',
-                                boxShadow: "0 25px 70px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(184, 134, 11, 0.12)",
-                                '&::before': {
-                                    left: '100%'
-                                }
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                                borderLeft: "none",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                             }
                         }}
                     >
                         <Sidebar onMenuClick={handleMenuClick} />
-                    </Box>
+                    </Drawer>
 
                     {/* Main Content */}
                     <Box className="fade-in-up" sx={{ 
                         flexGrow: 1, 
                         overflowY: "auto",
                         background: "transparent",
-                        marginLeft: "250px" // Add margin equal to sidebar width
+                        width: "100%"
                     }}>
                         <Container sx={{ mt: 2 }}>
                             <SettingsPage/>
