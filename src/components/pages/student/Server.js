@@ -230,16 +230,41 @@ app.post("/api/mentors/login", async (req, res) => {
 
         if (!mentor) {
             console.log("❌ Mentor not found");
-            return res.status(400).json({ success: false, message: "Mentor not found. Please check your Mentor ID." });
+            return res.status(404).json({ success: false, message: "Mentor not found. Please check your Mentor ID." });
         }
 
         if (mentor.password !== password) {
             console.log("❌ Invalid password");
-            return res.status(400).json({ success: false, message: "Invalid password" });
+            return res.status(401).json({ success: false, message: "Invalid password" });
         }
 
+        // Generate JWT token
+        const jwt = require('jsonwebtoken');
+        const JWT_SECRET = process.env.JWT_SECRET || 'aspirai-secret-key-2024';
+        
+        const token = jwt.sign(
+            { 
+                mentorID: mentor.mentorID, 
+                email: mentor.email,
+                type: 'mentor'
+            },
+            JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
         console.log("✅ Login successful for mentor:", mentorID);
-        res.json({ success: true, message: "Login successful", mentorID, mentor: { fullName: mentor.fullName, email: mentor.email } });
+        res.json({ 
+            success: true, 
+            message: "Login successful", 
+            token: token,
+            mentorID: mentor.mentorID,
+            mentor: { 
+                fullName: mentor.fullName, 
+                email: mentor.email,
+                expertise: mentor.expertise,
+                availabilityStatus: mentor.availabilityStatus
+            } 
+        });
     } catch (error) {
         console.error("❌ Login error:", error);
         res.status(500).json({ success: false, message: "Server error", error: error.message });
