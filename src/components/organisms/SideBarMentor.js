@@ -15,6 +15,7 @@ import ContactMailIcon from "@mui/icons-material/DraftsOutlined";
 import StarIcon from "@mui/icons-material/Star";
 import AccountCircleIcon from "@mui/icons-material/AccountCircleOutlined";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import HomeIcon from "@mui/icons-material/Home";
 import PropTypes from "prop-types";
 
 // Constants for styling - matching the login theme
@@ -38,6 +39,7 @@ const SidebarMentor = ({ onMenuClick }) => {
     };
 
     const menuItems = [
+        { text: "Home", path: "/", icon: <HomeIcon /> },
         { text: "Dashboard", path: "/dashboard-mentor", icon: <DashboardIcon /> },
         { text: "Student Verification", path: "/mentor/students-verification", icon: <VerifiedUserIcon /> },
     ];

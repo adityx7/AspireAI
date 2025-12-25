@@ -66,7 +66,7 @@ const NavMentor = ({ onDrawerToggle, title, subtitle }) => {
     const handleLogout = () => {
         handleMenuClose();
         localStorage.clear();
-        navigate("/mentor-login"); // Navigate to the login
+        navigate("/mentor/login"); // Navigate to the login page
     };
 
     const handleSettings = () => {
