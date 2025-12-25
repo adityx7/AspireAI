@@ -16,6 +16,7 @@ const GOLD_DARK = "#8B6914";
 
 const SettingsMentor = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -26,12 +27,18 @@ const SettingsMentor = () => {
         return path.charAt(0).toUpperCase() + path.slice(1) || "Dashboard"; // Capitalize the first letter or default to "Dashboard"
     };
 
-    const handleMenuClick = (menu) => {
-        navigate(`/${menu.toLowerCase()}`);
+    const handleMenuClick = (path) => {
+        // Handle both formats: "dashboard-mentor" and "/dashboard-mentor"
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        navigate(cleanPath);
+        // Close sidebar after navigation
+        setSidebarOpen(false);
+        setMobileOpen(false);
     };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     // Add animation effects when component mounts
@@ -116,28 +123,34 @@ const SettingsMentor = () => {
             />
 
             <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden", position: 'relative', zIndex: 1 }}>
-                {/* Sidebar */}
-                <Box
+                {/* Desktop Sidebar (Sliding - opens on hamburger click) */}
+                <Drawer
+                    variant="temporary"
+                    open={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
                     sx={{
-                        width: 250,
-                        backgroundColor: `rgba(17, 34, 64, 0.9)`,
-                        boxShadow: `0 0 15px rgba(184, 134, 11, 0.15)`,
-                        backdropFilter: 'blur(5px)',
                         display: { xs: "none", sm: "block" },
-                        borderRight: `1px solid ${GOLD_MAIN}20`,
+                        '& .MuiDrawer-paper': {
+                            width: 280,
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderLeft: "none",
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        }
                     }}
-                    className="scale-in"
                 >
                     <SidebarMentor onMenuClick={handleMenuClick} />
-                </Box>
+                </Drawer>
 
                 {/* Main Content */}
                 <Box sx={{ 
                     flexGrow: 1, 
                     overflowY: "auto",
-                    margin: { xs: "0", sm: "0 0 0 250px" },
                     background: 'transparent',
-                    position: 'relative'
+                    position: 'relative',
+                    width: '100%'
                 }}>
                     <Container 
                         sx={{ 

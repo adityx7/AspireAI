@@ -32,11 +32,21 @@ const MentorStudentsListPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [sidebarVisible, setSidebarVisible] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Desktop sidebar toggle
     const mentorID = localStorage.getItem('mentorID');
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
+    };
+
+    const handleMenuClick = (path) => {
+        navigate(path);
+        // Close sidebar after navigation
+        if (mobileOpen) {
+            setMobileOpen(false);
+        }
+        setSidebarOpen(false);
     };
 
     useEffect(() => {
@@ -145,29 +155,35 @@ const MentorStudentsListPage = () => {
             />
 
             <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden', position: 'relative', zIndex: 1 }}>
-                {/* Sidebar */}
-                <Box
+                {/* Desktop Sidebar (Sliding Drawer) */}
+                <Drawer
+                    variant="temporary"
+                    open={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
                     sx={{
-                        width: 250,
-                        backgroundColor: `rgba(17, 34, 64, 0.9)`,
-                        boxShadow: `0 0 15px rgba(184, 134, 11, 0.15)`,
-                        backdropFilter: 'blur(5px)',
                         display: { xs: "none", sm: "block" },
-                        borderRight: `1px solid ${GOLD_MAIN}20`,
+                        '& .MuiDrawer-paper': {
+                            width: 280,
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderLeft: "none",
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        }
                     }}
-                    className="scale-in"
                 >
-                    <SidebarMentor />
-                </Box>
+                    <SidebarMentor onMenuClick={handleMenuClick} />
+                </Drawer>
 
             {/* Main Content */}
             <Box
                 sx={{
                     flexGrow: 1,
                     overflowY: 'auto',
-                    margin: { xs: '0', sm: '0 0 0 250px' },
                     background: 'transparent',
-                    position: 'relative'
+                    position: 'relative',
+                    width: '100%'
                 }}
             >
                 {loading ? (
@@ -366,13 +382,15 @@ const MentorStudentsListPage = () => {
                 ModalProps={{ keepMounted: true }}
                 sx={{ 
                     display: { xs: "block", sm: "none" },
+                    color: "black",
                     '& .MuiDrawer-paper': {
-                        backgroundColor: NAVY_BLUE_LIGHT,
-                        color: 'white'
+                        background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                        backdropFilter: "blur(25px)",
+                        border: "1px solid rgba(184, 134, 11, 0.15)",
                     }
                 }}
             >
-                <SidebarMentor />
+                <SidebarMentor onMenuClick={handleMenuClick} />
             </Drawer>
         </Box>
     );

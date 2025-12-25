@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Drawer } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SideBarMentor from "../organisms/SideBarMentor";
 import NavMentor from "../organisms/NavMentor";
 import MentorMeetingNotes from "../organisms/MentorMeetingNotes";
@@ -17,6 +17,7 @@ const shimmerBackground = {
 const MentorMeetingNotesPage = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
 
     const sidebarOptions = [
         { label: "Dashboard", id: "dashboard-mentor" },
@@ -30,25 +31,23 @@ const MentorMeetingNotesPage = () => {
         setMobileOpen(!mobileOpen);
     };
 
-    const handleMenuClick = (menuId) => {
-        switch (menuId) {
-            case "dashboard-mentor":
-                navigate("/mentor-main");
-                break;
-            case "meeting-notes-mentor":
-                // Already on this page
-                break;
-            case "settings-mentor":
-                navigate("/settings-mentor");
-                break;
-            case "contact-mentor":
-                navigate("/mentor-contact");
-                break;
-            case "profile-mentor":
-                navigate("/profile-mentor");
-                break;
-            default:
-                break;
+    const handleMenuClick = (path) => {
+        // Handle both formats: "dashboard-mentor" and "/dashboard-mentor"
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        const pathId = path.startsWith('/') ? path.slice(1) : path;
+        
+        // Map any special cases
+        const routeMap = {
+            'dashboard-mentor': '/dashboard-mentor',
+            'meeting-notes-mentor': '/mentor-meeting-notes',
+            'settings-mentor': '/settings-mentor',
+            'contact-mentor': '/contact-mentor',
+            'profile-mentor': '/profile-mentor'
+        };
+        
+        const targetRoute = routeMap[pathId] || cleanPath;
+        if (location.pathname !== targetRoute) {
+            navigate(targetRoute);
         }
     };
 

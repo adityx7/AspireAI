@@ -22,6 +22,7 @@ import {
   Assignment as AssignmentIcon,
   Event as EventIcon,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // Theme colors
@@ -30,6 +31,7 @@ const NAVY_BLUE_LIGHT = '#003D7A';
 const GOLD_MAIN = '#FFD700';
 
 const NotificationBell = ({ userId, onNotificationClick }) => {
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -100,7 +102,12 @@ const NotificationBell = ({ userId, onNotificationClick }) => {
 
     // Navigate to action URL if provided
     if (notification.actionUrl) {
-      window.location.href = notification.actionUrl;
+      // Use React Router for internal routes, window.location for external URLs
+      if (notification.actionUrl.startsWith('http://') || notification.actionUrl.startsWith('https://')) {
+        window.location.href = notification.actionUrl;
+      } else {
+        navigate(notification.actionUrl);
+      }
     }
 
     handleClose();

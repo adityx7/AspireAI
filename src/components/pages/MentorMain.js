@@ -7,19 +7,78 @@ import MentorTrainingPage from "../organisms/MenMainContent";
 import NavMentor from "../organisms/NavMentor";
 import FloatingChat from "../organisms/FloatingChatMentor";
 
-// Constants for styling - matching the login theme
-const NAVY_BLUE_MAIN = "#0A192F";
-const NAVY_BLUE_LIGHT = "#112240";
-const NAVY_BLUE_DARK = "#020c1b";
-const GOLD_MAIN = "#B8860B";
-const GOLD_LIGHT = "#DAA520";
-const GOLD_DARK = "#8B6914";
-const FONT_FAMILY = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+const shimmerBackground = {
+    minHeight: "100vh",
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    background: "linear-gradient(135deg, #0A192F 0%, #1A2B4C 50%, #0A192F 100%)",
+    position: "relative",
+    overflow: "hidden",
+    color: "#F8FAFC",
+    // Enhanced animation styles
+    '& .fade-in-up': {
+      opacity: 1,
+      transform: 'translateY(0)',
+      transition: 'all 1.2s cubic-bezier(0.23, 1, 0.32, 1)',
+      '&:not(.animate-in)': {
+        opacity: 0,
+        transform: 'translateY(60px)'
+      }
+    },
+    '& .scale-in': {
+      opacity: 1,
+      transform: 'scale(1) rotateZ(0deg)',
+      transition: 'all 1s cubic-bezier(0.23, 1, 0.32, 1)',
+      '&:not(.animate-in)': {
+        opacity: 0.3,
+        transform: 'scale(0.7) rotateZ(-5deg)'
+      }
+    },
+    '& .floating-element': {
+      animation: 'floating 6s ease-in-out infinite',
+      transition: 'transform 0.3s ease-out'
+    },
+    '@keyframes floating': {
+      '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+      '25%': { transform: 'translateY(-10px) rotate(1deg)' },
+      '50%': { transform: 'translateY(-20px) rotate(0deg)' },
+      '75%': { transform: 'translateY(-10px) rotate(-1deg)' }
+    },
+    '@keyframes shimmer': {
+      '0%': { backgroundPosition: '-200% 0' },
+      '100%': { backgroundPosition: '200% 0' }
+    }
+};
+
+const shimmerOverlay = {
+    content: '""',
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "linear-gradient(120deg, rgba(184, 134, 11, 0.1) 0%, rgba(26, 43, 76, 0.2) 100%)",
+    animation: "shimmer 3s infinite linear",
+    zIndex: 0,
+    pointerEvents: "none",
+};
 
 const MentorMain = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false); // Desktop sidebar toggle
     const [title, setTitle] = useState("Dashboard"); // Default title
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Trigger animations on page load
+        setTimeout(() => {
+            const animatedElements = document.querySelectorAll('.fade-in-up, .scale-in');
+            animatedElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('animate-in');
+                }, index * 200);
+            });
+        }, 300);
+    }, []);
 
     const sidebarOptions = [
         { label: "Dashboard", id: "dashboard-mentor" },
@@ -29,185 +88,138 @@ const MentorMain = () => {
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     const handleMenuClick = (path) => {
-        const selectedOption = sidebarOptions.find((option) => option.id === path);
+        // Handle both formats: "dashboard-mentor" and "/dashboard-mentor"
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        const pathId = path.startsWith('/') ? path.slice(1) : path;
+        const selectedOption = sidebarOptions.find((option) => option.id === pathId);
         if (selectedOption) {
             setTitle(selectedOption.label); // Update title
-            navigate(`/${path}`); // Navigate to the selected path
         }
+        navigate(cleanPath); // Navigate to the selected path
+        // Close sidebar after navigation on mobile
+        if (mobileOpen) {
+            setMobileOpen(false);
+        }
+        setSidebarOpen(false); // Close desktop sidebar after selection
     };
 
-    // Add animation effects when component mounts
-    useEffect(() => {
-        // Trigger animations for elements with these classes
-        const elements = document.querySelectorAll('.fade-in-up, .scale-in, .slide-in-right');
-        elements.forEach((el, index) => {
-            setTimeout(() => {
-                el.style.animationPlayState = 'running';
-            }, index * 100);
-        });
-    }, []);
-
     return (
-        <Box 
-            sx={{ 
+        <Box sx={shimmerBackground}>
+            {/* Animated Background Elements */}
+            <Box sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '120%',
+                background: 'radial-gradient(circle at 20% 80%, rgba(184, 134, 11, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(26, 43, 76, 0.2) 0%, transparent 50%)',
+                zIndex: 0,
+                pointerEvents: 'none'
+            }} />
+            
+            {/* Floating Decorative Elements */}
+            <Box className="floating-element" sx={{
+                position: 'fixed',
+                top: '10%',
+                left: '5%',
+                width: '60px',
+                height: '60px',
+                background: 'linear-gradient(45deg, rgba(184, 134, 11, 0.1), rgba(184, 134, 11, 0.2))',
+                borderRadius: '50%',
+                zIndex: 1,
+                pointerEvents: 'none',
+                filter: 'blur(1px)'
+            }} />
+            
+            <Box className="floating-element" sx={{
+                position: 'fixed',
+                top: '60%',
+                right: '8%',
+                width: '40px',
+                height: '40px',
+                background: 'linear-gradient(45deg, rgba(26, 43, 76, 0.2), rgba(26, 43, 76, 0.3))',
+                borderRadius: '50%',
+                zIndex: 1,
+                pointerEvents: 'none',
+                filter: 'blur(1px)',
+                animationDelay: '2s'
+            }} />
+
+            <Box sx={{ ...shimmerOverlay }} />
+            
+            <Box sx={{ 
                 display: "flex", 
                 flexDirection: "column", 
                 height: "100vh",
-                position: 'relative',
-                background: `linear-gradient(135deg, 
-                    ${NAVY_BLUE_MAIN} 0%, 
-                    ${NAVY_BLUE_LIGHT} 35%, 
-                    ${NAVY_BLUE_DARK} 100%)`,
-                '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: `
-                        radial-gradient(ellipse at 25% 25%, rgba(184, 134, 11, 0.05) 0%, transparent 50%),
-                        radial-gradient(ellipse at 75% 75%, rgba(184, 134, 11, 0.08) 0%, transparent 50%),
-                        radial-gradient(ellipse at 50% 50%, rgba(218, 165, 32, 0.03) 0%, transparent 50%)
-                    `,
-                    zIndex: 0
-                },
-                // Animation classes
-                '& .fade-in-up': {
-                    animation: 'fadeInUp 0.6s ease-out forwards',
-                    opacity: 0,
-                    transform: 'translateY(30px)',
-                },
-                '& .scale-in': {
-                    animation: 'scaleIn 0.7s ease-out forwards',
-                    opacity: 0,
-                    transform: 'scale(0.9)',
-                    animationDelay: '0.2s'
-                },
-                '& .slide-in-right': {
-                    animation: 'slideInRight 0.8s ease-out forwards',
-                    opacity: 0,
-                    transform: 'translateX(30px)',
-                    animationDelay: '0.4s'
-                },
-                '@keyframes fadeInUp': {
-                    'to': {
-                        opacity: 1,
-                        transform: 'translateY(0)',
-                    }
-                },
-                '@keyframes scaleIn': {
-                    'to': {
-                        opacity: 1,
-                        transform: 'scale(1)',
-                    }
-                },
-                '@keyframes slideInRight': {
-                    'to': {
-                        opacity: 1,
-                        transform: 'translateX(0)',
-                    }
-                }
-            }}
-        >
-            {/* Navbar */}
-            <NavMentor onDrawerToggle={handleDrawerToggle} title={title} />
-
-            <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden", position: 'relative', zIndex: 1 }}>
-                {/* Sidebar */}
-                <Box
-                    sx={{
-                        width: 250,
-                        backgroundColor: `rgba(17, 34, 64, 0.9)`,
-                        boxShadow: `0 0 15px rgba(184, 134, 11, 0.15)`,
-                        backdropFilter: 'blur(5px)',
-                        display: { xs: "none", sm: "block" },
-                        borderRight: `1px solid ${GOLD_MAIN}20`,
-                    }}
-                    className="scale-in"
-                >
-                    <SidebarMentor onMenuClick={handleMenuClick} />
+                position: "relative",
+                zIndex: 2
+            }}>
+                {/* Navbar */}
+                <Box className="fade-in-up">
+                    <NavMentor onDrawerToggle={handleDrawerToggle} title={title} />
                 </Box>
 
-                {/* Main Content */}
-                <Box sx={{ 
-                    flexGrow: 1, 
-                    overflowY: "auto",
-                    margin: { xs: "0", sm: "0 0 0 250px" },
-                    background: 'transparent',
-                    position: 'relative'
-                }}>
-                    <Container 
-                        sx={{ 
-                            mt: 2,
-                            position: 'relative',
-                            zIndex: 1
-                        }}
-                        className="fade-in-up"
-                    >
-                        <MentorTrainingPage />
-                    </Container>
-                    
-                    {/* Animated floating elements */}
-                    <Box 
-                        sx={{ 
-                            position: 'absolute', 
-                            top: '10%', 
-                            left: '5%', 
-                            width: '80px', 
-                            height: '80px', 
-                            borderRadius: '50%',
-                            background: `${GOLD_MAIN}20`,
-                            animation: 'floating 6s infinite ease-in-out',
-                            zIndex: 0,
-                            '@keyframes floating': {
-                                '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-                                '25%': { transform: 'translateY(-10px) rotate(1deg)' },
-                                '50%': { transform: 'translateY(-5px) rotate(-1deg)' },
-                                '75%': { transform: 'translateY(-15px) rotate(0.5deg)' }
+                <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+                    {/* Desktop Sidebar (Hidden by default - opens on hamburger click) */}
+                    <Drawer
+                        variant="temporary"
+                        open={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
+                        sx={{
+                            display: { xs: "none", sm: "block" },
+                            '& .MuiDrawer-paper': {
+                                width: 280,
+                                background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                                backdropFilter: "blur(25px)",
+                                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                                border: "1px solid rgba(184, 134, 11, 0.15)",
+                                borderLeft: "none",
+                                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                             }
                         }}
-                    />
-                    
-                    <Box 
-                        sx={{ 
-                            position: 'absolute', 
-                            bottom: '20%', 
-                            right: '15%', 
-                            width: '60px', 
-                            height: '60px', 
-                            transform: 'rotate(45deg)',
-                            background: `${GOLD_LIGHT}20`,
-                            animation: 'floating 8s infinite ease-in-out',
-                            animationDelay: '1s',
-                            zIndex: 0
-                        }}
-                    />
+                    >
+                        <SidebarMentor onMenuClick={handleMenuClick} />
+                    </Drawer>
+
+                    {/* Main Content */}
+                    <Box className="fade-in-up" sx={{ 
+                        flexGrow: 1, 
+                        overflowY: "auto",
+                        background: "transparent",
+                        width: "100%"
+                    }}>
+                        <Container sx={{ mt: 2 }}>
+                            <MentorTrainingPage />
+                        </Container>
+                    </Box>
                 </Box>
+
+                {/* Floating Chat Feature */}
+                <FloatingChat />
+
+                {/* Mobile Sidebar Drawer */}
+                <Drawer
+                    variant="temporary"
+                    open={mobileOpen}
+                    onClose={handleDrawerToggle}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{ 
+                        display: { xs: "block", sm: "none" }, 
+                        color: "black",
+                        '& .MuiDrawer-paper': {
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                        }
+                    }}
+                >
+                    <SidebarMentor onMenuClick={handleMenuClick} />
+                </Drawer>
             </Box>
-
-            {/* Floating Chat Feature */}
-            <FloatingChat />
-
-            {/* Mobile Sidebar Drawer */}
-            <Drawer
-                variant="temporary"
-                open={mobileOpen}
-                onClose={handleDrawerToggle}
-                ModalProps={{ keepMounted: true }}
-                sx={{ 
-                    display: { xs: "block", sm: "none" },
-                    '& .MuiDrawer-paper': {
-                        backgroundColor: NAVY_BLUE_LIGHT,
-                        color: 'white'
-                    }
-                }}
-            >
-                <SidebarMentor onMenuClick={handleMenuClick} />
-            </Drawer>
         </Box>
     );
 };

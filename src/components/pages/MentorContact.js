@@ -8,6 +8,7 @@ import MentorContactPage from "../organisms/MenContactContent";
 
 const MentorContact = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [title, setTitle] = useState("Dashboard"); // Default title
     const navigate = useNavigate();
     const location = useLocation();
@@ -27,13 +28,19 @@ const MentorContact = () => {
     }, [location.pathname, sidebarOptions]);
 
     const handleMenuClick = (path) => {
-        if (location.pathname !== `/${path}`) {
-            navigate(`/${path}`);
+        // Handle both formats: "contact-mentor" and "/contact-mentor"
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        if (location.pathname !== cleanPath) {
+            navigate(cleanPath);
         }
+        // Close sidebar after navigation
+        setSidebarOpen(false);
+        setMobileOpen(false);
     };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };    
 
     console.log("title", title);
@@ -50,24 +57,32 @@ const MentorContact = () => {
             <NavMentor onDrawerToggle={handleDrawerToggle} title={title} />
 
             <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                {/* Sidebar */}
-                <Box
+                {/* Desktop Sidebar (Sliding - opens on hamburger click) */}
+                <Drawer
+                    variant="temporary"
+                    open={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
                     sx={{
-                        width: 250,
-                        background: "rgba(10, 25, 47, 0.95)",
-                        boxShadow: `2px 0px 15px rgba(184, 134, 11, 0.2)`,
                         display: { xs: "none", sm: "block" },
-                        borderRight: `1px solid rgba(184, 134, 11, 0.3)`,
+                        '& .MuiDrawer-paper': {
+                            width: 280,
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderLeft: "none",
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        }
                     }}
                 >
                     <SidebarMentor onMenuClick={handleMenuClick} />
-                </Box>
+                </Drawer>
 
                 {/* Main Content */}
                 <Box sx={{ 
                     flexGrow: 1, 
                     overflowY: "auto",
-                    marginLeft: "250px"
+                    width: "100%"
                 }}>
                     <Container sx={{ mt: 2 }}>
                         <MentorContactPage />

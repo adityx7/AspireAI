@@ -62,6 +62,7 @@ const shimmer = {
 
 const MentorProfile = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const [title, setTitle] = useState("Mentor Profile");
     const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -77,11 +78,12 @@ const MentorProfile = () => {
 
     // ✅ Fetch Mentor Profile
     const fetchMentorProfile = async () => {
-        const mentorID = localStorage.getItem("mentorID"); // Make sure 'mentorID' is stored during login
-        console.log(mentorID);
+        const mentorID = localStorage.getItem("mentorID") || localStorage.getItem("mentorId") || localStorage.getItem("userId"); // Check multiple possible keys
+        console.log("Mentor ID from localStorage:", mentorID);
         if (!mentorID) {
             setError("Mentor ID not found. Please log in.");
             setLoading(false);
+            navigate("/mentor/login");
             return;
         }
 
@@ -108,14 +110,21 @@ const MentorProfile = () => {
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
+        setSidebarOpen(!sidebarOpen);
     };
 
     const handleMenuClick = (path) => {
-        const selectedOption = sidebarOptions.find((option) => option.id === path);
+        // Handle both formats: "dashboard-mentor" and "/dashboard-mentor"
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        const pathId = path.startsWith('/') ? path.slice(1) : path;
+        const selectedOption = sidebarOptions.find((option) => option.id === pathId);
         if (selectedOption) {
             setTitle(selectedOption.label);
-            navigate(`/${path}`);
         }
+        navigate(cleanPath);
+        // Close sidebar after navigation
+        setSidebarOpen(false);
+        setMobileOpen(false);
     };
 
     if (loading) {
@@ -175,15 +184,26 @@ const MentorProfile = () => {
             <NavDash onDrawerToggle={handleDrawerToggle} title={title} />
 
             <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-                <Box sx={{ 
-                    width: 250, 
-                    background: "rgba(10, 25, 47, 0.95)", 
-                    boxShadow: `2px 0px 15px rgba(184, 134, 11, 0.2)`, 
-                    display: { xs: "none", sm: "block" },
-                    borderRight: `1px solid rgba(184, 134, 11, 0.3)`,
-                }}>
+                {/* Desktop Sidebar (Sliding - opens on hamburger click) */}
+                <Drawer
+                    variant="temporary"
+                    open={sidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
+                    sx={{
+                        display: { xs: "none", sm: "block" },
+                        '& .MuiDrawer-paper': {
+                            width: 280,
+                            background: "linear-gradient(135deg, rgba(26, 43, 76, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%)",
+                            backdropFilter: "blur(25px)",
+                            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(184, 134, 11, 0.08)",
+                            border: "1px solid rgba(184, 134, 11, 0.15)",
+                            borderLeft: "none",
+                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        }
+                    }}
+                >
                     <SideBar onMenuClick={handleMenuClick} />
-                </Box>
+                </Drawer>
 
                 <Box sx={{ 
                     display: "flex", 

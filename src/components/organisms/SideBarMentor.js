@@ -15,6 +15,7 @@ import ContactMailIcon from "@mui/icons-material/DraftsOutlined";
 import StarIcon from "@mui/icons-material/Star";
 import AccountCircleIcon from "@mui/icons-material/AccountCircleOutlined";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import PropTypes from "prop-types";
 
 // Constants for styling - matching the login theme
 const NAVY_BLUE_MAIN = "#0A192F";
@@ -24,10 +25,17 @@ const GOLD_MAIN = "#B8860B";
 const GOLD_LIGHT = "#DAA520";
 const GOLD_DARK = "#8B6914";
 
-const SidebarMentor = () => {
+const SidebarMentor = ({ onMenuClick }) => {
     const navigate = useNavigate();  // ✅ React Router hook for navigation
     const location = useLocation();
-    const currentPath = location.pathname.split("/")[1];
+    const currentPath = location.pathname;
+
+    const handleNavigation = (path) => {
+        navigate(path);
+        if (onMenuClick) {
+            onMenuClick(path);
+        }
+    };
 
     const menuItems = [
         { text: "Dashboard", path: "/dashboard-mentor", icon: <DashboardIcon /> },
@@ -43,10 +51,11 @@ const SidebarMentor = () => {
     return (
         <Box
             sx={{
-                width: 250,
+                width: '100%',
                 background: 'transparent',
                 height: "100vh",
-                color: "white"
+                color: "white",
+                pt: 2
             }}
         >
             {/* Logo Section */}
@@ -79,25 +88,27 @@ const SidebarMentor = () => {
                     <ListItem
                         button
                         key={text}
-                        onClick={() => navigate(path)}
+                        onClick={() => handleNavigation(path)}
                         className="fade-in-up"
                         sx={{
                             mt: "20px",
-                            backgroundColor: currentPath === path.slice(1) ? `${GOLD_MAIN}40` : "transparent",
-                            color: currentPath === path.slice(1) ? GOLD_LIGHT : "white",
-                            borderLeft: currentPath === path.slice(1) ? `3px solid ${GOLD_MAIN}` : 'none',
+                            backgroundColor: currentPath === path ? `${GOLD_MAIN}40` : "transparent",
+                            color: currentPath === path ? GOLD_LIGHT : "white",
+                            borderLeft: currentPath === path ? `3px solid ${GOLD_MAIN}` : 'none',
                             "&:hover": { 
-                                backgroundColor: currentPath === path.slice(1) ? `${GOLD_MAIN}40` : `${GOLD_MAIN}20`,
-                                borderLeft: `3px solid ${GOLD_MAIN}80`
+                                backgroundColor: currentPath === path ? `${GOLD_MAIN}40` : `${GOLD_MAIN}20`,
+                                borderLeft: `3px solid ${GOLD_MAIN}80`,
+                                transform: 'translateX(5px)'
                             },
                             transition: "all 0.3s ease",
                             borderRadius: "0 4px 4px 0",
-                            margin: "5px 0"
+                            margin: "5px 0",
+                            cursor: 'pointer'
                         }}
                     >
                         <ListItemIcon 
                             sx={{ 
-                                color: currentPath === path.slice(1) ? GOLD_LIGHT : "rgba(255, 255, 255, 0.7)",
+                                color: currentPath === path ? GOLD_LIGHT : "rgba(255, 255, 255, 0.7)",
                                 minWidth: "40px"
                             }}
                         >
@@ -107,7 +118,8 @@ const SidebarMentor = () => {
                             primary={text}
                             primaryTypographyProps={{
                                 fontSize: 15,
-                                fontWeight: currentPath === path.slice(1) ? "bold" : "normal"
+                                fontWeight: currentPath === path ? "bold" : "normal",
+                                fontFamily: "'Inter', sans-serif"
                             }}
                         />
                     </ListItem>
@@ -119,26 +131,28 @@ const SidebarMentor = () => {
                     <ListItem
                         button
                         key={text}
-                        onClick={() => navigate(path)}
+                        onClick={() => handleNavigation(path)}
                         className="slide-in-right"
                         sx={{
                             mt: "10px",
-                            backgroundColor: currentPath === path.slice(1) ? `${GOLD_MAIN}40` : "transparent",
-                            color: currentPath === path.slice(1) ? GOLD_LIGHT : "white",
-                            borderLeft: currentPath === path.slice(1) ? `3px solid ${GOLD_MAIN}` : 'none',
+                            backgroundColor: currentPath === path ? `${GOLD_MAIN}40` : "transparent",
+                            color: currentPath === path ? GOLD_LIGHT : "white",
+                            borderLeft: currentPath === path ? `3px solid ${GOLD_MAIN}` : 'none',
                             "&:hover": { 
-                                backgroundColor: currentPath === path.slice(1) ? `${GOLD_MAIN}40` : `${GOLD_MAIN}20`,
-                                borderLeft: `3px solid ${GOLD_MAIN}80`
+                                backgroundColor: currentPath === path ? `${GOLD_MAIN}40` : `${GOLD_MAIN}20`,
+                                borderLeft: `3px solid ${GOLD_MAIN}80`,
+                                transform: 'translateX(5px)'
                             },
                             transition: "all 0.3s ease",
                             borderRadius: "0 4px 4px 0",
                             margin: "5px 0",
-                            animationDelay: `${0.2 + index * 0.1}s`
+                            animationDelay: `${0.2 + index * 0.1}s`,
+                            cursor: 'pointer'
                         }}
                     >
                         <ListItemIcon 
                             sx={{ 
-                                color: currentPath === path.slice(1) ? GOLD_LIGHT : "rgba(255, 255, 255, 0.7)",
+                                color: currentPath === path ? GOLD_LIGHT : "rgba(255, 255, 255, 0.7)",
                                 minWidth: "40px"
                             }}
                         >
@@ -148,7 +162,8 @@ const SidebarMentor = () => {
                             primary={text}
                             primaryTypographyProps={{
                                 fontSize: 15,
-                                fontWeight: currentPath === path.slice(1) ? "bold" : "normal"
+                                fontFamily: "'Inter', sans-serif",
+                                fontWeight: currentPath === path ? "bold" : "normal"
                             }}
                         />
                     </ListItem>
@@ -173,6 +188,10 @@ const SidebarMentor = () => {
             </Box>
         </Box>
     );
+};
+
+SidebarMentor.propTypes = {
+    onMenuClick: PropTypes.func,
 };
 
 export default SidebarMentor;
