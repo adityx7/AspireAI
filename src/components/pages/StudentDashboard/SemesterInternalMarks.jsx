@@ -155,18 +155,23 @@ const SemesterInternalMarks = () => {
       setSaving(true);
       setError(null);
 
+      console.log('💾 Saving internal marks...', { userId, semester, semesterData });
+
       const response = await axios.post(
         `http://localhost:5002/api/students/${userId}/internal-marks/${semester}`,
         semesterData
       );
+
+      console.log('✅ Save response:', response.data);
 
       if (response.data.success) {
         alert('Internal marks saved successfully!');
         fetchSemesterData(); // Refresh data
       }
     } catch (err) {
-      console.error('Error saving data:', err);
-      setError('Failed to save internal marks. Please try again.');
+      console.error('❌ Error saving data:', err);
+      console.error('❌ Error response:', err.response?.data);
+      setError(err.response?.data?.message || 'Failed to save internal marks. Please try again.');
     } finally {
       setSaving(false);
     }

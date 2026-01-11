@@ -83,6 +83,7 @@ const Dashboard = () => {
     const sidebarOptions = [
         { label: "Dashboard", id: "dashboard" },
         { label: "Academics", id: "academics" },
+        { label: "Assessment", id: "assessment" },
         { label: "Mentors", id: "mentors" },
         { label: "Documents", id: "dashboard" },
         { label: "Settings", id: "settings" },

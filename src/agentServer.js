@@ -5,7 +5,7 @@
 
 require('dotenv').config();
 const mongoose = require('mongoose');
-const { createMentorAgentWorker } = require('./workers/mentorAgentWorker');
+const { worker } = require('./workers/mentorAgentWorker');
 const { initializeScheduler } = require('./services/schedulerService');
 const { cleanupJobs } = require('./services/queueService');
 
@@ -26,7 +26,8 @@ async function startWorkerServer() {
 
     // Start BullMQ worker
     console.log('👷 Starting BullMQ workers...');
-    const worker = createMentorAgentWorker();
+    // Worker is already started when imported
+    console.log('✅ Worker ready');
     console.log('');
 
     // Initialize scheduler

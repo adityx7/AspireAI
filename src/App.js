@@ -19,6 +19,8 @@ import ProfilePage from './components/pages/Profile';
 import { AuthProvider } from './components/pages/AuthContext';
 import MentorProfile from './components/pages/ProfileMentor';
 import Academics from './components/pages/StudentDashboard/Academics';
+import Assessment from './components/pages/Assessment';
+import SyllabusUpload from './components/pages/SyllabusUpload';
 import InternalMarksOverview from './components/pages/StudentDashboard/InternalMarksOverview';
 import SemesterInternalMarks from './components/pages/StudentDashboard/SemesterInternalMarks';
 import SemesterMarksPage from './components/pages/StudentDashboard/SemesterMarksPage';
@@ -58,6 +60,8 @@ export default function App() {
           <Route path="/student/register" element={<SimpleStudentRegister />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/academics" element={<Academics />} />
+          <Route path="/assessment" element={<Assessment />} />
+          <Route path="/syllabus-upload" element={<SyllabusUpload />} />
           <Route path="/semester-marks/:semester" element={<SemesterMarksPage />} />
           <Route path="/internal-marks" element={<InternalMarksOverview />} />
           <Route path="/internal-marks/semester/:semester" element={<SemesterInternalMarks />} />

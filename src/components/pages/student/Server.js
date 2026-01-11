@@ -1609,6 +1609,26 @@ try {
     console.warn('⚠️  Internal Marks routes not available:', err.message);
 }
 
+// ✅ Assessment Routes (AI-powered analysis)
+try {
+    const assessmentRoutes = require('../../../routes/assessmentRoutes');
+    app.use('/api/assessment', assessmentRoutes);
+    console.log('✅ Assessment routes loaded');
+    console.log('   🤖 AI-powered assessment analysis available');
+} catch (err) {
+    console.warn('⚠️  Assessment routes not available:', err.message);
+}
+
+// ✅ Syllabus Routes (PDF management)
+try {
+    const syllabusRoutes = require('../../../routes/syllabusRoutes');
+    app.use('/api/syllabus', syllabusRoutes);
+    console.log('✅ Syllabus routes loaded');
+    console.log('   📚 PDF syllabus management available');
+} catch (err) {
+    console.warn('⚠️  Syllabus routes not available:', err.message);
+}
+
 // ✅ Mentor Verification Routes
 try {
     const mentorVerificationRoutes = require('../../../routes/mentorVerificationRoutes');

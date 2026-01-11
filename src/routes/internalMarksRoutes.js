@@ -82,14 +82,16 @@ router.post('/students/:userId/internal-marks/:semester', checkAuth, async (req,
     
     if (semesterDoc) {
       // Update existing document
-      console.log('✅ Updating existing document');
+      console.log('✅ Updating existing document, ID:', semesterDoc._id);
+      console.log('📝 Courses to save:', updateData.courses?.length || 0);
       semesterDoc.academicYear = updateData.academicYear;
       semesterDoc.mentorName = updateData.mentorName || '';
       semesterDoc.feesToBePaid = updateData.feesToBePaid || 0;
       semesterDoc.feesPaid = updateData.feesPaid || 0;
       semesterDoc.receiptNo = updateData.receiptNo || '';
       semesterDoc.courses = updateData.courses || [];
-      await semesterDoc.save();
+      const saved = await semesterDoc.save();
+      console.log('💾 Document saved, courses count:', saved.courses.length);
     } else {
       // Create new document
       console.log('✅ Creating new document');
@@ -103,9 +105,19 @@ router.post('/students/:userId/internal-marks/:semester', checkAuth, async (req,
         receiptNo: updateData.receiptNo || '',
         courses: updateData.courses || []
       });
+      console.log('💾 New document created with courses:', semesterDoc.courses.length);
     }
     
     console.log('✅ Saved successfully:', semesterDoc._id);
+    console.log('✅ Final courses count:', semesterDoc.courses.length);
+    
+    // Verify it was actually saved
+    const verification = await InternalMarks.findById(semesterDoc._id);
+    if (verification) {
+      console.log('✅ VERIFIED: Document exists in DB with', verification.courses.length, 'courses');
+    } else {
+      console.log('❌ WARNING: Document NOT found in DB after save!');
+    }
     
     res.json({
       success: true,
