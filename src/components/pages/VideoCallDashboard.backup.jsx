@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
@@ -10,33 +10,12 @@ import {
   CheckCircle,
   Cancel,
   Phone,
-  AccessTime,
-  Refresh,
-  PersonOff
+  AccessTime
 } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import './VideoCallDashboard.css';
 
-// Configuration
-const getApiUrl = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return window.location.origin;
-  }
-  return process.env.REACT_APP_API_URL || 'http://localhost:5002';
-};
-
-const API_URL = getApiUrl();
-
-// Call states
-const CallState = {
-  IDLE: 'idle',
-  CALLING: 'calling',
-  RINGING: 'ringing',
-  CONNECTING: 'connecting',
-  REJECTED: 'rejected',
-  TIMEOUT: 'timeout',
-  FAILED: 'failed'
-};
+const SOCKET_URL = 'http://localhost:5002';
 
 const VideoCallDashboard = () => {
   const navigate = useNavigate();
@@ -44,15 +23,20 @@ const VideoCallDashboard = () => {
   // Get user info from localStorage
   const [currentUser] = useState(() => {
     const userType = localStorage.getItem('userType');
+    console.log('🔍 UserType from localStorage:', userType);
     
     if (userType === 'student') {
       const userString = localStorage.getItem('user');
+      console.log('📦 Raw user data:', userString);
       const user = JSON.parse(userString || '{}');
-      return {
+      console.log('👤 Parsed user:', user);
+      const currentUserData = {
         userId: user.usn || user._id,
         userName: user.fullName || user.name || 'Student',
         userType: 'student'
       };
+      console.log('✅ Final currentUser:', currentUserData);
+      return currentUserData;
     } else if (userType === 'mentor') {
       const mentor = JSON.parse(localStorage.getItem('mentorData') || '{}');
       return {
@@ -61,7 +45,7 @@ const VideoCallDashboard = () => {
         userType: 'mentor'
       };
     }
-    
+    console.log('⚠️ No valid userType, using default');
     return { userId: '', userName: '', userType: 'student' };
   });
 
@@ -69,246 +53,60 @@ const VideoCallDashboard = () => {
   const [callHistory, setCallHistory] = useState([]);
   const [upcomingCalls, setUpcomingCalls] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [socket, setSocket] = useState(null);
   const [incomingCall, setIncomingCall] = useState(null);
-  const [outgoingCall, setOutgoingCall] = useState(null);
-  const [callState, setCallState] = useState(CallState.IDLE);
   
   // For initiating calls
   const [selectedUser, setSelectedUser] = useState('');
   const [availableUsers, setAvailableUsers] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
   const [scheduleDate, setScheduleDate] = useState('');
   const [scheduleTime, setScheduleTime] = useState('');
 
-  // Refs
-  const socketRef = useRef(null);
-  const ringtoneRef = useRef(null);
-  const callTimeoutRef = useRef(null);
-
-  // Initialize socket connection
   useEffect(() => {
-    if (!currentUser.userId) return;
-
+    fetchCallHistory();
+    fetchUpcomingCalls();
     initializeSocket();
 
     return () => {
-      cleanup();
+      if (socket) {
+        socket.disconnect();
+      }
     };
-  }, [currentUser.userId]);
-
-  // Fetch data when tab changes
-  useEffect(() => {
-    if (activeTab === 'start') {
-      fetchAvailableUsers();
-    } else if (activeTab === 'scheduled') {
-      fetchUpcomingCalls();
-    } else if (activeTab === 'history') {
-      fetchCallHistory();
-    }
-  }, [activeTab, currentUser.userType]);
+  }, []);
 
   const initializeSocket = () => {
-    if (socketRef.current?.connected) {
-      return; // Already connected
-    }
-
-    const socket = io(API_URL, {
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000
-    });
-
-    socketRef.current = socket;
-
-    socket.on('connect', () => {
-      console.log('✅ Dashboard socket connected');
-      socket.emit('register', currentUser.userId);
-    });
-
-    socket.on('registered', ({ userId }) => {
-      console.log('✅ Registered as:', userId);
-    });
-
-    // Incoming call
-    socket.on('incoming-call', (data) => {
-      console.log('📞 Incoming call:', data);
-      setIncomingCall(data);
-      setCallState(CallState.RINGING);
-      
-      // Play ringtone
-      playRingtone();
-    });
-
-    // Call ringing (outgoing)
-    socket.on('call-ringing', ({ roomId, receiverId }) => {
-      console.log('🔔 Call ringing for:', receiverId);
-      setCallState(CallState.RINGING);
-    });
-
-    // Call accepted
-    socket.on('call-accepted', ({ roomId, acceptedBy }) => {
-      console.log('✅ Call accepted, navigating to room:', roomId);
-      stopRingtone();
-      clearCallTimeout();
-      setCallState(CallState.CONNECTING);
-      setOutgoingCall(null);
-      
-      // Navigate to call room with initiator flag
-      navigate(`/video-call/${roomId}`, { 
-        state: { isInitiator: true } 
-      });
-    });
-
-    // Call rejected
-    socket.on('call-rejected', ({ roomId, rejectedBy, reason }) => {
-      console.log('❌ Call rejected:', reason);
-      stopRingtone();
-      clearCallTimeout();
-      setCallState(CallState.REJECTED);
-      setOutgoingCall(null);
-      toast.error(`Call declined: ${reason}`);
-      
-      // Reset state after a moment
-      setTimeout(() => setCallState(CallState.IDLE), 2000);
-    });
-
-    // Call timeout
-    socket.on('call-timeout', ({ roomId, reason }) => {
-      console.log('⏱️ Call timeout:', reason);
-      stopRingtone();
-      setCallState(CallState.TIMEOUT);
-      setOutgoingCall(null);
-      toast.warning(`Call not answered`);
-      
-      setTimeout(() => setCallState(CallState.IDLE), 2000);
-    });
-
-    // Call failed
-    socket.on('call-failed', ({ reason, receiverId }) => {
-      console.log('❌ Call failed:', reason);
-      stopRingtone();
-      clearCallTimeout();
-      setCallState(CallState.FAILED);
-      setOutgoingCall(null);
-      toast.error(`Call failed: ${reason}`);
-      
-      setTimeout(() => setCallState(CallState.IDLE), 2000);
-    });
-
-    // Call cancelled by caller
-    socket.on('call-cancelled', ({ roomId, cancelledBy }) => {
-      console.log('🚫 Call cancelled');
-      stopRingtone();
-      setIncomingCall(null);
-      setCallState(CallState.IDLE);
-      toast.info('Call was cancelled');
-    });
-
-    // Call missed
-    socket.on('call-missed', ({ callerId, callerName, roomId }) => {
-      console.log('📵 Missed call from:', callerName);
-      stopRingtone();
-      setIncomingCall(null);
-      setCallState(CallState.IDLE);
-      toast.info(`Missed call from ${callerName}`);
-    });
-
-    // Session replaced (connected from another device)
-    socket.on('session-replaced', ({ message }) => {
-      toast.warning(message);
-      cleanup();
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.log('❌ Dashboard socket disconnected:', reason);
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-    });
-  };
-
-  const cleanup = () => {
-    stopRingtone();
-    clearCallTimeout();
+    const newSocket = io(SOCKET_URL);
     
-    if (socketRef.current) {
-      socketRef.current.disconnect();
-      socketRef.current = null;
-    }
-  };
-
-  const playRingtone = () => {
-    try {
-      // Try to play audio file first
-      if (!ringtoneRef.current) {
-        ringtoneRef.current = new Audio('/ringtone.mp3');
-        ringtoneRef.current.loop = true;
-      }
-      ringtoneRef.current.play().catch(e => {
-        console.warn('Could not play ringtone file, using Web Audio API:', e);
-        // Fallback: Use Web Audio API to create a simple ringtone
-        playWebAudioRingtone();
-      });
-    } catch (e) {
-      console.warn('Ringtone not available, using Web Audio API');
-      playWebAudioRingtone();
-    }
-  };
-
-  // Web Audio API fallback ringtone
-  const playWebAudioRingtone = () => {
-    try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      const audioContext = new AudioContext();
+    newSocket.emit('register', currentUser.userId);
+    
+    newSocket.on('incoming-call', (data) => {
+      console.log('Incoming call:', data);
+      setIncomingCall(data);
       
-      const playTone = () => {
-        if (!incomingCall) return; // Stop if call is no longer incoming
-        
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 440; // A4 note
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-        
-        // Play again after a pause
-        setTimeout(playTone, 1000);
-      };
+      // Play ringtone (optional)
+      const audio = new Audio('/ringtone.mp3');
+      audio.loop = true;
+      audio.play().catch(e => console.log('Audio play failed:', e));
       
-      playTone();
-    } catch (e) {
-      console.warn('Web Audio API not available');
-    }
-  };
+      // Store audio reference to stop later
+      newSocket.audioRef = audio;
+    });
 
-  const stopRingtone = () => {
-    if (ringtoneRef.current) {
-      ringtoneRef.current.pause();
-      ringtoneRef.current.currentTime = 0;
-    }
-  };
+    newSocket.on('call-accepted', ({ roomId }) => {
+      toast.success('Call accepted!');
+      navigate(`/video-call/${roomId}`);
+    });
 
-  const clearCallTimeout = () => {
-    if (callTimeoutRef.current) {
-      clearTimeout(callTimeoutRef.current);
-      callTimeoutRef.current = null;
-    }
+    newSocket.on('call-rejected', ({ reason }) => {
+      toast.error(`Call rejected: ${reason}`);
+    });
+
+    setSocket(newSocket);
   };
 
   const fetchCallHistory = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/video-calls/history/${currentUser.userId}`, {
+      const response = await axios.get(`http://localhost:5002/api/video-calls/history/${currentUser.userId}`, {
         params: { userType: currentUser.userType, limit: 20 }
       });
       if (response.data.success) {
@@ -320,25 +118,34 @@ const VideoCallDashboard = () => {
   };
 
   const fetchUpcomingCalls = async () => {
+    console.log('📅 Fetching upcoming calls for user:', currentUser.userId);
     try {
-      const response = await axios.get(`${API_URL}/api/video-calls/upcoming/${currentUser.userId}`);
+      const response = await axios.get(`http://localhost:5002/api/video-calls/upcoming/${currentUser.userId}`);
+      console.log('📋 Upcoming calls response:', response.data);
       if (response.data.success) {
         setUpcomingCalls(response.data.data);
+        console.log('✅ Set upcoming calls:', response.data.data);
+      } else {
+        console.warn('⚠️ No upcoming calls or unsuccessful response');
       }
     } catch (error) {
-      console.error('Error fetching upcoming calls:', error);
+      console.error('❌ Error fetching upcoming calls:', error);
+      console.error('Error details:', error.response?.data);
     }
   };
 
   const fetchAvailableUsers = async () => {
     try {
+      // Fetch mentors if student, students if mentor
       const endpoint = currentUser.userType === 'student' 
-        ? `${API_URL}/api/mentor/details` 
-        : `${API_URL}/api/mentor/${currentUser.userId}/mentees`;
+        ? 'http://localhost:5002/api/mentor/details' 
+        : `http://localhost:5002/api/mentor/${currentUser.userId}/mentees`;
       
       const response = await axios.get(endpoint);
       
+      // Format the response data
       if (currentUser.userType === 'student') {
+        // For students fetching mentors - response is array of mentor objects
         const formattedMentors = (response.data || []).map(mentor => ({
           id: mentor.mentorID || mentor._id,
           mentorID: mentor.mentorID,
@@ -347,141 +154,101 @@ const VideoCallDashboard = () => {
         }));
         setAvailableUsers(formattedMentors);
       } else {
+        // For mentors fetching students - response.data.mentees
         setAvailableUsers(response.data.mentees || response.data || []);
       }
     } catch (error) {
       console.error('Error fetching users:', error);
-      // Don't show error toast, just log it
+      toast.error('Failed to load available users');
     }
   };
 
+  useEffect(() => {
+    if (activeTab === 'start') {
+      fetchAvailableUsers();
+    } else if (activeTab === 'scheduled') {
+      fetchUpcomingCalls();
+    } else if (activeTab === 'history') {
+      fetchCallHistory();
+    }
+  }, [activeTab, currentUser.userType]);
+
   const startInstantCall = async (receiverId, receiverName) => {
+    console.log('🎥 startInstantCall called', { receiverId, receiverName });
+    console.log('👤 currentUser:', currentUser);
+    
     if (!receiverId || !receiverName) {
       toast.error('Please select a user to call');
       return;
     }
 
-    if (!socketRef.current?.connected) {
-      toast.error('Not connected. Please refresh the page.');
-      return;
-    }
-
     setLoading(true);
-    setCallState(CallState.CALLING);
-
+    
+    const callData = {
+      initiatorId: currentUser.userId,
+      initiatorType: currentUser.userType,
+      initiatorName: currentUser.userName,
+      receiverId,
+      receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
+      receiverName
+    };
+    
+    console.log('📤 Sending call data:', callData);
+    
     try {
-      // Create call record in database
-      const response = await axios.post(`${API_URL}/api/video-calls/initiate`, {
-        initiatorId: currentUser.userId,
-        initiatorType: currentUser.userType,
-        initiatorName: currentUser.userName,
-        receiverId,
-        receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
-        receiverName
-      });
+      const response = await axios.post('http://localhost:5002/api/video-calls/initiate', callData);
 
+      console.log('✅ Response received:', response.data);
+      
       if (response.data.success) {
         const { roomId } = response.data.data;
+        
+        console.log('🚪 Room ID:', roomId);
+        
+        // Notify the other user via socket
+        if (socket) {
+          socket.emit('call-user', {
+            callerId: currentUser.userId,
+            callerName: currentUser.userName,
+            receiverId,
+            receiverName,
+            roomId
+          });
+          console.log('📡 Socket notification sent');
+        } else {
+          console.warn('⚠️ Socket not connected');
+        }
 
-        setOutgoingCall({
-          roomId,
-          receiverId,
-          receiverName
-        });
-
-        // Send call request via socket
-        socketRef.current.emit('call-user', {
-          callerId: currentUser.userId,
-          callerName: currentUser.userName,
-          receiverId,
-          receiverName,
-          roomId
-        });
-
-        toast.info(`Calling ${receiverName}...`);
-
-        // Set local timeout as backup (server has 30s timeout)
-        callTimeoutRef.current = setTimeout(() => {
-          if (callState === CallState.CALLING || callState === CallState.RINGING) {
-            setCallState(CallState.TIMEOUT);
-            setOutgoingCall(null);
-            toast.warning('No answer');
-            setTimeout(() => setCallState(CallState.IDLE), 2000);
-          }
-        }, 35000);
-
+        toast.success('Calling...');
+        
+        // Navigate to call room after a brief delay
+        setTimeout(() => {
+          console.log('🎯 Navigating to:', `/video-call/${roomId}`);
+          navigate(`/video-call/${roomId}`);
+        }, 1000);
       } else {
-        setCallState(CallState.FAILED);
+        console.error('❌ Call initiation failed:', response.data);
         toast.error(response.data.message || 'Failed to start call');
-        setTimeout(() => setCallState(CallState.IDLE), 2000);
       }
     } catch (error) {
-      console.error('Error starting call:', error);
-      setCallState(CallState.FAILED);
+      console.error('❌ Error starting call:', error);
+      console.error('Error details:', error.response?.data);
       toast.error(error.response?.data?.message || 'Failed to start call');
-      setTimeout(() => setCallState(CallState.IDLE), 2000);
     } finally {
       setLoading(false);
     }
   };
 
-  const cancelOutgoingCall = () => {
-    if (outgoingCall && socketRef.current) {
-      socketRef.current.emit('cancel-call', {
-        roomId: outgoingCall.roomId,
-        receiverId: outgoingCall.receiverId
-      });
-    }
-    
-    stopRingtone();
-    clearCallTimeout();
-    setOutgoingCall(null);
-    setCallState(CallState.IDLE);
-    toast.info('Call cancelled');
-  };
-
-  const acceptCall = () => {
-    if (!incomingCall || !socketRef.current) return;
-
-    stopRingtone();
-
-    socketRef.current.emit('accept-call', {
-      roomId: incomingCall.roomId,
-      callerId: incomingCall.callerId
-    });
-
-    setIncomingCall(null);
-    setCallState(CallState.CONNECTING);
-
-    // Navigate to call room
-    navigate(`/video-call/${incomingCall.roomId}`, {
-      state: { isInitiator: false }
-    });
-  };
-
-  const rejectCall = (reason = 'Busy') => {
-    if (!incomingCall || !socketRef.current) return;
-
-    stopRingtone();
-
-    socketRef.current.emit('reject-call', {
-      roomId: incomingCall.roomId,
-      callerId: incomingCall.callerId,
-      reason
-    });
-
-    setIncomingCall(null);
-    setCallState(CallState.IDLE);
-    toast.info('Call declined');
-  };
-
   const scheduleCall = async () => {
+    console.log('📅 scheduleCall called', { selectedUser, scheduleDate, scheduleTime });
+    
     if (!selectedUser || !scheduleDate || !scheduleTime) {
       toast.error('Please fill all fields');
       return;
     }
 
     const scheduledDateTime = new Date(`${scheduleDate}T${scheduleTime}`);
+    console.log('⏰ Scheduled DateTime:', scheduledDateTime);
     
     if (scheduledDateTime <= new Date()) {
       toast.error('Please select a future date and time');
@@ -493,8 +260,10 @@ const VideoCallDashboard = () => {
       const user = availableUsers.find(u => 
         (u.mentorID || u.usn || u._id) === selectedUser
       );
+      
+      console.log('👤 Found user for scheduling:', user);
 
-      const response = await axios.post(`${API_URL}/api/video-calls/initiate`, {
+      const scheduleData = {
         initiatorId: currentUser.userId,
         initiatorType: currentUser.userType,
         initiatorName: currentUser.userName,
@@ -502,7 +271,13 @@ const VideoCallDashboard = () => {
         receiverType: currentUser.userType === 'student' ? 'mentor' : 'student',
         receiverName: user?.fullName || user?.name || 'User',
         scheduledTime: scheduledDateTime.toISOString()
-      });
+      };
+      
+      console.log('📤 Sending schedule data:', scheduleData);
+
+      const response = await axios.post('http://localhost:5002/api/video-calls/initiate', scheduleData);
+      
+      console.log('✅ Schedule response:', response.data);
 
       if (response.data.success) {
         toast.success('Call scheduled successfully!');
@@ -512,25 +287,62 @@ const VideoCallDashboard = () => {
         fetchUpcomingCalls();
         setActiveTab('scheduled');
       } else {
+        console.error('❌ Schedule failed:', response.data);
         toast.error(response.data.message || 'Failed to schedule call');
       }
     } catch (error) {
-      console.error('Error scheduling call:', error);
+      console.error('❌ Error scheduling call:', error);
+      console.error('Error details:', error.response?.data);
       toast.error(error.response?.data?.message || 'Failed to schedule call');
     } finally {
       setLoading(false);
     }
   };
 
+  const acceptCall = () => {
+    if (incomingCall && socket) {
+      // Stop ringtone
+      if (socket.audioRef) {
+        socket.audioRef.pause();
+        socket.audioRef = null;
+      }
+
+      socket.emit('accept-call', {
+        roomId: incomingCall.roomId,
+        callerId: incomingCall.callerId
+      });
+
+      navigate(`/video-call/${incomingCall.roomId}`);
+      setIncomingCall(null);
+    }
+  };
+
+  const rejectCall = () => {
+    if (incomingCall && socket) {
+      // Stop ringtone
+      if (socket.audioRef) {
+        socket.audioRef.pause();
+        socket.audioRef = null;
+      }
+
+      socket.emit('reject-call', {
+        roomId: incomingCall.roomId,
+        callerId: incomingCall.callerId,
+        reason: 'Busy'
+      });
+
+      setIncomingCall(null);
+      toast.info('Call rejected');
+    }
+  };
+
   const joinScheduledCall = (roomId) => {
-    navigate(`/video-call/${roomId}`, {
-      state: { isInitiator: false }
-    });
+    navigate(`/video-call/${roomId}`);
   };
 
   const cancelScheduledCall = async (roomId) => {
     try {
-      await axios.put(`${API_URL}/api/video-calls/${roomId}/cancel`, {
+      await axios.put(`http://localhost:5002/api/video-calls/${roomId}/cancel`, {
         cancelledBy: currentUser.userId,
         cancelReason: 'Cancelled by user'
       });
@@ -544,44 +356,23 @@ const VideoCallDashboard = () => {
   };
 
   const formatDuration = (seconds) => {
-    if (!seconds) return '0m';
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+    return `${mins}m ${secs}s`;
   };
 
   const formatDate = (date) => {
-    if (!date) return '';
     return new Date(date).toLocaleString();
-  };
-
-  const getCallStateText = () => {
-    switch (callState) {
-      case CallState.CALLING:
-        return 'Calling...';
-      case CallState.RINGING:
-        return 'Ringing...';
-      case CallState.CONNECTING:
-        return 'Connecting...';
-      case CallState.REJECTED:
-        return 'Call Declined';
-      case CallState.TIMEOUT:
-        return 'No Answer';
-      case CallState.FAILED:
-        return 'Call Failed';
-      default:
-        return '';
-    }
   };
 
   return (
     <div className="video-call-dashboard">
       {/* Incoming Call Modal */}
       {incomingCall && (
-        <div className="call-modal incoming">
-          <div className="modal-overlay" onClick={() => rejectCall('Busy')}></div>
+        <div className="incoming-call-modal">
+          <div className="modal-overlay" onClick={rejectCall}></div>
           <div className="modal-content">
-            <div className="call-avatar incoming-animation">
+            <div className="call-avatar">
               <Phone className="ringing-icon" />
             </div>
             <h2>{incomingCall.callerName}</h2>
@@ -592,30 +383,9 @@ const VideoCallDashboard = () => {
                 <CheckCircle />
                 <span>Accept</span>
               </button>
-              <button className="reject-btn" onClick={() => rejectCall('Busy')}>
+              <button className="reject-btn" onClick={rejectCall}>
                 <Cancel />
-                <span>Decline</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Outgoing Call Modal */}
-      {outgoingCall && (
-        <div className="call-modal outgoing">
-          <div className="modal-overlay" onClick={cancelOutgoingCall}></div>
-          <div className="modal-content">
-            <div className="call-avatar outgoing-animation">
-              <Phone className="calling-icon" />
-            </div>
-            <h2>{outgoingCall.receiverName}</h2>
-            <p>{getCallStateText()}</p>
-            
-            <div className="call-actions">
-              <button className="cancel-btn" onClick={cancelOutgoingCall}>
-                <Cancel />
-                <span>Cancel</span>
+                <span>Reject</span>
               </button>
             </div>
           </div>
@@ -664,7 +434,6 @@ const VideoCallDashboard = () => {
                   value={selectedUser}
                   onChange={(e) => setSelectedUser(e.target.value)}
                   className="user-select"
-                  disabled={callState !== CallState.IDLE}
                 >
                   <option value="">Select {currentUser.userType === 'student' ? 'mentor' : 'student'}</option>
                   {availableUsers.map((user) => {
@@ -681,23 +450,19 @@ const VideoCallDashboard = () => {
                 <button
                   className="instant-call-btn"
                   onClick={() => {
+                    console.log('🔘 Button clicked! selectedUser:', selectedUser);
+                    console.log('👥 availableUsers:', availableUsers);
                     const user = availableUsers.find(u => 
                       (u.mentorID || u.usn || u._id) === selectedUser
                     );
+                    console.log('👤 Found user:', user);
                     startInstantCall(selectedUser, user?.fullName || user?.name);
                   }}
-                  disabled={!selectedUser || loading || callState !== CallState.IDLE}
+                  disabled={!selectedUser || loading}
                 >
                   <VideoCallIcon />
-                  {loading ? 'Starting...' : 'Start Call Now'}
+                  {loading ? 'Calling...' : 'Start Call Now'}
                 </button>
-
-                {availableUsers.length === 0 && (
-                  <p className="no-users-hint">
-                    <PersonOff fontSize="small" />
-                    No {currentUser.userType === 'student' ? 'mentors' : 'students'} available
-                  </p>
-                )}
               </div>
 
               {/* Schedule Call */}
@@ -739,7 +504,10 @@ const VideoCallDashboard = () => {
 
                 <button
                   className="schedule-call-btn"
-                  onClick={scheduleCall}
+                  onClick={() => {
+                    console.log('🔘 Schedule button clicked!');
+                    scheduleCall();
+                  }}
                   disabled={!selectedUser || !scheduleDate || !scheduleTime || loading}
                 >
                   <Schedule />
@@ -753,13 +521,6 @@ const VideoCallDashboard = () => {
         {/* Scheduled Calls Tab */}
         {activeTab === 'scheduled' && (
           <div className="scheduled-calls-section">
-            <div className="section-header">
-              <h3>Upcoming Calls</h3>
-              <button className="refresh-btn" onClick={fetchUpcomingCalls}>
-                <Refresh /> Refresh
-              </button>
-            </div>
-            
             {upcomingCalls.length === 0 ? (
               <div className="empty-state">
                 <Schedule />
@@ -806,13 +567,6 @@ const VideoCallDashboard = () => {
         {/* History Tab */}
         {activeTab === 'history' && (
           <div className="history-section">
-            <div className="section-header">
-              <h3>Call History</h3>
-              <button className="refresh-btn" onClick={fetchCallHistory}>
-                <Refresh /> Refresh
-              </button>
-            </div>
-            
             {callHistory.length === 0 ? (
               <div className="empty-state">
                 <History />
@@ -833,7 +587,7 @@ const VideoCallDashboard = () => {
                     
                     <div className="call-metadata">
                       <p>📅 {formatDate(call.startTime || call.createdAt)}</p>
-                      {call.duration && call.duration > 0 && (
+                      {call.duration && (
                         <p>⏱️ Duration: {formatDuration(call.duration)}</p>
                       )}
                     </div>

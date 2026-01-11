@@ -636,6 +636,26 @@
 }
 
 /* Incoming Call Modal */
+.call-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.call-modal.incoming .call-avatar {
+  background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+}
+
+.call-modal.outgoing .call-avatar {
+  background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+}
+
 .incoming-call-modal {
   position: fixed;
   top: 0;
@@ -696,6 +716,104 @@
   font-size: 3rem;
   color: #fff;
   animation: ring 1s ease-in-out infinite;
+}
+
+.calling-icon {
+  font-size: 3rem;
+  color: #fff;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.incoming-animation {
+  animation: incomingPulse 1.5s ease-in-out infinite;
+}
+
+.outgoing-animation {
+  animation: outgoingPulse 2s ease-in-out infinite;
+}
+
+@keyframes incomingPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0 rgba(0, 200, 83, 0.7);
+  }
+  50% { 
+    transform: scale(1.1); 
+    box-shadow: 0 0 0 20px rgba(0, 200, 83, 0);
+  }
+}
+
+@keyframes outgoingPulse {
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 0 0 rgba(184, 134, 11, 0.7);
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 0 0 15px rgba(184, 134, 11, 0);
+  }
+}
+
+.cancel-btn {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #DC143C 0%, #FF0000 100%);
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(220, 20, 60, 0.5);
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h3 {
+  color: #B8860B;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid rgba(184, 134, 11, 0.5);
+  border-radius: 20px;
+  background: transparent;
+  color: #B8860B;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.refresh-btn:hover {
+  background: rgba(184, 134, 11, 0.1);
+  border-color: #B8860B;
+}
+
+.no-users-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  margin-top: 10px;
 }
 
 @keyframes ring {
