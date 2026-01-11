@@ -95,7 +95,13 @@ const SemesterPage = ({ userId, semester, onBack }) => {
 
   const handleCourseFieldChange = (courseIndex, field, value) => {
     const updatedCourses = [...semesterData.courses];
-    updatedCourses[courseIndex][field] = value;
+    
+    // Parse numeric fields to numbers, keep strings as strings
+    if (['attendancePercent', 'ia1', 'ia2', 'ia3', 'labMarks', 'otherMarks', 'externalMarks', 'credits'].includes(field)) {
+      updatedCourses[courseIndex][field] = parseFloat(value) || 0;
+    } else {
+      updatedCourses[courseIndex][field] = value;
+    }
 
     // Validate
     const errors = { ...validationErrors };
@@ -243,18 +249,42 @@ const SemesterPage = ({ userId, semester, onBack }) => {
       setSaving(true);
       setError(null);
 
+      // Ensure all numeric fields are properly formatted as numbers
+      const sanitizedData = {
+        ...semesterData,
+        courses: semesterData.courses.map(course => ({
+          ...course,
+          slNo: parseInt(course.slNo) || 0,
+          attendancePercent: parseFloat(course.attendancePercent) || 0,
+          ia1: parseFloat(course.ia1) || 0,
+          ia2: parseFloat(course.ia2) || 0,
+          ia3: parseFloat(course.ia3) || 0,
+          labMarks: parseFloat(course.labMarks) || 0,
+          otherMarks: parseFloat(course.otherMarks) || 0,
+          totalInternal: parseFloat(course.totalInternal) || 0,
+          externalMarks: parseFloat(course.externalMarks) || 0,
+          total: parseFloat(course.total) || 0,
+          gradePoints: parseFloat(course.gradePoints) || 0,
+          credits: parseFloat(course.credits) || 0
+        }))
+      };
+
+      console.log('💾 Saving semester data:', JSON.stringify(sanitizedData, null, 2));
+
       const response = await axios.post(
         `http://localhost:5002/api/students/${userId}/academics/${semester}`,
-        semesterData
+        sanitizedData
       );
 
       if (response.data.success) {
+        console.log('✅ Save successful:', response.data);
         setSemesterData(response.data.data);
         setEditingCourse(null);
         // Show success message
         alert('Semester data saved successfully!');
       }
     } catch (err) {
+      console.error('❌ Save error:', err);
       setError(err.response?.data?.message || 'Failed to save semester data');
     } finally {
       setSaving(false);
@@ -376,7 +406,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                   <TableCell>
                     <TextField
                       size="small"
-                      value={course.courseCode}
+                      value={course.courseCode || ''}
                       onChange={(e) => handleCourseFieldChange(index, 'courseCode', e.target.value)}
                       variant="standard"
                       sx={{ width: 80 }}
@@ -385,7 +415,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                   <TableCell>
                     <TextField
                       size="small"
-                      value={course.courseName}
+                      value={course.courseName || ''}
                       onChange={(e) => handleCourseFieldChange(index, 'courseName', e.target.value)}
                       variant="standard"
                       fullWidth
@@ -395,7 +425,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.attendancePercent}
+                      value={course.attendancePercent || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'attendancePercent', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-attendancePercent`]}
@@ -407,7 +437,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.ia1}
+                      value={course.ia1 || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'ia1', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-ia1`]}
@@ -419,7 +449,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.ia2}
+                      value={course.ia2 || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'ia2', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-ia2`]}
@@ -431,7 +461,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.ia3}
+                      value={course.ia3 || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'ia3', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-ia3`]}
@@ -443,7 +473,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.labMarks}
+                      value={course.labMarks || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'labMarks', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-labMarks`]}
@@ -455,7 +485,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.otherMarks}
+                      value={course.otherMarks || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'otherMarks', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-otherMarks`]}
@@ -470,7 +500,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.externalMarks}
+                      value={course.externalMarks || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'externalMarks', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-externalMarks`]}
@@ -493,7 +523,7 @@ const SemesterPage = ({ userId, semester, onBack }) => {
                     <TextField
                       size="small"
                       type="number"
-                      value={course.credits}
+                      value={course.credits || 0}
                       onChange={(e) => handleCourseFieldChange(index, 'credits', e.target.value)}
                       variant="standard"
                       error={!!validationErrors[`${index}-credits`]}
